@@ -1,4 +1,5 @@
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap');
+/* index.css - Sophisticated Solar Pro */
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=JetBrains+Mono:wght@500;700&display=swap');
 @import "tailwindcss";
 
 @theme {
@@ -6,64 +7,28 @@
   --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
 }
 
-@layer base {
-  :root {
-    --bg-primary: #f8f9fa;
-    --bg-secondary: #eef1f4;
-    --text-primary: #1a1c1e;
-    --text-secondary: rgba(26, 28, 30, 0.6);
-    --accent: #0052CC;
-    --border: rgba(0, 0, 0, 0.08);
-    --card-bg: #ffffff;
-    --shadow: 0 4px 20px rgba(0, 0, 0, 0.03), 0 1px 3px rgba(0, 0, 0, 0.02);
-    --btn-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-    --btn-shadow-active: 0 1px 2px rgba(0, 0, 0, 0.05);
-  }
-
-  [data-theme='plant'] {
-    --bg-primary: #0f1419;
-    --bg-secondary: #161b22;
-    --text-primary: #f0f6fc;
-    --text-secondary: rgba(240, 246, 252, 0.6);
-    --accent: #00ff88;
-    --border: rgba(255, 255, 255, 0.08);
-    --card-bg: #1c2128;
-    --shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
-    --btn-shadow: 0 4px 12px rgba(0, 255, 136, 0.1);
-    --btn-shadow-active: 0 2px 4px rgba(0, 255, 136, 0.1);
-  }
-
-  body {
-    background-color: var(--bg-primary);
-    color: var(--text-primary);
-    transition: background-color 0.3s ease, color 0.3s ease;
-    overflow: hidden;
-    height: 100vh;
-    width: 100vw;
-    @apply antialiased selection:bg-blue-100 selection:text-[#0052CC];
-  }
-
-  .mono {
-    font-family: var(--font-mono);
-  }
-
-  .industrial-btn {
-    box-shadow: var(--btn-shadow);
-    transition: all 0.2s cubic-bezier(0.2, 0, 0, 1);
-  }
-
-  .industrial-btn:active {
-    transform: scale(0.98);
-    box-shadow: var(--btn-shadow-active);
-  }
+:root {
+  --bg: #FDFDFD;
+  --card: #FFFFFF;
+  --text: #000000;
+  --accent: #2563EB;
+  --border: #E5E7EB;
 }
 
-@layer utilities {
-  .no-scrollbar::-webkit-scrollbar {
-    display: none;
-  }
-  .no-scrollbar {
-    -ms-overflow-style: none;
-    scrollbar-width: none;
-  }
+body {
+  background-color: var(--bg);
+  color: var(--text);
+  @apply antialiased overflow-hidden h-screen w-screen;
+}
+
+.premium-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 28px;
+  box-shadow: 0 4px 6px -1px rgba(0,0,0,0.02), 0 2px 4px -2px rgba(0,0,0,0.02);
+  @apply p-8 transition-all active:scale-[0.99] hover:shadow-xl hover:border-black/10;
+}
+
+.industrial-input {
+  @apply h-16 px-6 bg-zinc-50 border border-zinc-200 rounded-2xl font-bold text-xl focus:ring-4 focus:ring-blue-50 focus:border-blue-600 outline-none transition-all;
 }

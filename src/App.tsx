@@ -2468,8 +2468,8 @@ const LotManagementView = ({
 // --- Main Application ---
 
 export default function App() {
-  const [currentModule, setCurrentModule] = useState<'home' | 'campo' | 'planta'>('home');
-  const [activeTab, setActiveTab] = useState<'inventario' | 'operaciones' | 'calidad' | 'maestros'>('inventario');
+  const [universe, setUniverse] = useState<'home' | 'campo' | 'planta'>('home');
+  const [tab, setTab] = useState<'inventario' | 'operaciones' | 'calidad' | 'maestros'>('inventario');
   
   const [contacts, setContacts] = useState<Contact[]>(() => {
     const saved = localStorage.getItem('dusa_contacts');
@@ -2714,41 +2714,29 @@ export default function App() {
       <div className="bg-white border-b border-black/5 px-10 py-6 flex justify-between items-center sticky top-0 z-40">
         <div className="flex items-center gap-12">
           <button 
-            onClick={() => setCurrentModule('home')}
+            onClick={() => setUniverse('home')}
             className="flex items-center gap-2 text-[#0052CC] font-black tracking-tighter text-2xl hover:scale-105 transition-transform"
           >
             <Leaf fill="currentColor" />
             <span>TERRASYNC</span>
           </button>
           
-          {currentModule !== 'home' && (
+          {universe !== 'home' && (
             <nav className="flex bg-black/5 p-1.5 rounded-2xl">
-              {currentModule === 'maestros' && (
+              {universe === 'campo' && (
                 <>
-                  <button onClick={() => setActiveTab('crops')} className={`px-6 py-2.5 rounded-xl font-bold text-sm transition-all ${activeTab === 'crops' ? 'bg-white shadow-md text-[#0052CC]' : 'text-black/30'}`}>Rubros</button>
-                  <button onClick={() => setActiveTab('contacts')} className={`px-6 py-2.5 rounded-xl font-bold text-sm transition-all ${activeTab === 'contacts' ? 'bg-white shadow-md text-[#0052CC]' : 'text-black/30'}`}>Contactos</button>
+                  <button onClick={() => setTab('inventario')} className={`px-6 py-2.5 rounded-xl font-bold text-sm transition-all ${tab === 'inventario' ? 'bg-white shadow-md text-[#0052CC]' : 'text-black/30'}`}>Inventario</button>
+                  <button onClick={() => setTab('operaciones')} className={`px-6 py-2.5 rounded-xl font-bold text-sm transition-all ${tab === 'operaciones' ? 'bg-white shadow-md text-[#0052CC]' : 'text-black/30'}`}>Operaciones</button>
+                  <button onClick={() => setTab('calidad')} className={`px-6 py-2.5 rounded-xl font-bold text-sm transition-all ${tab === 'calidad' ? 'bg-white shadow-md text-[#0052CC]' : 'text-black/30'}`}>Calidad</button>
+                  <button onClick={() => setTab('maestros')} className={`px-6 py-2.5 rounded-xl font-bold text-sm transition-all ${tab === 'maestros' ? 'bg-white shadow-md text-[#0052CC]' : 'text-black/30'}`}>Maestros</button>
                 </>
               )}
-              {currentModule === 'campo' && (
+              {universe === 'planta' && (
                 <>
-                  <button onClick={() => setActiveTab('inventario')} className={`px-6 py-2.5 rounded-xl font-bold text-sm transition-all ${activeTab === 'inventario' ? 'bg-white shadow-md text-[#0052CC]' : 'text-black/30'}`}>Inventario</button>
-                  <button onClick={() => setActiveTab('operaciones')} className={`px-6 py-2.5 rounded-xl font-bold text-sm transition-all ${activeTab === 'operaciones' ? 'bg-white shadow-md text-[#0052CC]' : 'text-black/30'}`}>Operaciones</button>
-                  <button onClick={() => setActiveTab('calidad')} className={`px-6 py-2.5 rounded-xl font-bold text-sm transition-all ${activeTab === 'calidad' ? 'bg-white shadow-md text-[#0052CC]' : 'text-black/30'}`}>Calidad</button>
-                  <button onClick={() => setActiveTab('maestros')} className={`px-6 py-2.5 rounded-xl font-bold text-sm transition-all ${activeTab === 'maestros' ? 'bg-white shadow-md text-[#0052CC]' : 'text-black/30'}`}>Maestros</button>
-                </>
-              )}
-              {currentModule === 'planta' && (
-                <>
-                  <button onClick={() => setActiveTab('inventario')} className={`px-6 py-2.5 rounded-xl font-bold text-sm transition-all ${activeTab === 'inventario' ? 'bg-white shadow-md text-[#0052CC]' : 'text-black/30'}`}>Inventario</button>
-                  <button onClick={() => setActiveTab('operaciones')} className={`px-6 py-2.5 rounded-xl font-bold text-sm transition-all ${activeTab === 'operaciones' ? 'bg-white shadow-md text-[#0052CC]' : 'text-black/30'}`}>Operaciones</button>
-                  <button onClick={() => setActiveTab('calidad')} className={`px-6 py-2.5 rounded-xl font-bold text-sm transition-all ${activeTab === 'calidad' ? 'bg-white shadow-md text-[#0052CC]' : 'text-black/30'}`}>Calidad</button>
-                  <button onClick={() => setActiveTab('maestros')} className={`px-6 py-2.5 rounded-xl font-bold text-sm transition-all ${activeTab === 'maestros' ? 'bg-white shadow-md text-[#0052CC]' : 'text-black/30'}`}>Maestros</button>
-                </>
-              )}
-              {currentModule === 'calidad' && (
-                <>
-                  <button onClick={() => setActiveTab('analisis')} className={`px-6 py-2.5 rounded-xl font-bold text-sm transition-all ${activeTab === 'analisis' ? 'bg-white shadow-md text-[#0052CC]' : 'text-black/30'}`}>Calidad</button>
-                  <button onClick={() => setActiveTab('cuarentena')} className={`px-6 py-2.5 rounded-xl font-bold text-sm transition-all ${activeTab === 'cuarentena' ? 'bg-white shadow-md text-[#0052CC]' : 'text-black/30'}`}>Cuarentena</button>
+                  <button onClick={() => setTab('inventario')} className={`px-6 py-2.5 rounded-xl font-bold text-sm transition-all ${tab === 'inventario' ? 'bg-white shadow-md text-[#0052CC]' : 'text-black/30'}`}>Inventario</button>
+                  <button onClick={() => setTab('operaciones')} className={`px-6 py-2.5 rounded-xl font-bold text-sm transition-all ${tab === 'operaciones' ? 'bg-white shadow-md text-[#0052CC]' : 'text-black/30'}`}>Operaciones</button>
+                  <button onClick={() => setTab('calidad')} className={`px-6 py-2.5 rounded-xl font-bold text-sm transition-all ${tab === 'calidad' ? 'bg-white shadow-md text-[#0052CC]' : 'text-black/30'}`}>Calidad</button>
+                  <button onClick={() => setTab('maestros')} className={`px-6 py-2.5 rounded-xl font-bold text-sm transition-all ${tab === 'maestros' ? 'bg-white shadow-md text-[#0052CC]' : 'text-black/30'}`}>Maestros</button>
                 </>
               )}
             </nav>
@@ -2777,19 +2765,19 @@ export default function App() {
       <div className="p-6 md:p-10 flex-1 bg-[#F8F9FA]">
         <main className="max-w-7xl mx-auto w-full">
           <AnimatePresence mode="wait">
-            {currentModule === 'home' && (
+            {universe === 'home' && (
               <HomeDashboardView 
                 key="home" 
                 onNavigate={(mod) => {
-                  setCurrentModule(mod as any);
-                  if (mod === 'maestros') setActiveTab('crops');
-                  if (mod === 'campo') setActiveTab('fincas');
-                  if (mod === 'planta') setActiveTab('recepcion');
-                  if (mod === 'calidad') setActiveTab('analisis');
+                  setUniverse(mod as any);
+                  if (mod === 'maestros') setTab('inventario');
+                  if (mod === 'campo') setTab('inventario');
+                  if (mod === 'planta') setTab('inventario');
+                  if (mod === 'calidad') setTab('calidad');
                 }} 
               />
             )}
-            {currentModule === 'maestros' && activeTab === 'crops' && (
+            {universe === 'campo' && tab === 'maestros' && (
               <CropMasterView 
                 key="crops"
                 crops={crops} 
@@ -2798,7 +2786,7 @@ export default function App() {
                 onUpdateCrop={handleUpdateCrop} 
               />
             )}
-            {currentModule === 'maestros' && activeTab === 'contacts' && (
+            {universe === 'campo' && tab === 'maestros' && (
               <ContactManagementView 
                 key="contacts"
                 contacts={contacts}
@@ -2806,7 +2794,7 @@ export default function App() {
                 onDeleteContact={handleDeleteContact}
               />
             )}
-            {currentModule === 'maestros' && activeTab === 'chemicals' && (
+            {universe === 'campo' && tab === 'maestros' && (
               <ChemicalManagementView 
                 key="chemicals"
                 chemicals={chemicals}
@@ -2814,7 +2802,7 @@ export default function App() {
                 onDeleteChemical={handleDeleteChemical}
               />
             )}
-            {currentModule === 'campo' && activeTab === 'fincas' && (
+            {universe === 'campo' && tab === 'maestros' && (
               <FarmManagementView 
                 key="fincas" 
                 farms={farms} 
@@ -2823,7 +2811,7 @@ export default function App() {
                 onDeleteFarm={handleDeleteFarm} 
               />
             )}
-            {currentModule === 'campo' && activeTab === 'lots' && (
+            {universe === 'campo' && tab === 'operaciones' && (
               <LotManagementView 
                 key="lots"
                 lots={lots} 
@@ -2834,7 +2822,7 @@ export default function App() {
                 onAddAnalysis={handleAddAnalysis}
               />
             )}
-            {currentModule === 'campo' && activeTab === 'cura' && (
+            {universe === 'campo' && tab === 'calidad' && (
               <CureManagementView 
                 key="cura"
                 receptions={receptions}
@@ -2844,7 +2832,7 @@ export default function App() {
                 onAddCureRecord={handleAddCureRecord}
               />
             )}
-            {currentModule === 'campo' && activeTab === 'siembra' && (
+            {universe === 'campo' && tab === 'operaciones' && (
               <SowingManagementView 
                 key="siembra"
                 lots={lots}
@@ -2852,7 +2840,7 @@ export default function App() {
                 onAddSowingRecord={handleAddSowingRecord}
               />
             )}
-            {currentModule === 'campo' && activeTab === 'inventario' && (
+            {universe === 'campo' && tab === 'inventario' && (
               <MaterialReceptionView 
                 key="recepcion"
                 receptions={receptions}
@@ -2862,7 +2850,7 @@ export default function App() {
                 onAddReception={handleAddReception}
               />
             )}
-            {currentModule === 'planta' && activeTab === 'inventario' && (
+            {universe === 'planta' && tab === 'inventario' && (
               <TruckReceptionView 
                 silos={silos}
                 dispatches={dispatches}
@@ -2870,14 +2858,14 @@ export default function App() {
                 onUpdateDispatch={handleUpdateDispatch}
               />
             )}
-            {currentModule === 'planta' && activeTab === 'operaciones' && (
+            {universe === 'planta' && tab === 'operaciones' && (
               <ProductionProcessView 
                 silos={silos}
                 onUpdateSilo={handleUpdateSilo}
                 onAddBarrel={handleAddBarrel}
               />
             )}
-            {currentModule === 'planta' && activeTab === 'calidad' && (
+            {universe === 'planta' && tab === 'calidad' && (
               <QualityManagementView 
                 key="cuarentena"
                 barrels={barrels}

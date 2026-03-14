@@ -80,83 +80,79 @@ const SiloMonitorView = ({ silos, crops }: { silos: Silo[], crops: Crop[] }) => 
   );
 };
 
-const TruckReceptionView = ({ silos, onUpdateSilo }: { silos: Silo[], onUpdateSilo: (silo: Silo) => void }) => {
+const TruckReceptionView = ({ silos, dispatches, onUpdateSilo, onUpdateDispatch }: { silos: Silo[], dispatches: DispatchRecord[], onUpdateSilo: (silo: Silo) => void, onUpdateDispatch: (id: string, updates: Partial<DispatchRecord>) => void }) => {
+  const [selectedDispatchId, setSelectedDispatchId] = useState<string>('');
   const [selectedSiloId, setSelectedSiloId] = useState<string>('');
-  const [weight, setWeight] = useState<number>(0);
-  const [brix, setBrix] = useState<number>(0);
-  const [acidity, setAcidity] = useState<number>(0);
+  
+  const pendingDispatches = dispatches.filter(d => d.status === 'PENDIENTE');
+  const selectedDispatch = pendingDispatches.find(d => d.id === selectedDispatchId);
 
   const handleAssign = () => {
+    if (!selectedDispatch || !selectedSiloId) return;
     const silo = silos.find(s => s.id === selectedSiloId);
-    if (!silo || weight === 0) return;
-
-    const newTotalWeight = silo.currentLevel + weight;
-    const newBrix = ((silo.brixAverage * silo.currentLevel) + (brix * weight)) / newTotalWeight;
-    const newAcidity = ((silo.acidityAverage * silo.currentLevel) + (acidity * weight)) / newTotalWeight;
+    if (!silo) return;
 
     onUpdateSilo({
       ...silo,
-      currentLevel: newTotalWeight,
-      brixAverage: newBrix,
-      acidityAverage: newAcidity,
+      currentLevel: silo.currentLevel + selectedDispatch.quantity,
       status: 'MEZCLANDO'
     });
-    setWeight(0);
+    onUpdateDispatch(selectedDispatch.id, { status: 'RECIBIDO' });
+    setSelectedDispatchId('');
   };
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 font-sans">
       <div className="bg-white p-10 rounded-[28px] shadow-sm border border-black/5 flex flex-col gap-8">
-        <h3 className="text-3xl font-bold tracking-tight">Recepción Industrial</h3>
-        
+        <h3 className="text-3xl font-bold tracking-tight">Despachos Pendientes</h3>
         <div className="flex flex-col gap-4">
-          <span className="text-xs font-bold text-black/40 uppercase tracking-widest">Peso Bruto (Kg)</span>
-          <div className="grid grid-cols-2 gap-4">
-            {[12000, 20000, 30000, 45000].map(w => (
-              <motion.button
-                key={w}
-                whileTap={{ scale: 0.95 }}
-                onClick={() => setWeight(w)}
-                className={`h-[60px] rounded-2xl font-black text-lg transition-all ${weight === w ? 'bg-[#0052CC] text-white' : 'bg-black/5 text-black'}`}
-              >
-                {w.toLocaleString()} Kg
-              </motion.button>
-            ))}
-          </div>
-        </div>
-
-        <div className="grid grid-cols-2 gap-4">
-          <div className="flex flex-col gap-2">
-            <span className="text-xs font-bold text-black/40 uppercase tracking-widest">Brix</span>
-            <input type="number" value={brix} onChange={e => setBrix(Number(e.target.value))} className="h-[60px] px-6 bg-black/5 rounded-2xl font-bold" />
-          </div>
-          <div className="flex flex-col gap-2">
-            <span className="text-xs font-bold text-black/40 uppercase tracking-widest">Acidez</span>
-            <input type="number" value={acidity} onChange={e => setAcidity(Number(e.target.value))} className="h-[60px] px-6 bg-black/5 rounded-2xl font-bold" />
-          </div>
+          {pendingDispatches.map(d => (
+            <button key={d.id} onClick={() => setSelectedDispatchId(d.id)} className={`p-6 rounded-2xl text-left border-2 transition-all ${selectedDispatchId === d.id ? 'border-[#0052CC] bg-blue-50' : 'border-black/5'}`}>
+              <p className="font-bold">{d.providerName || 'Despacho Interno'}</p>
+              <p className="text-sm text-black/40">{d.quantity} Kg</p>
+            </button>
+          ))}
         </div>
       </div>
-
       <div className="bg-white p-10 rounded-[28px] shadow-sm border border-black/5 flex flex-col gap-8">
         <h3 className="text-3xl font-bold tracking-tight">Asignar a Silo</h3>
-        <select 
-          value={selectedSiloId} 
-          onChange={e => setSelectedSiloId(e.target.value)}
-          className="h-[60px] px-6 bg-black/5 rounded-[20px] font-bold appearance-none"
-        >
+        <select value={selectedSiloId} onChange={e => setSelectedSiloId(e.target.value)} className="h-[60px] px-6 bg-black/5 rounded-[20px] font-bold appearance-none">
           <option value="">Seleccione un silo...</option>
-          {silos.map(s => <option key={s.id} value={s.id}>{s.code} - {s.currentLevel} / {s.capacity} Kg</option>)}
+          {silos.map(s => <option key={s.id} value={s.id}>{s.code} - {s.currentLevel} Kg</option>)}
         </select>
-        
-        <motion.button
-          whileTap={{ scale: 0.95 }}
-          onClick={handleAssign}
-          disabled={!selectedSiloId || weight === 0}
-          className="h-[80px] bg-black text-white rounded-[28px] font-black text-xl shadow-xl disabled:opacity-30"
-        >
-          Asignar Carga
-        </motion.button>
+        <button onClick={handleAssign} disabled={!selectedSiloId || !selectedDispatchId} className="h-[80px] bg-black text-white rounded-[28px] font-black text-xl shadow-xl disabled:opacity-30">Asignar Carga</button>
       </div>
+    </div>
+  );
+};
+
+const ProductionProcessView = ({ silos, onUpdateSilo, onAddBarrel }: { silos: Silo[], onUpdateSilo: (silo: Silo) => void, onAddBarrel: (b: Barrel) => void }) => {
+  const [selectedSiloId, setSelectedSiloId] = useState<string>('');
+  const [liters, setLiters] = useState<number>(0);
+  const [efficiency, setEfficiency] = useState<number>(0);
+
+  const handleProcess = () => {
+    const silo = silos.find(s => s.id === selectedSiloId);
+    if (!silo || liters === 0) return;
+    
+    const weightProcessed = (liters / 1000) * 1000; // Simplified logic
+    const eff = silo.currentLevel / liters;
+    setEfficiency(eff);
+
+    onUpdateSilo({...silo, currentLevel: silo.currentLevel - weightProcessed, status: 'VACIANDO'});
+    onAddBarrel({ id: `barrel-${Date.now()}`, code: `B-${Date.now()}`, cropId: silo.cropId, status: 'EN ESPERA', analysisValues: {}, date: new Date().toISOString() });
+  };
+
+  return (
+    <div className="bg-white p-10 rounded-[28px] shadow-sm border border-black/5 flex flex-col gap-8">
+      <h3 className="text-3xl font-bold tracking-tight">Evaporador</h3>
+      <select value={selectedSiloId} onChange={e => setSelectedSiloId(e.target.value)} className="h-[60px] px-6 bg-black/5 rounded-[20px] font-bold">
+        <option value="">Seleccione Silo Activo...</option>
+        {silos.filter(s => s.currentLevel > 0).map(s => <option key={s.id} value={s.id}>{s.code} ({s.currentLevel} Kg)</option>)}
+      </select>
+      <input type="number" placeholder="Litros de Caudal" value={liters} onChange={e => setLiters(Number(e.target.value))} className="h-[60px] px-6 bg-black/5 rounded-2xl font-bold" />
+      <button onClick={handleProcess} className="h-[80px] bg-[#0052CC] text-white rounded-[28px] font-black text-xl shadow-xl">PROCESAR Y LLENAR</button>
+      {efficiency > 0 && <p className="text-center font-black text-2xl">Eficiencia: {efficiency.toFixed(2)} Kg/L</p>}
     </div>
   );
 };
@@ -1663,9 +1659,13 @@ const QualityManagementView = ({
 
   const handleStatusChange = (status: BarrelStatus) => {
     if (selectedBarrel) {
+      const hoursPassed = (Date.now() - new Date(selectedBarrel.date).getTime()) / (1000 * 60 * 60);
+      if (status === 'LIBERADO' && hoursPassed < 72) return;
       onUpdateBarrel({ ...selectedBarrel, status });
     }
   };
+
+  const isIncubating = (date: string) => (Date.now() - new Date(date).getTime()) / (1000 * 60 * 60) < 72;
 
   const handleValueChange = (paramId: string, value: any) => {
     if (selectedBarrel) {
@@ -2502,6 +2502,14 @@ export default function App() {
   const [silos, setSilos] = useState<Silo[]>([]);
   const [theme, setTheme] = useState<'solar' | 'plant'>('solar');
 
+  const handleUpdateDispatch = (id: string, updates: Partial<DispatchRecord>) => {
+    setDispatches(prev => prev.map(d => d.id === id ? { ...d, ...updates } : d));
+  };
+
+  const handleAddBarrel = (barrel: Barrel) => {
+    setBarrels(prev => [...prev, barrel]);
+  };
+
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme);
   }, [theme]);
@@ -2736,6 +2744,7 @@ export default function App() {
                   <button onClick={() => setActiveTab('recepcion')} className={`px-6 py-2.5 rounded-xl font-bold text-sm transition-all ${activeTab === 'recepcion' ? 'bg-white shadow-md text-[#0052CC]' : 'text-black/30'}`}>Recepción</button>
                   <button onClick={() => setActiveTab('silos')} className={`px-6 py-2.5 rounded-xl font-bold text-sm transition-all ${activeTab === 'silos' ? 'bg-white shadow-md text-[#0052CC]' : 'text-black/30'}`}>Silos</button>
                   <button onClick={() => setActiveTab('truck')} className={`px-6 py-2.5 rounded-xl font-bold text-sm transition-all ${activeTab === 'truck' ? 'bg-white shadow-md text-[#0052CC]' : 'text-black/30'}`}>Romanero</button>
+                  <button onClick={() => setActiveTab('produccion')} className={`px-6 py-2.5 rounded-xl font-bold text-sm transition-all ${activeTab === 'produccion' ? 'bg-white shadow-md text-[#0052CC]' : 'text-black/30'}`}>Producción</button>
                   <button onClick={() => setActiveTab('despacho')} className={`px-6 py-2.5 rounded-xl font-bold text-sm transition-all ${activeTab === 'despacho' ? 'bg-white shadow-md text-[#0052CC]' : 'text-black/30'}`}>Despacho</button>
                 </>
               )}
@@ -2865,7 +2874,16 @@ export default function App() {
             {currentModule === 'planta' && activeTab === 'truck' && (
               <TruckReceptionView 
                 silos={silos}
+                dispatches={dispatches}
                 onUpdateSilo={handleUpdateSilo}
+                onUpdateDispatch={handleUpdateDispatch}
+              />
+            )}
+            {currentModule === 'planta' && activeTab === 'produccion' && (
+              <ProductionProcessView 
+                silos={silos}
+                onUpdateSilo={handleUpdateSilo}
+                onAddBarrel={handleAddBarrel}
               />
             )}
             {currentModule === 'planta' && activeTab === 'despacho' && (

@@ -11,12 +11,13 @@ import {
   Droplets, Sprout, Truck, Box, Sun, Moon, FlaskConical, ClipboardCheck
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
+import { SiembraControlView } from './components/SiembraControlView';
 import { 
   Crop, INITIAL_CROPS, DynamicParameter, Lot, INITIAL_LOTS, 
   SoilType, LotStatus, Farm, INITIAL_FARMS, UnitSystem, 
   UNITS_MASTER, ParameterType, ParameterCategory, LotAnalysis,
   QualityCategory, MaterialReception, Contact, INITIAL_CONTACTS,
-  Chemical, INITIAL_CHEMICALS, CureRecord, SowingRecord, Barrel, DispatchRecord, BarrelStatus
+  Chemical, INITIAL_CHEMICALS, CureRecord, SowingRecord, Barrel, DispatchRecord, BarrelStatus, SowingProject
 } from './types';
 
 // --- Reusable Components ---
@@ -2161,6 +2162,17 @@ export default function App() {
     const saved = localStorage.getItem('dusa_receptions');
     return saved ? JSON.parse(saved) : [];
   });
+  const [sowingProjects, setSowingProjects] = useState<SowingProject[]>([]);
+
+  const handleAddProject = (projectData: Omit<SowingProject, 'id' | 'activityLogs'>) => {
+    const newProject: SowingProject = {
+      id: `project-${Date.now()}`,
+      ...projectData,
+      activityLogs: []
+    };
+    setSowingProjects(prev => [...prev, newProject]);
+  };
+
   const [chemicals] = useState<Chemical[]>(INITIAL_CHEMICALS);
   const [barrels, setBarrels] = useState<Barrel[]>([]);
   const [dispatches, setDispatches] = useState<DispatchRecord[]>([]);
@@ -2378,6 +2390,7 @@ export default function App() {
                   <button onClick={() => setActiveTab('lots')} className={`px-6 py-2.5 rounded-xl font-bold text-sm transition-all ${activeTab === 'lots' ? 'bg-white shadow-md text-[#0052CC]' : 'text-black/30'}`}>Lotes</button>
                   <button onClick={() => setActiveTab('cura')} className={`px-6 py-2.5 rounded-xl font-bold text-sm transition-all ${activeTab === 'cura' ? 'bg-white shadow-md text-[#0052CC]' : 'text-black/30'}`}>Cura</button>
                   <button onClick={() => setActiveTab('siembra')} className={`px-6 py-2.5 rounded-xl font-bold text-sm transition-all ${activeTab === 'siembra' ? 'bg-white shadow-md text-[#0052CC]' : 'text-black/30'}`}>Siembra</button>
+                  <button onClick={() => setActiveTab('control-siembra')} className={`px-6 py-2.5 rounded-xl font-bold text-sm transition-all ${activeTab === 'control-siembra' ? 'bg-white shadow-md text-[#0052CC]' : 'text-black/30'}`}>Control Siembra</button>
                 </>
               )}
               {currentModule === 'planta' && (
@@ -2484,6 +2497,14 @@ export default function App() {
                 contacts={contacts}
                 onAddSowingRecord={handleAddSowingRecord}
                 onGenerateDispatch={handleGenerateDispatch}
+              />
+            )}
+            {currentModule === 'campo' && activeTab === 'control-siembra' && (
+              <SiembraControlView 
+                key="control-siembra"
+                sowingProjects={sowingProjects}
+                lots={lots}
+                onAddProject={handleAddProject}
               />
             )}
             {currentModule === 'planta' && activeTab === 'recepcion' && (

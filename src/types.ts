@@ -90,6 +90,19 @@ export interface Barrel {
   date: string;
 }
 
+export type SiloStatus = 'VACÍO' | 'MEZCLANDO' | 'VACIANDO';
+
+export interface Silo {
+  id: string;
+  code: string;
+  capacity: number;
+  currentLevel: number;
+  cropId: string;
+  status: SiloStatus;
+  brixAverage: number;
+  acidityAverage: number;
+}
+
 export interface LotAnalysis {
   id: string;
   lotId: string;

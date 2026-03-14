@@ -16,10 +16,150 @@ import {
   SoilType, LotStatus, Farm, INITIAL_FARMS, UnitSystem, 
   UNITS_MASTER, ParameterType, ParameterCategory, LotAnalysis,
   QualityCategory, MaterialReception, Contact, INITIAL_CONTACTS,
-  Chemical, INITIAL_CHEMICALS, CureRecord, SowingRecord, Barrel, DispatchRecord, BarrelStatus
+  Chemical, INITIAL_CHEMICALS, CureRecord, SowingRecord, Barrel, DispatchRecord, BarrelStatus, Silo, SiloStatus
 } from './types';
 
-// --- Reusable Components ---
+// --- Helpers ---
+
+const getUnit = (farm: Farm | undefined, type: 'weight' | 'area') => {
+  if (!farm) return type === 'weight' ? 'Kg' : 'Ha';
+  if (farm.unitSystem === 'IMPERIAL') return type === 'weight' ? 'Lb' : 'Ac';
+  return type === 'weight' ? 'Kg' : 'Ha';
+};
+
+const SiloMonitorView = ({ silos, crops }: { silos: Silo[], crops: Crop[] }) => {
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 font-sans">
+      {silos.map(silo => {
+        const crop = crops.find(c => c.id === silo.cropId);
+        const levelPercent = (silo.currentLevel / silo.capacity) * 100;
+        return (
+          <motion.div 
+            key={silo.id}
+            whileHover={{ scale: 1.02 }}
+            className="bg-white p-8 rounded-[28px] shadow-sm border border-black/5 flex flex-col gap-6"
+          >
+            <div className="flex justify-between items-start">
+              <div>
+                <h3 className="text-2xl font-bold tracking-tight">{silo.code}</h3>
+                <p className="text-black/40 font-bold uppercase text-xs tracking-widest mt-1">{crop?.name || 'Vacío'}</p>
+              </div>
+              <div className={`px-4 py-1 rounded-full text-[10px] font-black uppercase ${silo.status === 'VACÍO' ? 'bg-black/5 text-black/40' : 'bg-emerald-100 text-emerald-700'}`}>
+                {silo.status}
+              </div>
+            </div>
+
+            <div className="flex items-end gap-6 h-40">
+              <div className="relative w-20 h-full bg-black/5 rounded-2xl overflow-hidden">
+                <motion.div 
+                  initial={{ height: 0 }}
+                  animate={{ height: `${levelPercent}%` }}
+                  className="absolute bottom-0 w-full bg-blue-500/80 transition-all duration-1000"
+                />
+              </div>
+              <div className="flex flex-col gap-2">
+                <div className="text-4xl font-black tracking-tighter">{levelPercent.toFixed(0)}%</div>
+                <div className="text-black/40 font-bold text-sm">{silo.currentLevel} / {silo.capacity} Kg</div>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4 pt-4 border-t border-black/5">
+              <div>
+                <p className="text-[10px] font-bold text-black/40 uppercase">Brix Promedio</p>
+                <p className="text-xl font-black">{silo.brixAverage.toFixed(1)} °Bx</p>
+              </div>
+              <div>
+                <p className="text-[10px] font-bold text-black/40 uppercase">Acidez Promedio</p>
+                <p className="text-xl font-black">{silo.acidityAverage.toFixed(2)} %</p>
+              </div>
+            </div>
+          </motion.div>
+        );
+      })}
+    </div>
+  );
+};
+
+const TruckReceptionView = ({ silos, onUpdateSilo }: { silos: Silo[], onUpdateSilo: (silo: Silo) => void }) => {
+  const [selectedSiloId, setSelectedSiloId] = useState<string>('');
+  const [weight, setWeight] = useState<number>(0);
+  const [brix, setBrix] = useState<number>(0);
+  const [acidity, setAcidity] = useState<number>(0);
+
+  const handleAssign = () => {
+    const silo = silos.find(s => s.id === selectedSiloId);
+    if (!silo || weight === 0) return;
+
+    const newTotalWeight = silo.currentLevel + weight;
+    const newBrix = ((silo.brixAverage * silo.currentLevel) + (brix * weight)) / newTotalWeight;
+    const newAcidity = ((silo.acidityAverage * silo.currentLevel) + (acidity * weight)) / newTotalWeight;
+
+    onUpdateSilo({
+      ...silo,
+      currentLevel: newTotalWeight,
+      brixAverage: newBrix,
+      acidityAverage: newAcidity,
+      status: 'MEZCLANDO'
+    });
+    setWeight(0);
+  };
+
+  return (
+    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 font-sans">
+      <div className="bg-white p-10 rounded-[28px] shadow-sm border border-black/5 flex flex-col gap-8">
+        <h3 className="text-3xl font-bold tracking-tight">Recepción Industrial</h3>
+        
+        <div className="flex flex-col gap-4">
+          <span className="text-xs font-bold text-black/40 uppercase tracking-widest">Peso Bruto (Kg)</span>
+          <div className="grid grid-cols-2 gap-4">
+            {[12000, 20000, 30000, 45000].map(w => (
+              <motion.button
+                key={w}
+                whileTap={{ scale: 0.95 }}
+                onClick={() => setWeight(w)}
+                className={`h-[60px] rounded-2xl font-black text-lg transition-all ${weight === w ? 'bg-[#0052CC] text-white' : 'bg-black/5 text-black'}`}
+              >
+                {w.toLocaleString()} Kg
+              </motion.button>
+            ))}
+          </div>
+        </div>
+
+        <div className="grid grid-cols-2 gap-4">
+          <div className="flex flex-col gap-2">
+            <span className="text-xs font-bold text-black/40 uppercase tracking-widest">Brix</span>
+            <input type="number" value={brix} onChange={e => setBrix(Number(e.target.value))} className="h-[60px] px-6 bg-black/5 rounded-2xl font-bold" />
+          </div>
+          <div className="flex flex-col gap-2">
+            <span className="text-xs font-bold text-black/40 uppercase tracking-widest">Acidez</span>
+            <input type="number" value={acidity} onChange={e => setAcidity(Number(e.target.value))} className="h-[60px] px-6 bg-black/5 rounded-2xl font-bold" />
+          </div>
+        </div>
+      </div>
+
+      <div className="bg-white p-10 rounded-[28px] shadow-sm border border-black/5 flex flex-col gap-8">
+        <h3 className="text-3xl font-bold tracking-tight">Asignar a Silo</h3>
+        <select 
+          value={selectedSiloId} 
+          onChange={e => setSelectedSiloId(e.target.value)}
+          className="h-[60px] px-6 bg-black/5 rounded-[20px] font-bold appearance-none"
+        >
+          <option value="">Seleccione un silo...</option>
+          {silos.map(s => <option key={s.id} value={s.id}>{s.code} - {s.currentLevel} / {s.capacity} Kg</option>)}
+        </select>
+        
+        <motion.button
+          whileTap={{ scale: 0.95 }}
+          onClick={handleAssign}
+          disabled={!selectedSiloId || weight === 0}
+          className="h-[80px] bg-black text-white rounded-[28px] font-black text-xl shadow-xl disabled:opacity-30"
+        >
+          Asignar Carga
+        </motion.button>
+      </div>
+    </div>
+  );
+};
 
 const HomeDashboardView = ({ onNavigate }: { onNavigate: (tab: string) => void, key?: React.Key }) => {
   const modules = [
@@ -2359,6 +2499,7 @@ export default function App() {
   });
   const [barrels, setBarrels] = useState<Barrel[]>([]);
   const [dispatches, setDispatches] = useState<DispatchRecord[]>([]);
+  const [silos, setSilos] = useState<Silo[]>([]);
   const [theme, setTheme] = useState<'solar' | 'plant'>('solar');
 
   useEffect(() => {
@@ -2549,6 +2690,10 @@ export default function App() {
     setBarrels(prev => prev.map(b => b.id === updatedBarrel.id ? updatedBarrel : b));
   };
 
+  const handleUpdateSilo = (updatedSilo: Silo) => {
+    setSilos(prev => prev.map(s => s.id === updatedSilo.id ? updatedSilo : s));
+  };
+
   const handleSave = () => {
     setIsSaving(true);
     setTimeout(() => {
@@ -2589,6 +2734,8 @@ export default function App() {
               {currentModule === 'planta' && (
                 <>
                   <button onClick={() => setActiveTab('recepcion')} className={`px-6 py-2.5 rounded-xl font-bold text-sm transition-all ${activeTab === 'recepcion' ? 'bg-white shadow-md text-[#0052CC]' : 'text-black/30'}`}>Recepción</button>
+                  <button onClick={() => setActiveTab('silos')} className={`px-6 py-2.5 rounded-xl font-bold text-sm transition-all ${activeTab === 'silos' ? 'bg-white shadow-md text-[#0052CC]' : 'text-black/30'}`}>Silos</button>
+                  <button onClick={() => setActiveTab('truck')} className={`px-6 py-2.5 rounded-xl font-bold text-sm transition-all ${activeTab === 'truck' ? 'bg-white shadow-md text-[#0052CC]' : 'text-black/30'}`}>Romanero</button>
                   <button onClick={() => setActiveTab('despacho')} className={`px-6 py-2.5 rounded-xl font-bold text-sm transition-all ${activeTab === 'despacho' ? 'bg-white shadow-md text-[#0052CC]' : 'text-black/30'}`}>Despacho</button>
                 </>
               )}
@@ -2709,6 +2856,18 @@ export default function App() {
                 onAddReception={handleAddReception}
               />
             )}
+            {currentModule === 'planta' && activeTab === 'silos' && (
+              <SiloMonitorView 
+                silos={silos}
+                crops={crops}
+              />
+            )}
+            {currentModule === 'planta' && activeTab === 'truck' && (
+              <TruckReceptionView 
+                silos={silos}
+                onUpdateSilo={handleUpdateSilo}
+              />
+            )}
             {currentModule === 'planta' && activeTab === 'despacho' && (
               <DispatchManagementView 
                 key="despacho"
@@ -2742,20 +2901,6 @@ export default function App() {
           </AnimatePresence>
         </main>
       </div>
-
-      <footer className="bg-white border-t border-black/5 p-10">
-        <div className="max-w-7xl mx-auto w-full flex justify-between items-center text-black/20 text-[10px] font-black uppercase tracking-[0.2em]">
-          <div className="flex items-center gap-6">
-            <span>TERRASYNC v2.0.0</span>
-            <span className="w-1.5 h-1.5 bg-black/5 rounded-full" />
-            <span>Arquitectura Modular Activa</span>
-          </div>
-          <div className="flex items-center gap-3">
-            <Activity size={14} />
-            Optimizado para Operaciones de Campo
-          </div>
-        </div>
-      </footer>
     </div>
   );
 }

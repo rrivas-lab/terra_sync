@@ -16,151 +16,17 @@ import {
   SoilType, LotStatus, Farm, INITIAL_FARMS, UnitSystem, 
   UNITS_MASTER, ParameterType, ParameterCategory, LotAnalysis,
   QualityCategory, MaterialReception, Contact, INITIAL_CONTACTS,
-  Chemical, INITIAL_CHEMICALS, CureRecord, SowingRecord, Barrel, DispatchRecord, BarrelStatus, Silo, SiloStatus
+  Chemical, INITIAL_CHEMICALS, CureRecord, SowingRecord, Barrel, DispatchRecord, BarrelStatus
 } from './types';
 
-// --- Helpers ---
-
-const getUnit = (farm: Farm | undefined, type: 'weight' | 'area') => {
-  if (!farm) return type === 'weight' ? 'Kg' : 'Ha';
-  if (farm.unitSystem === 'IMPERIAL') return type === 'weight' ? 'Lb' : 'Ac';
-  return type === 'weight' ? 'Kg' : 'Ha';
-};
-
-const SiloMonitorView = ({ silos, crops }: { silos: Silo[], crops: Crop[] }) => {
-  return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 font-sans">
-      {silos.map(silo => {
-        const crop = crops.find(c => c.id === silo.cropId);
-        const levelPercent = (silo.currentLevel / silo.capacity) * 100;
-        return (
-          <motion.div 
-            key={silo.id}
-            whileHover={{ scale: 1.02 }}
-            className="bg-white p-8 rounded-[28px] shadow-sm border border-black/5 flex flex-col gap-6"
-          >
-            <div className="flex justify-between items-start">
-              <div>
-                <h3 className="text-2xl font-bold tracking-tight">{silo.code}</h3>
-                <p className="text-black/40 font-bold uppercase text-xs tracking-widest mt-1">{crop?.name || 'Vacío'}</p>
-              </div>
-              <div className={`px-4 py-1 rounded-full text-[10px] font-black uppercase ${silo.status === 'VACÍO' ? 'bg-black/5 text-black/40' : 'bg-emerald-100 text-emerald-700'}`}>
-                {silo.status}
-              </div>
-            </div>
-
-            <div className="flex items-end gap-6 h-40">
-              <div className="relative w-20 h-full bg-black/5 rounded-2xl overflow-hidden">
-                <motion.div 
-                  initial={{ height: 0 }}
-                  animate={{ height: `${levelPercent}%` }}
-                  className="absolute bottom-0 w-full bg-blue-500/80 transition-all duration-1000"
-                />
-              </div>
-              <div className="flex flex-col gap-2">
-                <div className="text-4xl font-black tracking-tighter">{levelPercent.toFixed(0)}%</div>
-                <div className="text-black/40 font-bold text-sm">{silo.currentLevel} / {silo.capacity} Kg</div>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-4 pt-4 border-t border-black/5">
-              <div>
-                <p className="text-[10px] font-bold text-black/40 uppercase">Brix Promedio</p>
-                <p className="text-xl font-black">{silo.brixAverage.toFixed(1)} °Bx</p>
-              </div>
-              <div>
-                <p className="text-[10px] font-bold text-black/40 uppercase">Acidez Promedio</p>
-                <p className="text-xl font-black">{silo.acidityAverage.toFixed(2)} %</p>
-              </div>
-            </div>
-          </motion.div>
-        );
-      })}
-    </div>
-  );
-};
-
-const TruckReceptionView = ({ silos, dispatches, onUpdateSilo, onUpdateDispatch }: { silos: Silo[], dispatches: DispatchRecord[], onUpdateSilo: (silo: Silo) => void, onUpdateDispatch: (id: string, updates: Partial<DispatchRecord>) => void }) => {
-  const [selectedDispatchId, setSelectedDispatchId] = useState<string>('');
-  const [selectedSiloId, setSelectedSiloId] = useState<string>('');
-  
-  const pendingDispatches = dispatches.filter(d => d.status === 'PENDIENTE');
-  const selectedDispatch = pendingDispatches.find(d => d.id === selectedDispatchId);
-
-  const handleAssign = () => {
-    if (!selectedDispatch || !selectedSiloId) return;
-    const silo = silos.find(s => s.id === selectedSiloId);
-    if (!silo) return;
-
-    onUpdateSilo({
-      ...silo,
-      currentLevel: silo.currentLevel + selectedDispatch.quantity,
-      status: 'MEZCLANDO'
-    });
-    onUpdateDispatch(selectedDispatch.id, { status: 'RECIBIDO' });
-    setSelectedDispatchId('');
-  };
-
-  return (
-    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 font-sans">
-      <div className="bg-white p-10 rounded-[28px] shadow-sm border border-black/5 flex flex-col gap-8">
-        <h3 className="text-3xl font-bold tracking-tight">Despachos Pendientes</h3>
-        <div className="flex flex-col gap-4">
-          {pendingDispatches.map(d => (
-            <button key={d.id} onClick={() => setSelectedDispatchId(d.id)} className={`p-6 rounded-2xl text-left border-2 transition-all ${selectedDispatchId === d.id ? 'border-[#0052CC] bg-blue-50' : 'border-black/5'}`}>
-              <p className="font-bold">{d.providerName || 'Despacho Interno'}</p>
-              <p className="text-sm text-black/40">{d.quantity} Kg</p>
-            </button>
-          ))}
-        </div>
-      </div>
-      <div className="bg-white p-10 rounded-[28px] shadow-sm border border-black/5 flex flex-col gap-8">
-        <h3 className="text-3xl font-bold tracking-tight">Asignar a Silo</h3>
-        <select value={selectedSiloId} onChange={e => setSelectedSiloId(e.target.value)} className="h-[60px] px-6 bg-black/5 rounded-[20px] font-bold appearance-none">
-          <option value="">Seleccione un silo...</option>
-          {silos.map(s => <option key={s.id} value={s.id}>{s.code} - {s.currentLevel} Kg</option>)}
-        </select>
-        <button onClick={handleAssign} disabled={!selectedSiloId || !selectedDispatchId} className="h-[80px] bg-black text-white rounded-[28px] font-black text-xl shadow-xl disabled:opacity-30">Asignar Carga</button>
-      </div>
-    </div>
-  );
-};
-
-const ProductionProcessView = ({ silos, onUpdateSilo, onAddBarrel }: { silos: Silo[], onUpdateSilo: (silo: Silo) => void, onAddBarrel: (b: Barrel) => void }) => {
-  const [selectedSiloId, setSelectedSiloId] = useState<string>('');
-  const [liters, setLiters] = useState<number>(0);
-  const [efficiency, setEfficiency] = useState<number>(0);
-
-  const handleProcess = () => {
-    const silo = silos.find(s => s.id === selectedSiloId);
-    if (!silo || liters === 0) return;
-    
-    const weightProcessed = (liters / 1000) * 1000; // Simplified logic
-    const eff = silo.currentLevel / liters;
-    setEfficiency(eff);
-
-    onUpdateSilo({...silo, currentLevel: silo.currentLevel - weightProcessed, status: 'VACIANDO'});
-    onAddBarrel({ id: `barrel-${Date.now()}`, code: `B-${Date.now()}`, cropId: silo.cropId, status: 'EN ESPERA', analysisValues: {}, date: new Date().toISOString() });
-  };
-
-  return (
-    <div className="bg-white p-10 rounded-[28px] shadow-sm border border-black/5 flex flex-col gap-8">
-      <h3 className="text-3xl font-bold tracking-tight">Evaporador</h3>
-      <select value={selectedSiloId} onChange={e => setSelectedSiloId(e.target.value)} className="h-[60px] px-6 bg-black/5 rounded-[20px] font-bold">
-        <option value="">Seleccione Silo Activo...</option>
-        {silos.filter(s => s.currentLevel > 0).map(s => <option key={s.id} value={s.id}>{s.code} ({s.currentLevel} Kg)</option>)}
-      </select>
-      <input type="number" placeholder="Litros de Caudal" value={liters} onChange={e => setLiters(Number(e.target.value))} className="h-[60px] px-6 bg-black/5 rounded-2xl font-bold" />
-      <button onClick={handleProcess} className="h-[80px] bg-[#0052CC] text-white rounded-[28px] font-black text-xl shadow-xl">PROCESAR Y LLENAR</button>
-      {efficiency > 0 && <p className="text-center font-black text-2xl">Eficiencia: {efficiency.toFixed(2)} Kg/L</p>}
-    </div>
-  );
-};
+// --- Reusable Components ---
 
 const HomeDashboardView = ({ onNavigate }: { onNavigate: (tab: string) => void, key?: React.Key }) => {
   const modules = [
-    { id: 'campo', label: 'OPERACIONES DE CAMPO', icon: Map, color: 'bg-emerald-700', description: 'Cura, Siembra y Lotes' },
-    { id: 'planta', label: 'PROCESAMIENTO EN PLANTA', icon: Factory, color: 'bg-slate-600', description: 'Recepción y Despacho' },
+    { id: 'maestros', label: 'MAESTROS', icon: Briefcase, color: 'bg-blue-600', description: 'Configuración base y contactos' },
+    { id: 'campo', label: 'CAMPO', icon: Map, color: 'bg-emerald-700', description: 'Cura, Siembra y Lotes' },
+    { id: 'planta', label: 'PLANTA', icon: Factory, color: 'bg-slate-600', description: 'Recepción y Despacho' },
+    { id: 'calidad', label: 'CALIDAD', icon: ShieldCheck, color: 'bg-amber-500', description: 'Microbiología y Barriles' },
   ];
 
   return (
@@ -302,106 +168,8 @@ const ContactManagementView = ({
   );
 };
 
-const ChemicalManagementView = ({ 
-  chemicals, 
-  onAddChemical, 
-  onDeleteChemical 
-}: { 
-  chemicals: Chemical[], 
-  onAddChemical: (c: Partial<Chemical>) => void, 
-  onDeleteChemical: (id: string) => void,
-  key?: React.Key
-}) => {
-  const [isAdding, setIsAdding] = useState(false);
-  const [newChemical, setNewChemical] = useState<Partial<Chemical>>({
-    name: '',
-    type: 'Fungicida',
-    unit: 'ml/Kg'
-  });
-
-  return (
-    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex flex-col gap-8">
-      <div className="flex justify-between items-center">
-        <h2 className="text-3xl font-bold tracking-tight">Maestro de Insumos</h2>
-        <button 
-          onClick={() => setIsAdding(true)}
-          className="flex items-center gap-2 px-8 py-4 bg-black text-white rounded-[28px] font-bold shadow-xl hover:scale-105 transition-transform h-[60px]"
-        >
-          <Plus size={20} /> Nuevo Insumo
-        </button>
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-        {chemicals.map(chemical => (
-          <BentoCard key={chemical.id} title={chemical.name} icon={FlaskConical}>
-            <div className="flex flex-col gap-4">
-              <div className="flex items-center gap-3">
-                <div className="px-3 py-1 bg-emerald-50 text-emerald-700 text-[10px] font-black uppercase rounded-full">
-                  {chemical.type}
-                </div>
-              </div>
-              <div className="flex items-center gap-3 text-black/60">
-                <span className="font-bold text-sm uppercase tracking-widest">Unidad: {chemical.unit}</span>
-              </div>
-              <div className="pt-4 border-t border-[var(--border)] flex justify-end">
-                <button 
-                  onClick={() => onDeleteChemical(chemical.id)}
-                  className="p-2 text-black/10 hover:text-red-500 transition-colors h-[60px] w-[60px] flex items-center justify-center"
-                >
-                  <Trash2 size={24} />
-                </button>
-              </div>
-            </div>
-          </BentoCard>
-        ))}
-      </div>
-
-      <AnimatePresence>
-        {isAdding && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-6">
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setIsAdding(false)} className="absolute inset-0 bg-black/40 backdrop-blur-sm" />
-            <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.9, opacity: 0 }} className="relative bg-white w-full max-w-xl rounded-[28px] shadow-2xl p-10 flex flex-col gap-8">
-              <h3 className="text-3xl font-bold tracking-tight">Registrar Insumo</h3>
-              <div className="flex flex-col gap-6">
-                <div className="flex flex-col gap-2">
-                  <span className="text-xs font-bold text-black/40 uppercase tracking-widest">Nombre del Insumo</span>
-                  <input type="text" value={newChemical.name} onChange={e => setNewChemical(prev => ({ ...prev, name: e.target.value }))} className="h-[60px] px-6 bg-black/5 rounded-[20px] font-bold" />
-                </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="flex flex-col gap-2">
-                    <span className="text-xs font-bold text-black/40 uppercase tracking-widest">Tipo</span>
-                    <select 
-                      value={newChemical.type} 
-                      onChange={e => setNewChemical(prev => ({ ...prev, type: e.target.value as any }))}
-                      className="h-[60px] px-6 bg-black/5 rounded-[20px] font-bold appearance-none"
-                    >
-                      <option value="Fungicida">Fungicida</option>
-                      <option value="Insecticida">Insecticida</option>
-                      <option value="Fertilizante">Fertilizante</option>
-                    </select>
-                  </div>
-                  <div className="flex flex-col gap-2">
-                    <span className="text-xs font-bold text-black/40 uppercase tracking-widest">Unidad</span>
-                    <input type="text" value={newChemical.unit} onChange={e => setNewChemical(prev => ({ ...prev, unit: e.target.value }))} className="h-[60px] px-6 bg-black/5 rounded-[20px] font-bold" placeholder="Ej: ml/Kg" />
-                  </div>
-                </div>
-                <button 
-                  onClick={() => { onAddChemical(newChemical); setIsAdding(false); }}
-                  className="h-[60px] bg-black text-white font-bold rounded-[20px] shadow-xl mt-4"
-                >
-                  Guardar Insumo
-                </button>
-              </div>
-            </motion.div>
-          </div>
-        )}
-      </AnimatePresence>
-    </motion.div>
-  );
-};
-
 const BentoCard = ({ children, title, icon: Icon, className = "", noPadding = false }: { children: React.ReactNode, title: string, icon: any, className?: string, noPadding?: boolean, key?: React.Key }) => (
-  <div className={`bg-white border border-[var(--border)] rounded-[28px] shadow-[var(--shadow)] hover:shadow-md transition-shadow flex flex-col ${noPadding ? '' : 'p-8'} gap-6 ${className}`}>
+  <div className={`bg-white border border-black/10 rounded-[2rem] shadow-sm hover:shadow-md transition-shadow flex flex-col ${noPadding ? '' : 'p-8'} gap-6 ${className}`}>
     <div className={`flex items-center gap-3 ${noPadding ? 'p-8 pb-0' : ''}`}>
       <div className="p-3 bg-blue-50 rounded-2xl text-[#0052CC]">
         <Icon size={24} />
@@ -1428,213 +1196,70 @@ const MaterialReceptionView = ({
 const DispatchManagementView = ({ 
   dispatches, 
   lots, 
-  farms,
-  onAddDispatch
+  farms 
 }: { 
   dispatches: DispatchRecord[], 
   lots: Lot[], 
   farms: Farm[],
-  onAddDispatch: (dispatch: DispatchRecord) => void,
   key?: React.Key
 }) => {
-  const [type, setType] = useState<'INTERNO' | 'EXTERNO'>('INTERNO');
-  const [selectedLotId, setSelectedLotId] = useState<string>('');
-  const [quantity, setQuantity] = useState<number>(1000);
-  const [providerName, setProviderName] = useState<string>('');
-
-  const selectedLot = lots.find(l => l.id === selectedLotId);
-
-  // Consider lots that have been sown as ready for dispatch (in a real app, this might be 'COSECHADO')
-  const readyLots = lots.filter(l => l.status === 'SEMBRADO');
-
-  const handleSave = () => {
-    if (!selectedLotId) {
-      alert("Seleccione un lote.");
-      return;
-    }
-    if (type === 'EXTERNO' && !providerName) {
-      alert("Ingrese el destino/cliente para el despacho externo.");
-      return;
-    }
-
-    const dispatch: DispatchRecord = {
-      id: `disp-${Date.now()}`,
-      lotId: selectedLotId,
-      date: new Date().toISOString(),
-      quantity,
-      status: 'PENDIENTE',
-      type,
-      originFarmId: selectedLot?.farmId,
-      providerName: type === 'EXTERNO' ? providerName : undefined
-    };
-
-    onAddDispatch(dispatch);
-    setSelectedLotId('');
-    setQuantity(1000);
-    setProviderName('');
-  };
-
   return (
-    <div className="flex flex-col gap-8 h-full">
+    <div className="flex flex-col gap-8">
       <div className="flex justify-between items-center">
         <div>
-          <h2 className="text-4xl font-black tracking-tighter uppercase">Despachos</h2>
+          <h2 className="text-4xl font-black tracking-tighter uppercase">Despachos a Planta</h2>
           <p className="text-black/40 font-mono text-sm">LOGÍSTICA Y TRAZABILIDAD DE SALIDA</p>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 flex-1">
-        <div className="lg:col-span-5 flex flex-col gap-6">
-          <BentoCard title="Generar Despacho" icon={Truck}>
-            <div className="flex flex-col gap-6">
-              <div className="flex flex-col gap-2">
-                <span className="text-xs font-bold text-black/40 uppercase tracking-widest">Tipo de Despacho</span>
-                <div className="flex gap-4">
-                  <button
-                    onClick={() => setType('INTERNO')}
-                    className={`flex-1 h-[60px] rounded-[20px] font-bold border-[1px] transition-all ${
-                      type === 'INTERNO' ? 'bg-black text-white border-black' : 'bg-black/5 text-black/40 border-transparent'
-                    }`}
-                  >
-                    INTERNO (A Planta)
-                  </button>
-                  <button
-                    onClick={() => setType('EXTERNO')}
-                    className={`flex-1 h-[60px] rounded-[20px] font-bold border-[1px] transition-all ${
-                      type === 'EXTERNO' ? 'bg-[#0052CC] text-white border-[#0052CC]' : 'bg-black/5 text-black/40 border-transparent'
-                    }`}
-                  >
-                    EXTERNO (Venta)
-                  </button>
-                </div>
-              </div>
-
-              <div className="flex flex-col gap-2">
-                <span className="text-xs font-bold text-black/40 uppercase tracking-widest">Lote de Origen</span>
-                <select 
-                  value={selectedLotId} 
-                  onChange={e => setSelectedLotId(e.target.value)}
-                  className="h-[60px] px-6 bg-black/5 rounded-[20px] font-bold appearance-none"
-                >
-                  <option value="">Seleccione un lote...</option>
-                  {readyLots.map(l => {
-                    const farm = farms.find(f => f.id === l.farmId);
-                    return (
-                      <option key={l.id} value={l.id}>
-                        {l.lotCode} - {farm?.name}
-                      </option>
-                    );
-                  })}
-                </select>
-                {readyLots.length === 0 && (
-                  <span className="text-xs text-amber-600 font-bold mt-1">No hay lotes listos para despacho.</span>
-                )}
-              </div>
-
-              {type === 'EXTERNO' && (
-                <div className="flex flex-col gap-2">
-                  <span className="text-xs font-bold text-black/40 uppercase tracking-widest">Destino / Cliente</span>
-                  <input 
-                    type="text" 
-                    value={providerName}
-                    onChange={e => setProviderName(e.target.value)}
-                    placeholder="Nombre del cliente o destino"
-                    className="h-[60px] px-6 bg-black/5 rounded-[20px] font-bold"
-                  />
-                </div>
-              )}
-
-              <div className="p-6 bg-black/5 rounded-[28px]">
-                <Stepper 
-                  label="Cantidad (Kg)"
-                  value={quantity}
-                  onChange={setQuantity}
-                  min={100}
-                  max={100000}
-                  step={100}
-                />
-              </div>
-
-              <div className="p-6 bg-white rounded-[20px] border border-black/5 flex flex-col gap-2">
-                <span className="text-[10px] font-black text-black/30 uppercase tracking-widest">Resumen de Trazabilidad</span>
-                <div className="flex justify-between items-center">
-                  <span className="font-bold text-sm">Lote:</span>
-                  <span className="font-mono text-sm">{selectedLot?.lotCode || '---'}</span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="font-bold text-sm">Finca:</span>
-                  <span className="text-sm">{farms.find(f => f.id === selectedLot?.farmId)?.name || '---'}</span>
-                </div>
-              </div>
-
-              <button 
-                onClick={handleSave}
-                disabled={!selectedLotId || (type === 'EXTERNO' && !providerName)}
-                className={`h-[60px] font-black rounded-[20px] shadow-xl transition-all mt-auto ${
-                  selectedLotId && (type === 'INTERNO' || providerName)
-                    ? 'bg-[#0052CC] text-white hover:scale-[1.02]' 
-                    : 'bg-black/10 text-black/30 cursor-not-allowed'
-                }`}
-              >
-                REGISTRAR DESPACHO
-              </button>
-            </div>
-          </BentoCard>
-        </div>
-
-        <div className="lg:col-span-7 flex flex-col gap-6">
-          <BentoCard title="Historial de Despachos" icon={ClipboardCheck}>
-            <div className="flex flex-col gap-4">
-              {dispatches.length === 0 ? (
-                <div className="flex flex-col items-center justify-center py-20 bg-black/5 rounded-[28px] text-black/20">
-                  <Truck size={64} strokeWidth={1} className="mb-4" />
-                  <p className="font-bold">No hay despachos registrados.</p>
-                </div>
-              ) : (
-                dispatches.map(dispatch => {
-                  const lot = lots.find(l => l.id === dispatch.lotId);
-                  const farm = farms.find(f => f.id === dispatch.originFarmId);
-                  return (
-                    <div key={dispatch.id} className="bg-white p-6 rounded-[28px] border-[1px] flex flex-col md:flex-row justify-between items-start md:items-center gap-4 industrial-btn">
-                      <div className="flex items-center gap-6">
-                        <div className={`p-4 rounded-2xl text-white ${dispatch.type === 'INTERNO' ? 'bg-black' : 'bg-[#0052CC]'}`}>
-                          <Truck size={24} />
-                        </div>
-                        <div>
-                          <div className="flex items-center gap-2 mb-1">
-                            <span className="font-mono font-black text-xl">{dispatch.id.split('-')[1]}</span>
-                            <span className={`px-2 py-0.5 rounded text-[8px] font-black tracking-widest ${dispatch.type === 'INTERNO' ? 'bg-black/10 text-black' : 'bg-[#0052CC]/10 text-[#0052CC]'}`}>
-                              {dispatch.type}
-                            </span>
-                          </div>
-                          <p className="text-xs font-bold text-black/40 uppercase tracking-widest">
-                            {dispatch.type === 'EXTERNO' ? dispatch.providerName : farm?.name} • Lote {lot?.lotCode || 'N/A'}
-                          </p>
-                        </div>
-                      </div>
-
-                      <div className="flex gap-8 items-center w-full md:w-auto justify-between md:justify-end">
-                        <div className="text-right">
-                          <span className="text-[10px] font-black text-black/30 uppercase tracking-widest block">Cantidad</span>
-                          <span className="text-xl font-black">{dispatch.quantity} Kg</span>
-                        </div>
-                        <div className="text-right">
-                          <span className="text-[10px] font-black text-black/30 uppercase tracking-widest block">Fecha</span>
-                          <span className="text-sm font-bold">{new Date(dispatch.date).toLocaleDateString()}</span>
-                        </div>
-                        <div className={`px-4 py-2 rounded-xl text-[10px] font-black border ${
-                          dispatch.status === 'RECIBIDO' ? 'bg-emerald-50 border-emerald-200 text-emerald-600' : 'bg-amber-50 border-amber-200 text-amber-600'
-                        }`}>
-                          {dispatch.status}
-                        </div>
-                      </div>
+      <div className="grid grid-cols-1 gap-4">
+        {dispatches.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-20 bg-white rounded-[3rem] border border-black/5 text-black/20">
+            <Truck size={64} strokeWidth={1} className="mb-4" />
+            <p className="font-bold">No hay despachos registrados.</p>
+          </div>
+        ) : (
+          dispatches.map(dispatch => {
+            const lot = lots.find(l => l.id === dispatch.lotId);
+            const farm = farms.find(f => f.id === dispatch.originFarmId);
+            return (
+              <div key={dispatch.id} className="bg-white p-8 rounded-[2rem] border border-black/5 flex justify-between items-center industrial-btn">
+                <div className="flex items-center gap-8">
+                  <div className="p-5 bg-black text-white rounded-2xl">
+                    <Truck size={24} />
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="font-mono font-black text-xl">{dispatch.id.split('-')[1]}</span>
+                      <span className={`px-2 py-0.5 rounded text-[8px] font-black tracking-widest ${dispatch.type === 'INTERNO' ? 'bg-blue-100 text-blue-600' : 'bg-amber-100 text-amber-600'}`}>
+                        {dispatch.type}
+                      </span>
                     </div>
-                  );
-                })
-              )}
-            </div>
-          </BentoCard>
-        </div>
+                    <p className="text-xs font-bold text-black/40 uppercase tracking-widest">
+                      {farm?.name || 'Proveedor Externo'} • {lot?.lotCode || 'N/A'}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex gap-12 items-center">
+                  <div className="text-right">
+                    <span className="text-[10px] font-black text-black/30 uppercase tracking-widest block">Cantidad</span>
+                    <span className="text-2xl font-black">{dispatch.quantity} Kg</span>
+                  </div>
+                  <div className="text-right">
+                    <span className="text-[10px] font-black text-black/30 uppercase tracking-widest block">Fecha</span>
+                    <span className="text-sm font-bold">{new Date(dispatch.date).toLocaleDateString()}</span>
+                  </div>
+                  <div className={`px-4 py-2 rounded-xl text-[10px] font-black border ${
+                    dispatch.status === 'RECIBIDO' ? 'bg-emerald-50 border-emerald-200 text-emerald-600' : 'bg-blue-50 border-blue-200 text-blue-600'
+                  }`}>
+                    {dispatch.status}
+                  </div>
+                </div>
+              </div>
+            );
+          })
+        )}
       </div>
     </div>
   );
@@ -1657,13 +1282,9 @@ const QualityManagementView = ({
 
   const handleStatusChange = (status: BarrelStatus) => {
     if (selectedBarrel) {
-      const hoursPassed = (Date.now() - new Date(selectedBarrel.date).getTime()) / (1000 * 60 * 60);
-      if (status === 'LIBERADO' && hoursPassed < 72) return;
       onUpdateBarrel({ ...selectedBarrel, status });
     }
   };
-
-  const isIncubating = (date: string) => (Date.now() - new Date(date).getTime()) / (1000 * 60 * 60) < 72;
 
   const handleValueChange = (paramId: string, value: any) => {
     if (selectedBarrel) {
@@ -1811,20 +1432,18 @@ const QualityManagementView = ({
 };
 
 const CureManagementView = ({ 
-  receptions,
   lots, 
   chemicals, 
   contacts,
   onAddCureRecord
 }: { 
-  receptions: MaterialReception[],
   lots: Lot[], 
   chemicals: Chemical[], 
   contacts: Contact[],
   onAddCureRecord: (record: Partial<CureRecord>) => void,
   key?: React.Key
 }) => {
-  const [selectedReceptionId, setSelectedReceptionId] = useState<string>('');
+  const [selectedLotId, setSelectedLotId] = useState<string>('');
   const [newCure, setNewCure] = useState<Partial<CureRecord>>({
     chemicalId: chemicals[0]?.id || '',
     dosage: 1.0,
@@ -1833,13 +1452,6 @@ const CureManagementView = ({
   });
 
   const selectedChemical = chemicals.find(c => c.id === newCure.chemicalId);
-  const selectedReception = receptions.find(r => r.id === selectedReceptionId);
-
-  // Consider "pending" receptions as those whose lot doesn't have a cure record yet
-  const pendingReceptions = receptions.filter(r => {
-    const lot = lots.find(l => l.id === r.lotId);
-    return lot && (!lot.cureRecords || lot.cureRecords.length === 0);
-  });
 
   return (
     <div className="flex flex-col gap-8">
@@ -1852,26 +1464,20 @@ const CureManagementView = ({
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
         <div className="lg:col-span-4 flex flex-col gap-6">
-          <BentoCard title="Recepción Pendiente" icon={Map}>
+          <BentoCard title="Selección de Lote" icon={Map}>
             <div className="flex flex-col gap-4">
-              {pendingReceptions.map(reception => {
-                const lot = lots.find(l => l.id === reception.lotId);
-                return (
-                  <button
-                    key={reception.id}
-                    onClick={() => setSelectedReceptionId(reception.id)}
-                    className={`p-6 rounded-[28px] border-[1px] transition-all text-left industrial-btn ${
-                      selectedReceptionId === reception.id ? 'bg-white border-[#0052CC] shadow-[var(--shadow)]' : 'bg-black/5 border-transparent'
-                    }`}
-                  >
-                    <span className="font-mono font-bold text-lg">{lot?.lotCode || 'Lote Desconocido'}</span>
-                    <span className="block text-[10px] font-black text-black/40 uppercase tracking-widest">Prov: {reception.provider} • {new Date(reception.date).toLocaleDateString()}</span>
-                  </button>
-                );
-              })}
-              {pendingReceptions.length === 0 && (
-                <span className="text-sm text-black/40 font-bold mt-2">No hay recepciones pendientes por curar.</span>
-              )}
+              {lots.filter(l => l.status === 'VACÍO' || l.status === 'PREPARACIÓN').map(lot => (
+                <button
+                  key={lot.id}
+                  onClick={() => setSelectedLotId(lot.id)}
+                  className={`p-6 rounded-2xl border-2 transition-all text-left industrial-btn ${
+                    selectedLotId === lot.id ? 'bg-white border-[#0052CC] shadow-lg' : 'bg-black/5 border-transparent'
+                  }`}
+                >
+                  <span className="font-mono font-bold text-lg">{lot.lotCode}</span>
+                  <span className="block text-[10px] font-black text-black/40 uppercase tracking-widest">{lot.soilType} • {lot.area} Ha</span>
+                </button>
+              ))}
             </div>
           </BentoCard>
         </div>
@@ -1887,8 +1493,8 @@ const CureManagementView = ({
                       <button
                         key={c.id}
                         onClick={() => setNewCure(prev => ({ ...prev, chemicalId: c.id }))}
-                        className={`h-[60px] px-6 rounded-[20px] font-bold border-[1px] transition-all text-left flex justify-between items-center ${
-                          newCure.chemicalId === c.id ? 'bg-white border-[#0052CC] text-[#0052CC] shadow-sm' : 'bg-black/5 border-transparent text-black/40'
+                        className={`h-16 px-6 rounded-2xl font-bold border-2 transition-all text-left flex justify-between items-center ${
+                          newCure.chemicalId === c.id ? 'bg-white border-[#0052CC] text-[#0052CC]' : 'bg-black/5 border-transparent text-black/40'
                         }`}
                       >
                         {c.name}
@@ -1903,7 +1509,7 @@ const CureManagementView = ({
                     type="date" 
                     value={newCure.date}
                     onChange={e => setNewCure(prev => ({ ...prev, date: e.target.value }))}
-                    className="h-[60px] px-6 bg-black/5 rounded-[20px] font-bold text-xl"
+                    className="h-16 px-6 bg-black/5 rounded-2xl font-bold text-xl"
                   />
                 </div>
               </div>
@@ -1923,7 +1529,7 @@ const CureManagementView = ({
                   <select 
                     value={newCure.responsibleId}
                     onChange={e => setNewCure(prev => ({ ...prev, responsibleId: e.target.value }))}
-                    className="h-[60px] px-6 bg-black/5 rounded-[20px] font-bold appearance-none"
+                    className="h-16 px-6 bg-black/5 rounded-2xl font-bold appearance-none"
                   >
                     {contacts.filter(c => c.role === 'Operador' || c.role === 'Administrador').map(c => (
                       <option key={c.id} value={c.id}>{c.name}</option>
@@ -1933,17 +1539,10 @@ const CureManagementView = ({
 
                 <button 
                   onClick={() => {
-                    if (!selectedReception) return alert('Seleccione una recepción pendiente');
-                    onAddCureRecord({ ...newCure, lotId: selectedReception.lotId });
-                    setSelectedReceptionId('');
-                    setNewCure(prev => ({ ...prev, dosage: 1.0 }));
+                    if (!selectedLotId) return alert('Seleccione un lote');
+                    onAddCureRecord({ ...newCure, lotId: selectedLotId });
                   }}
-                  disabled={!selectedReceptionId}
-                  className={`h-[60px] font-black rounded-[20px] shadow-xl transition-all mt-auto ${
-                    selectedReceptionId 
-                      ? 'bg-[#0052CC] text-white hover:scale-[1.02]' 
-                      : 'bg-black/10 text-black/30 cursor-not-allowed'
-                  }`}
+                  className="h-20 bg-black text-white font-black rounded-3xl shadow-2xl industrial-btn mt-auto"
                 >
                   REGISTRAR CURA
                 </button>
@@ -1959,11 +1558,13 @@ const CureManagementView = ({
 const SowingManagementView = ({ 
   lots, 
   contacts,
-  onAddSowingRecord
+  onAddSowingRecord,
+  onGenerateDispatch
 }: { 
   lots: Lot[], 
   contacts: Contact[],
   onAddSowingRecord: (record: Partial<SowingRecord>) => void,
+  onGenerateDispatch: (lotId: string, quantity: number) => void,
   key?: React.Key
 }) => {
   const [selectedLotId, setSelectedLotId] = useState<string>('');
@@ -1972,13 +1573,9 @@ const SowingManagementView = ({
     responsibleId: contacts[0]?.id || '',
     date: new Date().toISOString().split('T')[0]
   });
+  const [dispatchQty, setDispatchQty] = useState(1000);
 
   const selectedLot = lots.find(l => l.id === selectedLotId);
-
-  // Lots that have cure records but are not yet sown
-  const readyLots = lots.filter(l => 
-    l.cureRecords && l.cureRecords.length > 0 && l.status !== 'SEMBRADO'
-  );
 
   return (
     <div className="flex flex-col gap-8 h-full">
@@ -1991,85 +1588,111 @@ const SowingManagementView = ({
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 flex-1">
         <div className="lg:col-span-4 flex flex-col gap-6">
-          <BentoCard title="Lotes Listos (Semilla Curada)" icon={Sprout}>
+          <BentoCard title="Lotes Listos" icon={Sprout}>
             <div className="flex flex-col gap-4">
-              {readyLots.map(lot => (
+              {lots.filter(l => l.status === 'EN_CURA' || l.status === 'PREPARACIÓN').map(lot => (
                 <button
                   key={lot.id}
                   onClick={() => setSelectedLotId(lot.id)}
-                  className={`p-6 rounded-[28px] border-[1px] transition-all text-left industrial-btn ${
-                    selectedLotId === lot.id ? 'bg-white border-[#0052CC] shadow-[var(--shadow)]' : 'bg-black/5 border-transparent'
+                  className={`p-6 rounded-2xl border-2 transition-all text-left industrial-btn ${
+                    selectedLotId === lot.id ? 'bg-white border-[#0052CC] shadow-lg' : 'bg-black/5 border-transparent'
                   }`}
                 >
                   <span className="font-mono font-bold text-lg">{lot.lotCode}</span>
                   <span className="block text-[10px] font-black text-black/40 uppercase tracking-widest">{lot.soilType} • {lot.area} Ha</span>
                 </button>
               ))}
-              {readyLots.length === 0 && (
-                <span className="text-sm text-black/40 font-bold mt-2">No hay lotes con semilla curada listos para siembra.</span>
-              )}
             </div>
           </BentoCard>
         </div>
 
-        <div className="lg:col-span-8 flex flex-col gap-6">
-          <BentoCard title="Parámetros de Siembra" icon={ClipboardCheck}>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              <div className="flex flex-col gap-6">
+        <div className="lg:col-span-8 grid grid-cols-1 md:grid-cols-2 gap-8">
+          <div className="flex flex-col gap-6">
+            <BentoCard title="Parámetros de Siembra" icon={ClipboardCheck}>
+              <div className="flex flex-col gap-8">
                 <div className="flex flex-col gap-2">
                   <span className="text-xs font-bold text-black/40 uppercase tracking-widest">Fecha de Siembra</span>
                   <input 
                     type="date" 
                     value={newSowing.date}
                     onChange={e => setNewSowing(prev => ({ ...prev, date: e.target.value }))}
-                    className="h-[60px] px-6 bg-black/5 rounded-[20px] font-bold text-xl"
+                    className="h-16 px-6 bg-black/5 rounded-2xl font-bold text-xl"
                   />
                 </div>
+                
+                <Stepper 
+                  label="Densidad (Plantas/Ha)"
+                  value={newSowing.density || 0}
+                  onChange={v => setNewSowing(prev => ({ ...prev, density: v }))}
+                  min={1000}
+                  max={100000}
+                  step={500}
+                />
 
                 <div className="flex flex-col gap-2">
-                  <span className="text-xs font-bold text-black/40 uppercase tracking-widest">Cuadrilla / Responsable</span>
+                  <span className="text-xs font-bold text-black/40 uppercase tracking-widest">Responsable</span>
                   <select 
                     value={newSowing.responsibleId}
                     onChange={e => setNewSowing(prev => ({ ...prev, responsibleId: e.target.value }))}
-                    className="h-[60px] px-6 bg-black/5 rounded-[20px] font-bold appearance-none"
+                    className="h-16 px-6 bg-black/5 rounded-2xl font-bold appearance-none"
                   >
                     {contacts.filter(c => c.role === 'Operador' || c.role === 'Administrador').map(c => (
                       <option key={c.id} value={c.id}>{c.name}</option>
                     ))}
                   </select>
                 </div>
-              </div>
-
-              <div className="flex flex-col gap-8">
-                <div className="p-6 bg-black/5 rounded-[28px]">
-                  <Stepper 
-                    label="Densidad (Plantas/Ha)"
-                    value={newSowing.density || 0}
-                    onChange={v => setNewSowing(prev => ({ ...prev, density: v }))}
-                    min={1000}
-                    max={150000}
-                    step={1000}
-                  />
-                </div>
 
                 <button 
                   onClick={() => {
                     if (!selectedLotId) return alert('Seleccione un lote');
                     onAddSowingRecord({ ...newSowing, lotId: selectedLotId });
-                    setSelectedLotId('');
                   }}
-                  disabled={!selectedLotId}
-                  className={`h-[60px] font-black rounded-[20px] shadow-xl transition-all mt-auto ${
-                    selectedLotId 
-                      ? 'bg-[#0052CC] text-white hover:scale-[1.02]' 
-                      : 'bg-black/10 text-black/30 cursor-not-allowed'
-                  }`}
+                  className="h-20 bg-emerald-600 text-white font-black rounded-3xl shadow-2xl industrial-btn"
                 >
                   REGISTRAR SIEMBRA
                 </button>
               </div>
-            </div>
-          </BentoCard>
+            </BentoCard>
+          </div>
+
+          <div className="flex flex-col gap-6">
+            <BentoCard title="Despacho a Planta" icon={Truck} className="bg-slate-50">
+              <div className="flex flex-col gap-8">
+                <p className="text-sm font-medium text-black/60">Genera un despacho directo a planta heredando toda la trazabilidad del lote.</p>
+                
+                <Stepper 
+                  label="Cantidad a Despachar (Kg)"
+                  value={dispatchQty}
+                  onChange={setDispatchQty}
+                  min={100}
+                  max={50000}
+                  step={100}
+                />
+
+                <div className="p-6 bg-white rounded-2xl border border-black/5 flex flex-col gap-2">
+                  <span className="text-[10px] font-black text-black/30 uppercase tracking-widest">Resumen de Trazabilidad</span>
+                  <div className="flex justify-between items-center">
+                    <span className="font-bold text-sm">Lote:</span>
+                    <span className="font-mono text-sm">{selectedLot?.lotCode || '---'}</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="font-bold text-sm">Estado:</span>
+                    <span className="text-xs font-black">{selectedLot?.status || '---'}</span>
+                  </div>
+                </div>
+
+                <button 
+                  disabled={!selectedLot || selectedLot.status !== 'SEMBRADO'}
+                  onClick={() => onGenerateDispatch(selectedLotId, dispatchQty)}
+                  className={`h-20 font-black rounded-3xl shadow-2xl industrial-btn transition-all ${
+                    selectedLot?.status === 'SEMBRADO' ? 'bg-black text-white' : 'bg-black/10 text-black/30 cursor-not-allowed'
+                  }`}
+                >
+                  GENERAR DESPACHO
+                </button>
+              </div>
+            </BentoCard>
+          </div>
         </div>
       </div>
     </div>
@@ -2082,8 +1705,7 @@ const LotManagementView = ({
   farms,
   onAddLot,
   onDeleteLot,
-  onAddAnalysis,
-  hideAddButton
+  onAddAnalysis
 }: { 
   lots: Lot[], 
   crops: Crop[], 
@@ -2091,7 +1713,6 @@ const LotManagementView = ({
   onAddLot: (lot: Partial<Lot>) => void,
   onDeleteLot: (id: string) => void,
   onAddAnalysis: (lotId: string, analysis: LotAnalysis) => void,
-  hideAddButton?: boolean,
   key?: React.Key
 }) => {
   const [analyzingLotId, setAnalyzingLotId] = useState<string | null>(null);
@@ -2191,11 +1812,9 @@ const LotManagementView = ({
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex flex-col gap-8">
       <div className="flex justify-between items-center">
         <h2 className="text-3xl font-bold tracking-tight">Inventario de Lotes</h2>
-        {!hideAddButton && (
-          <button onClick={() => setIsAdding(true)} className="flex items-center gap-2 px-8 py-4 bg-[#0052CC] text-white rounded-2xl font-bold shadow-xl shadow-blue-200">
-            <Plus size={20} /> Nuevo Lote
-          </button>
-        )}
+        <button onClick={() => setIsAdding(true)} className="flex items-center gap-2 px-8 py-4 bg-[#0052CC] text-white rounded-2xl font-bold shadow-xl shadow-blue-200">
+          <Plus size={20} /> Nuevo Lote
+        </button>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -2468,8 +2087,8 @@ const LotManagementView = ({
 // --- Main Application ---
 
 export default function App() {
-  const [universe, setUniverse] = useState<'home' | 'campo' | 'planta'>('home');
-  const [tab, setTab] = useState<'inventario' | 'operaciones' | 'calidad' | 'maestros'>('inventario');
+  const [currentModule, setCurrentModule] = useState<'home' | 'maestros' | 'campo' | 'planta' | 'calidad'>('home');
+  const [activeTab, setActiveTab] = useState<string>('');
   
   const [contacts, setContacts] = useState<Contact[]>(() => {
     const saved = localStorage.getItem('dusa_contacts');
@@ -2491,22 +2110,10 @@ export default function App() {
     const saved = localStorage.getItem('dusa_receptions');
     return saved ? JSON.parse(saved) : [];
   });
-  const [chemicals, setChemicals] = useState<Chemical[]>(() => {
-    const saved = localStorage.getItem('dusa_chemicals');
-    return saved ? JSON.parse(saved) : INITIAL_CHEMICALS;
-  });
+  const [chemicals] = useState<Chemical[]>(INITIAL_CHEMICALS);
   const [barrels, setBarrels] = useState<Barrel[]>([]);
   const [dispatches, setDispatches] = useState<DispatchRecord[]>([]);
-  const [silos, setSilos] = useState<Silo[]>([]);
   const [theme, setTheme] = useState<'solar' | 'plant'>('solar');
-
-  const handleUpdateDispatch = (id: string, updates: Partial<DispatchRecord>) => {
-    setDispatches(prev => prev.map(d => d.id === id ? { ...d, ...updates } : d));
-  };
-
-  const handleAddBarrel = (barrel: Barrel) => {
-    setBarrels(prev => [...prev, barrel]);
-  };
 
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme);
@@ -2535,10 +2142,6 @@ export default function App() {
     localStorage.setItem('dusa_receptions', JSON.stringify(receptions));
   }, [receptions]);
 
-  useEffect(() => {
-    localStorage.setItem('dusa_chemicals', JSON.stringify(chemicals));
-  }, [chemicals]);
-
   const handleAddContact = (contactData: Partial<Contact>) => {
     const newContact: Contact = {
       id: `contact-${Date.now()}`,
@@ -2553,22 +2156,6 @@ export default function App() {
   const handleDeleteContact = (id: string) => {
     if (window.confirm('¿Está seguro de eliminar este contacto?')) {
       setContacts(prev => prev.filter(c => c.id !== id));
-    }
-  };
-
-  const handleAddChemical = (chemicalData: Partial<Chemical>) => {
-    const newChemical: Chemical = {
-      id: `chem-${Date.now()}`,
-      name: chemicalData.name || 'Nuevo Insumo',
-      type: chemicalData.type || 'Fungicida',
-      unit: chemicalData.unit || 'ml/Kg'
-    };
-    setChemicals(prev => [...prev, newChemical]);
-  };
-
-  const handleDeleteChemical = (id: string) => {
-    if (window.confirm('¿Está seguro de eliminar este insumo?')) {
-      setChemicals(prev => prev.filter(c => c.id !== id));
     }
   };
 
@@ -2621,7 +2208,7 @@ export default function App() {
         return {
           ...l,
           analyses: [...(l.analyses || []), analysis],
-          status: analysis.status as LotStatus
+          status: analysis.status === 'APROBADO' ? 'SEMBRADO' : l.status // Example logic
         };
       }
       return l;
@@ -2667,37 +2254,38 @@ export default function App() {
     }));
   };
 
-  const handleAddDispatch = (dispatch: DispatchRecord) => {
+  const handleGenerateDispatch = (lotId: string, quantity: number) => {
+    const lot = lots.find(l => l.id === lotId);
+    if (!lot) return;
+
+    const dispatch: DispatchRecord = {
+      id: `disp-${Date.now()}`,
+      lotId,
+      quantity,
+      date: new Date().toISOString(),
+      status: 'PENDIENTE',
+      type: 'INTERNO',
+      originFarmId: lot.farmId
+    };
+
     setDispatches(prev => [...prev, dispatch]);
-    
-    const lot = lots.find(l => l.id === dispatch.lotId);
-    if (lot) {
-      setLots(prev => prev.map(l => l.id === dispatch.lotId ? { ...l, status: 'DESPACHADO' } : l));
-      
-      if (dispatch.type === 'INTERNO') {
-        // Create a barrel for quality control
-        const newBarrel: Barrel = {
-          id: `bar-${Date.now()}`,
-          code: `B-${lot.lotCode}-${Date.now().toString().slice(-4)}`,
-          lotId: lot.id,
-          cropId: lot.cropId,
-          status: 'EN ESPERA',
-          date: new Date().toISOString(),
-          analysisValues: {}
-        };
-        setBarrels(prev => [...prev, newBarrel]);
-      }
-    }
+    setLots(prev => prev.map(l => l.id === lotId ? { ...l, status: 'DESPACHADO' } : l));
+
+    // Create a barrel for quality control
+    const newBarrel: Barrel = {
+      id: `bar-${Date.now()}`,
+      code: `B-${lot.lotCode}-${Date.now().toString().slice(-4)}`,
+      lotId,
+      cropId: lot.cropId,
+      status: 'EN ESPERA',
+      date: new Date().toISOString(),
+      analysisValues: {}
+    };
+    setBarrels(prev => [...prev, newBarrel]);
   };
-
-
 
   const handleUpdateBarrel = (updatedBarrel: Barrel) => {
     setBarrels(prev => prev.map(b => b.id === updatedBarrel.id ? updatedBarrel : b));
-  };
-
-  const handleUpdateSilo = (updatedSilo: Silo) => {
-    setSilos(prev => prev.map(s => s.id === updatedSilo.id ? updatedSilo : s));
   };
 
   const handleSave = () => {
@@ -2714,29 +2302,39 @@ export default function App() {
       <div className="bg-white border-b border-black/5 px-10 py-6 flex justify-between items-center sticky top-0 z-40">
         <div className="flex items-center gap-12">
           <button 
-            onClick={() => setUniverse('home')}
+            onClick={() => setCurrentModule('home')}
             className="flex items-center gap-2 text-[#0052CC] font-black tracking-tighter text-2xl hover:scale-105 transition-transform"
           >
             <Leaf fill="currentColor" />
             <span>TERRASYNC</span>
           </button>
           
-          {universe !== 'home' && (
+          {currentModule !== 'home' && (
             <nav className="flex bg-black/5 p-1.5 rounded-2xl">
-              {universe === 'campo' && (
+              {currentModule === 'maestros' && (
                 <>
-                  <button onClick={() => setTab('inventario')} className={`px-6 py-2.5 rounded-xl font-bold text-sm transition-all ${tab === 'inventario' ? 'bg-white shadow-md text-[#0052CC]' : 'text-black/30'}`}>Inventario</button>
-                  <button onClick={() => setTab('operaciones')} className={`px-6 py-2.5 rounded-xl font-bold text-sm transition-all ${tab === 'operaciones' ? 'bg-white shadow-md text-[#0052CC]' : 'text-black/30'}`}>Operaciones</button>
-                  <button onClick={() => setTab('calidad')} className={`px-6 py-2.5 rounded-xl font-bold text-sm transition-all ${tab === 'calidad' ? 'bg-white shadow-md text-[#0052CC]' : 'text-black/30'}`}>Calidad</button>
-                  <button onClick={() => setTab('maestros')} className={`px-6 py-2.5 rounded-xl font-bold text-sm transition-all ${tab === 'maestros' ? 'bg-white shadow-md text-[#0052CC]' : 'text-black/30'}`}>Maestros</button>
+                  <button onClick={() => setActiveTab('crops')} className={`px-6 py-2.5 rounded-xl font-bold text-sm transition-all ${activeTab === 'crops' ? 'bg-white shadow-md text-[#0052CC]' : 'text-black/30'}`}>Rubros</button>
+                  <button onClick={() => setActiveTab('contacts')} className={`px-6 py-2.5 rounded-xl font-bold text-sm transition-all ${activeTab === 'contacts' ? 'bg-white shadow-md text-[#0052CC]' : 'text-black/30'}`}>Contactos</button>
                 </>
               )}
-              {universe === 'planta' && (
+              {currentModule === 'campo' && (
                 <>
-                  <button onClick={() => setTab('inventario')} className={`px-6 py-2.5 rounded-xl font-bold text-sm transition-all ${tab === 'inventario' ? 'bg-white shadow-md text-[#0052CC]' : 'text-black/30'}`}>Inventario</button>
-                  <button onClick={() => setTab('operaciones')} className={`px-6 py-2.5 rounded-xl font-bold text-sm transition-all ${tab === 'operaciones' ? 'bg-white shadow-md text-[#0052CC]' : 'text-black/30'}`}>Operaciones</button>
-                  <button onClick={() => setTab('calidad')} className={`px-6 py-2.5 rounded-xl font-bold text-sm transition-all ${tab === 'calidad' ? 'bg-white shadow-md text-[#0052CC]' : 'text-black/30'}`}>Calidad</button>
-                  <button onClick={() => setTab('maestros')} className={`px-6 py-2.5 rounded-xl font-bold text-sm transition-all ${tab === 'maestros' ? 'bg-white shadow-md text-[#0052CC]' : 'text-black/30'}`}>Maestros</button>
+                  <button onClick={() => setActiveTab('fincas')} className={`px-6 py-2.5 rounded-xl font-bold text-sm transition-all ${activeTab === 'fincas' ? 'bg-white shadow-md text-[#0052CC]' : 'text-black/30'}`}>Fincas</button>
+                  <button onClick={() => setActiveTab('lots')} className={`px-6 py-2.5 rounded-xl font-bold text-sm transition-all ${activeTab === 'lots' ? 'bg-white shadow-md text-[#0052CC]' : 'text-black/30'}`}>Lotes</button>
+                  <button onClick={() => setActiveTab('cura')} className={`px-6 py-2.5 rounded-xl font-bold text-sm transition-all ${activeTab === 'cura' ? 'bg-white shadow-md text-[#0052CC]' : 'text-black/30'}`}>Cura</button>
+                  <button onClick={() => setActiveTab('siembra')} className={`px-6 py-2.5 rounded-xl font-bold text-sm transition-all ${activeTab === 'siembra' ? 'bg-white shadow-md text-[#0052CC]' : 'text-black/30'}`}>Siembra</button>
+                </>
+              )}
+              {currentModule === 'planta' && (
+                <>
+                  <button onClick={() => setActiveTab('recepcion')} className={`px-6 py-2.5 rounded-xl font-bold text-sm transition-all ${activeTab === 'recepcion' ? 'bg-white shadow-md text-[#0052CC]' : 'text-black/30'}`}>Recepción</button>
+                  <button onClick={() => setActiveTab('despacho')} className={`px-6 py-2.5 rounded-xl font-bold text-sm transition-all ${activeTab === 'despacho' ? 'bg-white shadow-md text-[#0052CC]' : 'text-black/30'}`}>Despacho</button>
+                </>
+              )}
+              {currentModule === 'calidad' && (
+                <>
+                  <button onClick={() => setActiveTab('analisis')} className={`px-6 py-2.5 rounded-xl font-bold text-sm transition-all ${activeTab === 'analisis' ? 'bg-white shadow-md text-[#0052CC]' : 'text-black/30'}`}>Calidad</button>
+                  <button onClick={() => setActiveTab('cuarentena')} className={`px-6 py-2.5 rounded-xl font-bold text-sm transition-all ${activeTab === 'cuarentena' ? 'bg-white shadow-md text-[#0052CC]' : 'text-black/30'}`}>Cuarentena</button>
                 </>
               )}
             </nav>
@@ -2765,19 +2363,19 @@ export default function App() {
       <div className="p-6 md:p-10 flex-1 bg-[#F8F9FA]">
         <main className="max-w-7xl mx-auto w-full">
           <AnimatePresence mode="wait">
-            {universe === 'home' && (
+            {currentModule === 'home' && (
               <HomeDashboardView 
                 key="home" 
                 onNavigate={(mod) => {
-                  setUniverse(mod as any);
-                  if (mod === 'maestros') setTab('inventario');
-                  if (mod === 'campo') setTab('inventario');
-                  if (mod === 'planta') setTab('inventario');
-                  if (mod === 'calidad') setTab('calidad');
+                  setCurrentModule(mod as any);
+                  if (mod === 'maestros') setActiveTab('crops');
+                  if (mod === 'campo') setActiveTab('fincas');
+                  if (mod === 'planta') setActiveTab('recepcion');
+                  if (mod === 'calidad') setActiveTab('analisis');
                 }} 
               />
             )}
-            {universe === 'campo' && tab === 'maestros' && (
+            {currentModule === 'maestros' && activeTab === 'crops' && (
               <CropMasterView 
                 key="crops"
                 crops={crops} 
@@ -2786,7 +2384,7 @@ export default function App() {
                 onUpdateCrop={handleUpdateCrop} 
               />
             )}
-            {universe === 'campo' && tab === 'maestros' && (
+            {currentModule === 'maestros' && activeTab === 'contacts' && (
               <ContactManagementView 
                 key="contacts"
                 contacts={contacts}
@@ -2794,15 +2392,7 @@ export default function App() {
                 onDeleteContact={handleDeleteContact}
               />
             )}
-            {universe === 'campo' && tab === 'maestros' && (
-              <ChemicalManagementView 
-                key="chemicals"
-                chemicals={chemicals}
-                onAddChemical={handleAddChemical}
-                onDeleteChemical={handleDeleteChemical}
-              />
-            )}
-            {universe === 'campo' && tab === 'maestros' && (
+            {currentModule === 'campo' && activeTab === 'fincas' && (
               <FarmManagementView 
                 key="fincas" 
                 farms={farms} 
@@ -2811,7 +2401,7 @@ export default function App() {
                 onDeleteFarm={handleDeleteFarm} 
               />
             )}
-            {universe === 'campo' && tab === 'operaciones' && (
+            {currentModule === 'campo' && activeTab === 'lots' && (
               <LotManagementView 
                 key="lots"
                 lots={lots} 
@@ -2822,25 +2412,25 @@ export default function App() {
                 onAddAnalysis={handleAddAnalysis}
               />
             )}
-            {universe === 'campo' && tab === 'calidad' && (
+            {currentModule === 'campo' && activeTab === 'cura' && (
               <CureManagementView 
                 key="cura"
-                receptions={receptions}
                 lots={lots}
                 chemicals={chemicals}
                 contacts={contacts}
                 onAddCureRecord={handleAddCureRecord}
               />
             )}
-            {universe === 'campo' && tab === 'operaciones' && (
+            {currentModule === 'campo' && activeTab === 'siembra' && (
               <SowingManagementView 
                 key="siembra"
                 lots={lots}
                 contacts={contacts}
                 onAddSowingRecord={handleAddSowingRecord}
+                onGenerateDispatch={handleGenerateDispatch}
               />
             )}
-            {universe === 'campo' && tab === 'inventario' && (
+            {currentModule === 'planta' && activeTab === 'recepcion' && (
               <MaterialReceptionView 
                 key="recepcion"
                 receptions={receptions}
@@ -2850,22 +2440,26 @@ export default function App() {
                 onAddReception={handleAddReception}
               />
             )}
-            {universe === 'planta' && tab === 'inventario' && (
-              <TruckReceptionView 
-                silos={silos}
+            {currentModule === 'planta' && activeTab === 'despacho' && (
+              <DispatchManagementView 
+                key="despacho"
                 dispatches={dispatches}
-                onUpdateSilo={handleUpdateSilo}
-                onUpdateDispatch={handleUpdateDispatch}
+                lots={lots}
+                farms={farms}
               />
             )}
-            {universe === 'planta' && tab === 'operaciones' && (
-              <ProductionProcessView 
-                silos={silos}
-                onUpdateSilo={handleUpdateSilo}
-                onAddBarrel={handleAddBarrel}
+            {currentModule === 'calidad' && activeTab === 'analisis' && (
+              <LotManagementView 
+                key="analisis"
+                lots={lots} 
+                crops={crops} 
+                farms={farms}
+                onAddLot={handleAddLot}
+                onDeleteLot={handleDeleteLot}
+                onAddAnalysis={handleAddAnalysis}
               />
             )}
-            {universe === 'planta' && tab === 'calidad' && (
+            {currentModule === 'calidad' && activeTab === 'cuarentena' && (
               <QualityManagementView 
                 key="cuarentena"
                 barrels={barrels}
@@ -2877,6 +2471,20 @@ export default function App() {
           </AnimatePresence>
         </main>
       </div>
+
+      <footer className="bg-white border-t border-black/5 p-10">
+        <div className="max-w-7xl mx-auto w-full flex justify-between items-center text-black/20 text-[10px] font-black uppercase tracking-[0.2em]">
+          <div className="flex items-center gap-6">
+            <span>TERRASYNC v2.0.0</span>
+            <span className="w-1.5 h-1.5 bg-black/5 rounded-full" />
+            <span>Arquitectura Modular Activa</span>
+          </div>
+          <div className="flex items-center gap-3">
+            <Activity size={14} />
+            Optimizado para Operaciones de Campo
+          </div>
+        </div>
+      </footer>
     </div>
   );
 }

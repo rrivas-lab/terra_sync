@@ -24,7 +24,7 @@ export interface Crop {
 }
 
 export type SoilType = 'Arcilloso' | 'Limoso' | 'Arenoso' | 'Franco';
-export type LotStatus = 'PREPARACIÓN' | 'SEMBRADO' | 'VACÍO' | 'EN_CURA' | 'APROBADO' | 'RECHAZADO' | 'DESPACHADO';
+export type LotStatus = 'PREPARACIÓN' | 'SEMBRADO' | 'VACÍO' | 'EN_CURA';
 export type UnitSystem = 'METRICO' | 'IMPERIAL';
 
 export interface Contact {
@@ -88,19 +88,6 @@ export interface Barrel {
   status: BarrelStatus;
   analysisValues: { [parameterId: string]: any };
   date: string;
-}
-
-export type SiloStatus = 'VACÍO' | 'MEZCLANDO' | 'VACIANDO';
-
-export interface Silo {
-  id: string;
-  code: string;
-  capacity: number;
-  currentLevel: number;
-  cropId: string;
-  status: SiloStatus;
-  brixAverage: number;
-  acidityAverage: number;
 }
 
 export interface LotAnalysis {

@@ -33,7 +33,7 @@ const HomeDashboardView = ({ onNavigate }: { onNavigate: (tab: string) => void, 
     <motion.div 
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="grid grid-cols-1 md:grid-cols-2 gap-8 h-[70vh]"
+      className="grid grid-cols-1 md:grid-cols-2 gap-8"
     >
       {modules.map((m) => (
         <button
@@ -63,34 +63,48 @@ const HomeDashboardView = ({ onNavigate }: { onNavigate: (tab: string) => void, 
 const ContactManagementView = ({ 
   contacts, 
   onAddContact, 
+  onEditContact,
   onDeleteContact 
 }: { 
   contacts: Contact[], 
   onAddContact: (c: Partial<Contact>) => void, 
+  onEditContact: (c: Contact) => void,
   onDeleteContact: (id: string) => void,
   key?: React.Key
 }) => {
-  const [isAdding, setIsAdding] = useState(false);
-  const [newContact, setNewContact] = useState<Partial<Contact>>({
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingContact, setEditingContact] = useState<Contact | null>(null);
+  const [contactForm, setContactForm] = useState<Partial<Contact>>({
     name: '',
     role: 'Administrador',
     phone: '',
     externalId: ''
   });
 
+  const openModal = (contact: Contact | null = null) => {
+    setEditingContact(contact);
+    setContactForm(contact || {
+      name: '',
+      role: 'Administrador',
+      phone: '',
+      externalId: ''
+    });
+    setIsModalOpen(true);
+  };
+
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex flex-col gap-8">
       <div className="flex justify-between items-center">
         <h2 className="text-3xl font-bold tracking-tight">Maestro de Contactos</h2>
         <button 
-          onClick={() => setIsAdding(true)}
+          onClick={() => openModal()}
           className="flex items-center gap-2 px-8 py-4 bg-black text-white rounded-2xl font-bold shadow-xl hover:scale-105 transition-transform"
         >
           <Plus size={20} /> Nuevo Contacto
         </button>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      <Carousel>
         {contacts.map(contact => (
           <BentoCard key={contact.id} title={contact.name} icon={Users}>
             <div className="flex flex-col gap-4">
@@ -107,7 +121,13 @@ const ContactManagementView = ({
                 <CreditCard size={16} />
                 <span className="font-bold">ID: {contact.externalId}</span>
               </div>
-              <div className="pt-4 border-t border-black/5 flex justify-end">
+              <div className="pt-4 border-t border-black/5 flex justify-between items-center">
+                <button 
+                  onClick={() => openModal(contact)}
+                  className="px-4 py-2 bg-black/5 rounded-xl font-bold text-sm"
+                >
+                  Editar
+                </button>
                 <button 
                   onClick={() => onDeleteContact(contact.id)}
                   className="p-2 text-black/10 hover:text-red-500 transition-colors"
@@ -118,24 +138,24 @@ const ContactManagementView = ({
             </div>
           </BentoCard>
         ))}
-      </div>
+      </Carousel>
 
       <AnimatePresence>
-        {isAdding && (
+        {isModalOpen && (
           <div className="fixed inset-0 z-50 flex items-center justify-center p-6">
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setIsAdding(false)} className="absolute inset-0 bg-black/40 backdrop-blur-sm" />
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setIsModalOpen(false)} className="absolute inset-0 bg-black/40 backdrop-blur-sm" />
             <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.9, opacity: 0 }} className="relative bg-white w-full max-w-xl rounded-[3rem] shadow-2xl p-10 flex flex-col gap-8">
-              <h3 className="text-3xl font-bold tracking-tight">Registrar Contacto</h3>
+              <h3 className="text-3xl font-bold tracking-tight">{editingContact ? 'Editar Contacto' : 'Registrar Contacto'}</h3>
               <div className="flex flex-col gap-6">
                 <div className="flex flex-col gap-2">
                   <span className="text-xs font-bold text-black/40 uppercase tracking-widest">Nombre Completo</span>
-                  <input type="text" value={newContact.name} onChange={e => setNewContact(prev => ({ ...prev, name: e.target.value }))} className="h-16 px-6 bg-black/5 rounded-2xl font-bold" />
+                  <input type="text" value={contactForm.name} onChange={e => setContactForm(prev => ({ ...prev, name: e.target.value }))} className="h-16 px-6 bg-black/5 rounded-2xl font-bold" />
                 </div>
                 <div className="flex flex-col gap-2">
                   <span className="text-xs font-bold text-black/40 uppercase tracking-widest">Cargo / Rol</span>
                   <select 
-                    value={newContact.role} 
-                    onChange={e => setNewContact(prev => ({ ...prev, role: e.target.value as any }))}
+                    value={contactForm.role} 
+                    onChange={e => setContactForm(prev => ({ ...prev, role: e.target.value as any }))}
                     className="h-16 px-6 bg-black/5 rounded-2xl font-bold appearance-none"
                   >
                     <option value="Administrador">Administrador</option>
@@ -146,18 +166,25 @@ const ContactManagementView = ({
                 <div className="grid grid-cols-2 gap-4">
                   <div className="flex flex-col gap-2">
                     <span className="text-xs font-bold text-black/40 uppercase tracking-widest">Teléfono</span>
-                    <input type="text" value={newContact.phone} onChange={e => setNewContact(prev => ({ ...prev, phone: e.target.value }))} className="h-16 px-6 bg-black/5 rounded-2xl font-bold" />
+                    <input type="text" value={contactForm.phone} onChange={e => setContactForm(prev => ({ ...prev, phone: e.target.value }))} className="h-16 px-6 bg-black/5 rounded-2xl font-bold" />
                   </div>
                   <div className="flex flex-col gap-2">
                     <span className="text-xs font-bold text-black/40 uppercase tracking-widest">ID / Cédula</span>
-                    <input type="text" value={newContact.externalId} onChange={e => setNewContact(prev => ({ ...prev, externalId: e.target.value }))} className="h-16 px-6 bg-black/5 rounded-2xl font-bold" />
+                    <input type="text" value={contactForm.externalId} onChange={e => setContactForm(prev => ({ ...prev, externalId: e.target.value }))} className="h-16 px-6 bg-black/5 rounded-2xl font-bold" />
                   </div>
                 </div>
                 <button 
-                  onClick={() => { onAddContact(newContact); setIsAdding(false); }}
+                  onClick={() => { 
+                    if (editingContact) {
+                      onEditContact({ ...editingContact, ...contactForm } as Contact);
+                    } else {
+                      onAddContact(contactForm);
+                    }
+                    setIsModalOpen(false); 
+                  }}
                   className="h-20 bg-black text-white font-bold rounded-3xl shadow-xl mt-4"
                 >
-                  Guardar Contacto
+                  {editingContact ? 'Guardar Cambios' : 'Guardar Contacto'}
                 </button>
               </div>
             </motion.div>
@@ -181,6 +208,30 @@ const BentoCard = ({ children, title, icon: Icon, className = "", noPadding = fa
     </div>
   </div>
 );
+
+const Carousel = ({ children }: { children: React.ReactNode[] }) => {
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const itemsPerPage = 3;
+  const totalPages = Math.ceil(children.length / itemsPerPage);
+
+  const next = () => setCurrentIndex((prev) => Math.min(prev + 1, totalPages - 1));
+  const prev = () => setCurrentIndex((prev) => Math.max(prev - 1, 0));
+
+  return (
+    <div className="relative w-full">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        {children.slice(currentIndex * itemsPerPage, (currentIndex + 1) * itemsPerPage)}
+      </div>
+      {totalPages > 1 && (
+        <div className="flex justify-between mt-8">
+          <button onClick={prev} disabled={currentIndex === 0} className="p-4 bg-black/5 rounded-2xl disabled:opacity-50 font-bold">Anterior</button>
+          <span className="flex items-center font-bold text-black/40">Página {currentIndex + 1} de {totalPages}</span>
+          <button onClick={next} disabled={currentIndex === totalPages - 1} className="p-4 bg-black/5 rounded-2xl disabled:opacity-50 font-bold">Siguiente</button>
+        </div>
+      )}
+    </div>
+  );
+};
 
 const Stepper = ({ 
   label, 
@@ -334,7 +385,7 @@ const FarmManagementView = ({
         </button>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      <Carousel>
         {farms.map(farm => {
           const admin = contacts.find(c => c.id === farm.adminId);
           return (
@@ -386,7 +437,7 @@ const FarmManagementView = ({
             </BentoCard>
           );
         })}
-      </div>
+      </Carousel>
 
       {/* Add Farm Modal */}
       <AnimatePresence>
@@ -1296,7 +1347,7 @@ const QualityManagementView = ({
   };
 
   return (
-    <div className="flex flex-col gap-8 h-full overflow-hidden">
+    <div className="flex flex-col gap-8 h-full">
       <div className="flex justify-between items-center">
         <div>
           <h2 className="text-4xl font-black tracking-tighter">CUARENTENA DE BARRILES</h2>
@@ -1578,7 +1629,7 @@ const SowingManagementView = ({
   const selectedLot = lots.find(l => l.id === selectedLotId);
 
   return (
-    <div className="flex flex-col gap-8 h-full">
+    <div className="flex flex-col gap-8">
       <div className="flex justify-between items-center">
         <div>
           <h2 className="text-4xl font-black tracking-tighter uppercase">Registro de Siembra</h2>
@@ -2153,6 +2204,10 @@ export default function App() {
     setContacts(prev => [...prev, newContact]);
   };
 
+  const handleEditContact = (updatedContact: Contact) => {
+    setContacts(prev => prev.map(c => c.id === updatedContact.id ? updatedContact : c));
+  };
+
   const handleDeleteContact = (id: string) => {
     if (window.confirm('¿Está seguro de eliminar este contacto?')) {
       setContacts(prev => prev.filter(c => c.id !== id));
@@ -2389,6 +2444,7 @@ export default function App() {
                 key="contacts"
                 contacts={contacts}
                 onAddContact={handleAddContact}
+                onEditContact={handleEditContact}
                 onDeleteContact={handleDeleteContact}
               />
             )}

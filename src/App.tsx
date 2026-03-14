@@ -159,10 +159,8 @@ const ProductionProcessView = ({ silos, onUpdateSilo, onAddBarrel }: { silos: Si
 
 const HomeDashboardView = ({ onNavigate }: { onNavigate: (tab: string) => void, key?: React.Key }) => {
   const modules = [
-    { id: 'maestros', label: 'MAESTROS', icon: Briefcase, color: 'bg-blue-600', description: 'Configuración base y contactos' },
-    { id: 'campo', label: 'CAMPO', icon: Map, color: 'bg-emerald-700', description: 'Cura, Siembra y Lotes' },
-    { id: 'planta', label: 'PLANTA', icon: Factory, color: 'bg-slate-600', description: 'Recepción y Despacho' },
-    { id: 'calidad', label: 'CALIDAD', icon: ShieldCheck, color: 'bg-amber-500', description: 'Microbiología y Barriles' },
+    { id: 'campo', label: 'OPERACIONES DE CAMPO', icon: Map, color: 'bg-emerald-700', description: 'Cura, Siembra y Lotes' },
+    { id: 'planta', label: 'PROCESAMIENTO EN PLANTA', icon: Factory, color: 'bg-slate-600', description: 'Recepción y Despacho' },
   ];
 
   return (
@@ -2470,8 +2468,8 @@ const LotManagementView = ({
 // --- Main Application ---
 
 export default function App() {
-  const [currentModule, setCurrentModule] = useState<'home' | 'maestros' | 'campo' | 'planta' | 'calidad'>('home');
-  const [activeTab, setActiveTab] = useState<string>('');
+  const [currentModule, setCurrentModule] = useState<'home' | 'campo' | 'planta'>('home');
+  const [activeTab, setActiveTab] = useState<'inventario' | 'operaciones' | 'calidad' | 'maestros'>('inventario');
   
   const [contacts, setContacts] = useState<Contact[]>(() => {
     const saved = localStorage.getItem('dusa_contacts');
@@ -2733,19 +2731,18 @@ export default function App() {
               )}
               {currentModule === 'campo' && (
                 <>
-                  <button onClick={() => setActiveTab('fincas')} className={`px-6 py-2.5 rounded-xl font-bold text-sm transition-all ${activeTab === 'fincas' ? 'bg-white shadow-md text-[#0052CC]' : 'text-black/30'}`}>Fincas</button>
-                  <button onClick={() => setActiveTab('lots')} className={`px-6 py-2.5 rounded-xl font-bold text-sm transition-all ${activeTab === 'lots' ? 'bg-white shadow-md text-[#0052CC]' : 'text-black/30'}`}>Lotes</button>
-                  <button onClick={() => setActiveTab('cura')} className={`px-6 py-2.5 rounded-xl font-bold text-sm transition-all ${activeTab === 'cura' ? 'bg-white shadow-md text-[#0052CC]' : 'text-black/30'}`}>Cura</button>
-                  <button onClick={() => setActiveTab('siembra')} className={`px-6 py-2.5 rounded-xl font-bold text-sm transition-all ${activeTab === 'siembra' ? 'bg-white shadow-md text-[#0052CC]' : 'text-black/30'}`}>Siembra</button>
+                  <button onClick={() => setActiveTab('inventario')} className={`px-6 py-2.5 rounded-xl font-bold text-sm transition-all ${activeTab === 'inventario' ? 'bg-white shadow-md text-[#0052CC]' : 'text-black/30'}`}>Inventario</button>
+                  <button onClick={() => setActiveTab('operaciones')} className={`px-6 py-2.5 rounded-xl font-bold text-sm transition-all ${activeTab === 'operaciones' ? 'bg-white shadow-md text-[#0052CC]' : 'text-black/30'}`}>Operaciones</button>
+                  <button onClick={() => setActiveTab('calidad')} className={`px-6 py-2.5 rounded-xl font-bold text-sm transition-all ${activeTab === 'calidad' ? 'bg-white shadow-md text-[#0052CC]' : 'text-black/30'}`}>Calidad</button>
+                  <button onClick={() => setActiveTab('maestros')} className={`px-6 py-2.5 rounded-xl font-bold text-sm transition-all ${activeTab === 'maestros' ? 'bg-white shadow-md text-[#0052CC]' : 'text-black/30'}`}>Maestros</button>
                 </>
               )}
               {currentModule === 'planta' && (
                 <>
-                  <button onClick={() => setActiveTab('recepcion')} className={`px-6 py-2.5 rounded-xl font-bold text-sm transition-all ${activeTab === 'recepcion' ? 'bg-white shadow-md text-[#0052CC]' : 'text-black/30'}`}>Recepción</button>
-                  <button onClick={() => setActiveTab('silos')} className={`px-6 py-2.5 rounded-xl font-bold text-sm transition-all ${activeTab === 'silos' ? 'bg-white shadow-md text-[#0052CC]' : 'text-black/30'}`}>Silos</button>
-                  <button onClick={() => setActiveTab('truck')} className={`px-6 py-2.5 rounded-xl font-bold text-sm transition-all ${activeTab === 'truck' ? 'bg-white shadow-md text-[#0052CC]' : 'text-black/30'}`}>Romanero</button>
-                  <button onClick={() => setActiveTab('produccion')} className={`px-6 py-2.5 rounded-xl font-bold text-sm transition-all ${activeTab === 'produccion' ? 'bg-white shadow-md text-[#0052CC]' : 'text-black/30'}`}>Producción</button>
-                  <button onClick={() => setActiveTab('despacho')} className={`px-6 py-2.5 rounded-xl font-bold text-sm transition-all ${activeTab === 'despacho' ? 'bg-white shadow-md text-[#0052CC]' : 'text-black/30'}`}>Despacho</button>
+                  <button onClick={() => setActiveTab('inventario')} className={`px-6 py-2.5 rounded-xl font-bold text-sm transition-all ${activeTab === 'inventario' ? 'bg-white shadow-md text-[#0052CC]' : 'text-black/30'}`}>Inventario</button>
+                  <button onClick={() => setActiveTab('operaciones')} className={`px-6 py-2.5 rounded-xl font-bold text-sm transition-all ${activeTab === 'operaciones' ? 'bg-white shadow-md text-[#0052CC]' : 'text-black/30'}`}>Operaciones</button>
+                  <button onClick={() => setActiveTab('calidad')} className={`px-6 py-2.5 rounded-xl font-bold text-sm transition-all ${activeTab === 'calidad' ? 'bg-white shadow-md text-[#0052CC]' : 'text-black/30'}`}>Calidad</button>
+                  <button onClick={() => setActiveTab('maestros')} className={`px-6 py-2.5 rounded-xl font-bold text-sm transition-all ${activeTab === 'maestros' ? 'bg-white shadow-md text-[#0052CC]' : 'text-black/30'}`}>Maestros</button>
                 </>
               )}
               {currentModule === 'calidad' && (
@@ -2855,7 +2852,7 @@ export default function App() {
                 onAddSowingRecord={handleAddSowingRecord}
               />
             )}
-            {currentModule === 'planta' && activeTab === 'recepcion' && (
+            {currentModule === 'campo' && activeTab === 'inventario' && (
               <MaterialReceptionView 
                 key="recepcion"
                 receptions={receptions}
@@ -2865,13 +2862,7 @@ export default function App() {
                 onAddReception={handleAddReception}
               />
             )}
-            {currentModule === 'planta' && activeTab === 'silos' && (
-              <SiloMonitorView 
-                silos={silos}
-                crops={crops}
-              />
-            )}
-            {currentModule === 'planta' && activeTab === 'truck' && (
+            {currentModule === 'planta' && activeTab === 'inventario' && (
               <TruckReceptionView 
                 silos={silos}
                 dispatches={dispatches}
@@ -2879,35 +2870,14 @@ export default function App() {
                 onUpdateDispatch={handleUpdateDispatch}
               />
             )}
-            {currentModule === 'planta' && activeTab === 'produccion' && (
+            {currentModule === 'planta' && activeTab === 'operaciones' && (
               <ProductionProcessView 
                 silos={silos}
                 onUpdateSilo={handleUpdateSilo}
                 onAddBarrel={handleAddBarrel}
               />
             )}
-            {currentModule === 'planta' && activeTab === 'despacho' && (
-              <DispatchManagementView 
-                key="despacho"
-                dispatches={dispatches}
-                lots={lots}
-                farms={farms}
-                onAddDispatch={handleAddDispatch}
-              />
-            )}
-            {currentModule === 'calidad' && activeTab === 'analisis' && (
-              <LotManagementView 
-                key="analisis"
-                lots={lots.filter(l => dispatches.some(d => d.lotId === l.id))} 
-                crops={crops} 
-                farms={farms}
-                onAddLot={handleAddLot}
-                onDeleteLot={handleDeleteLot}
-                onAddAnalysis={handleAddAnalysis}
-                hideAddButton={true}
-              />
-            )}
-            {currentModule === 'calidad' && activeTab === 'cuarentena' && (
+            {currentModule === 'planta' && activeTab === 'calidad' && (
               <QualityManagementView 
                 key="cuarentena"
                 barrels={barrels}

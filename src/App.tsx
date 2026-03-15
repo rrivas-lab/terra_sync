@@ -28,36 +28,36 @@ import {
 
 const HomeDashboardView = ({ onNavigate }: { onNavigate: (tab: string) => void, key?: React.Key }) => {
   const modules = [
-    { id: 'maestros', label: 'MAESTROS', icon: Briefcase, color: 'text-slate-800 bg-slate-100', description: 'Configuración base y contactos' },
-    { id: 'campo', label: 'CAMPO', icon: Map, color: 'text-[#10B981] bg-emerald-100', description: 'Cura, Siembra y Lotes' },
-    { id: 'planta', label: 'PLANTA', icon: Factory, color: 'text-[#0052CC] bg-blue-100', description: 'Recepción y Despacho' },
-    { id: 'calidad', label: 'CALIDAD', icon: ShieldCheck, color: 'text-amber-600 bg-amber-100', description: 'Microbiología y Barriles' },
+    { id: 'maestros', label: 'MAESTROS', icon: Briefcase, color: 'bg-zinc-900 text-white', description: 'Configuración base y contactos' },
+    { id: 'campo', label: 'CAMPO', icon: Map, color: 'bg-[#10B981] text-black', description: 'Cura, Siembra y Lotes' },
+    { id: 'planta', label: 'PLANTA', icon: Factory, color: 'bg-[#3B82F6] text-white', description: 'Recepción y Despacho' },
+    { id: 'calidad', label: 'CALIDAD', icon: ShieldCheck, color: 'bg-[#F59E0B] text-black', description: 'Microbiología y Barriles' },
   ];
 
   return (
     <motion.div 
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="grid grid-cols-1 md:grid-cols-2 gap-10"
+      className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"
     >
       {modules.map((m) => (
         <button
           key={m.id}
           onClick={() => onNavigate(m.id)}
-          className="bg-white border border-black/5 rounded-[3.5rem] shadow-xl shadow-black/5 p-12 flex flex-col justify-between text-left transition-all hover:-translate-y-2 hover:shadow-2xl group relative overflow-hidden"
+          className={`${m.color} rounded-[3rem] shadow-2xl p-10 flex flex-col justify-between text-left transition-all hover:-translate-y-2 hover:shadow-white/5 group relative overflow-hidden h-[400px]`}
         >
-          <div className="absolute top-0 right-0 p-12 opacity-[0.03] group-hover:scale-110 transition-transform text-black">
-            <m.icon size={280} />
+          <div className="absolute top-0 right-0 p-8 opacity-10 group-hover:scale-110 transition-transform">
+            <m.icon size={200} />
           </div>
           <div className="z-10">
-            <div className={`p-5 rounded-2xl w-fit mb-8 shadow-inner ${m.color}`}>
-              <m.icon size={36} />
+            <div className="p-4 rounded-2xl w-fit mb-8 bg-black/10 backdrop-blur-md">
+              <m.icon size={32} />
             </div>
-            <h2 className="text-6xl font-black tracking-tighter mb-4 text-black group-hover:text-[#0052CC] transition-colors">{m.label}</h2>
-            <p className="text-black/60 font-black uppercase text-xs tracking-widest">{m.description}</p>
+            <h2 className="text-5xl font-black tracking-tighter mb-4 leading-none">{m.label}</h2>
+            <p className="opacity-60 font-black uppercase text-[10px] tracking-widest">{m.description}</p>
           </div>
-          <div className="z-10 flex items-center gap-3 font-black text-sm uppercase tracking-widest text-[#0052CC] mt-12 group-hover:gap-5 transition-all">
-            Acceder Módulo <ChevronRight size={24} />
+          <div className="z-10 flex items-center gap-3 font-black text-xs uppercase tracking-widest mt-12 group-hover:gap-5 transition-all">
+            Acceder Módulo <ChevronRight size={20} />
           </div>
         </button>
       ))}
@@ -304,13 +304,13 @@ const ContactManagementView = ({
   );
 };
 
-const BentoCard = ({ children, title, icon: Icon, className = "", noPadding = false }: { children: React.ReactNode, title: string, icon: any, className?: string, noPadding?: boolean, key?: React.Key }) => (
-  <div className={`bg-white border border-black/10 rounded-[2rem] shadow-sm hover:shadow-md transition-shadow flex flex-col ${noPadding ? '' : 'p-8'} gap-6 ${className}`}>
-    <div className={`flex items-center gap-3 ${noPadding ? 'p-8 pb-0' : ''}`}>
-      <div className="p-3 bg-blue-50 rounded-2xl text-[#0052CC]">
-        <Icon size={24} />
+const BentoCard = ({ children, title, icon: Icon, className = "", noPadding = false }: { children: React.Key | React.ReactNode, title: string, icon: any, className?: string, noPadding?: boolean, key?: React.Key }) => (
+  <div className={`bg-zinc-900 border border-white/5 rounded-[2.5rem] shadow-2xl flex flex-col ${noPadding ? '' : 'p-10'} gap-8 ${className}`}>
+    <div className={`flex items-center gap-4 ${noPadding ? 'p-10 pb-0' : ''}`}>
+      <div className="p-4 bg-white/5 rounded-2xl text-[#3B82F6]">
+        <Icon size={28} />
       </div>
-      <h3 className="text-xl font-semibold tracking-tight text-black">{title}</h3>
+      <h3 className="text-2xl font-black tracking-tighter uppercase text-white">{title}</h3>
     </div>
     <div className="flex-1">
       {children}
@@ -503,92 +503,92 @@ const CropMasterView = ({
   };
 
   return (
-    <div className="flex flex-col gap-8">
+    <div className="flex flex-col gap-10">
       {/* Crop Selector */}
-      <div className="flex gap-4 overflow-x-auto pb-2 no-scrollbar">
+      <div className="flex gap-6 overflow-x-auto pb-4 no-scrollbar">
         {crops.map(crop => (
           <button
             key={crop.id}
             onClick={() => setSelectedCropId(crop.id)}
-            className={`flex items-center gap-3 px-8 py-5 rounded-3xl border transition-all whitespace-nowrap ${
+            className={`flex items-center gap-4 px-10 py-6 rounded-[2rem] border transition-all whitespace-nowrap ${
               selectedCropId === crop.id 
-                ? 'bg-white border-[#0052CC] shadow-xl text-[#0052CC] ring-4 ring-blue-50' 
-                : 'bg-white border-black/5 text-black/50 hover:border-black/20'
+                ? 'bg-[#3B82F6] border-transparent shadow-2xl shadow-blue-500/20 text-white scale-105' 
+                : 'bg-zinc-900 border-white/5 text-white/40 hover:border-white/20'
             }`}
           >
-            <span className="text-3xl">{crop.icon}</span>
-            <span className="font-extrabold text-xl">{crop.name}</span>
+            <span className="text-4xl">{crop.icon}</span>
+            <span className="font-black text-2xl tracking-tighter uppercase">{crop.name}</span>
           </button>
         ))}
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
         {/* Physical-Chemical Section */}
-        <div className="lg:col-span-12 flex flex-col gap-6">
-          <div className="flex justify-between items-end px-4">
+        <div className="lg:col-span-12 flex flex-col gap-8">
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 px-4">
             <div>
-              <h3 className="text-2xl font-black tracking-tight">Constructor de Análisis</h3>
-              <p className="text-black/40 font-medium">Define los parámetros dinámicos para el control de calidad.</p>
+              <h3 className="text-4xl font-black tracking-tighter uppercase leading-none">Constructor de Análisis</h3>
+              <p className="text-white/20 font-black uppercase text-[10px] tracking-widest mt-3">Define los parámetros dinámicos para el control de calidad.</p>
             </div>
             <button 
               onClick={() => setIsAddingParam(true)}
-              className="flex items-center gap-2 px-6 py-3 bg-black text-white rounded-2xl font-bold shadow-lg"
+              className="flex items-center gap-3 px-10 py-5 bg-[#3B82F6] text-white rounded-2xl font-black text-xs uppercase tracking-widest hover:scale-105 transition-all shadow-xl shadow-blue-500/20"
             >
-              <Plus size={18} /> Agregar Parámetro
+              <Plus size={20} /> Agregar Parámetro
             </button>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
             {currentCrop.parameters.map(param => (
               <BentoCard 
                 key={param.id} 
                 title={param.name} 
                 icon={param.category === 'FISICO_QUIMICO' ? Beaker : ShieldCheck}
-                className="relative"
+                className="relative group"
               >
                 <button 
                   onClick={() => removeParameter(param.id)}
-                  className="absolute top-8 right-8 p-2 text-black/20 hover:text-red-500 transition-colors"
+                  className="absolute top-10 right-10 p-3 text-white/10 hover:text-red-500 transition-colors bg-white/5 rounded-xl"
                 >
-                  <Trash2 size={18} />
+                  <Trash2 size={20} />
                 </button>
                 
-                <div className="flex flex-col gap-6">
-                  <div className="flex items-center gap-2">
-                    <span className={`px-3 py-1 rounded-lg text-[10px] font-black tracking-widest border ${
-                      param.category === 'FISICO_QUIMICO' ? 'bg-blue-50 text-blue-600 border-blue-100' : 'bg-purple-50 text-purple-600 border-purple-100'
+                <div className="flex flex-col gap-8">
+                  <div className="flex items-center gap-3">
+                    <span className={`px-4 py-1.5 rounded-xl text-[10px] font-black tracking-widest border ${
+                      param.category === 'FISICO_QUIMICO' ? 'bg-blue-500/10 text-[#3B82F6] border-blue-500/20' : 'bg-purple-500/10 text-purple-400 border-purple-500/20'
                     }`}>
                       {param.category.replace('_', ' ')}
                     </span>
-                    <span className="px-3 py-1 rounded-lg text-[10px] font-black tracking-widest border bg-black/5 text-black/40 border-black/5">
+                    <span className="px-4 py-1.5 rounded-xl text-[10px] font-black tracking-widest border bg-white/5 text-white/20 border-white/5">
                       {param.type}
                     </span>
                   </div>
 
                   {param.type === 'NUMERIC' && (
-                    <div className="flex flex-col gap-4">
-                      <div className="flex justify-between text-xs font-bold text-black/40 uppercase tracking-widest">
+                    <div className="flex flex-col gap-6">
+                      <div className="flex justify-between text-[10px] font-black text-white/20 uppercase tracking-widest">
                         <span>Rango de Aceptación</span>
-                        <span>{param.unit}</span>
+                        <span className="text-[#3B82F6]">{param.unit}</span>
                       </div>
-                      <div className="flex items-center gap-4 bg-black/5 p-4 rounded-2xl">
+                      <div className="flex items-center gap-6 bg-white/5 p-6 rounded-3xl border border-white/5">
                         <div className="flex-1 text-center">
-                          <span className="text-[10px] block text-black/30">MIN</span>
-                          <span className="text-lg font-black">{param.min}</span>
+                          <span className="text-[10px] block text-white/10 font-black uppercase tracking-widest mb-1">MIN</span>
+                          <span className="text-2xl font-black text-white">{param.min}</span>
                         </div>
-                        <div className="w-px h-8 bg-black/10" />
+                        <div className="w-px h-10 bg-white/10" />
                         <div className="flex-1 text-center">
-                          <span className="text-[10px] block text-black/30">MAX</span>
-                          <span className="text-lg font-black">{param.max}</span>
+                          <span className="text-[10px] block text-white/10 font-black uppercase tracking-widest mb-1">MAX</span>
+                          <span className="text-2xl font-black text-white">{param.max}</span>
                         </div>
                       </div>
                     </div>
                   )}
 
                   {param.type === 'SELECTION' && (
-                    <div className="flex flex-wrap gap-2">
+                    <div className="flex flex-wrap gap-3">
                       {param.options?.map((opt, idx) => (
-                        <span key={idx} className="px-3 py-1 bg-black/5 rounded-lg text-xs font-bold">
+                        <span key={idx} className="px-4 py-2 bg-white/5 rounded-xl text-xs font-black text-white/60 border border-white/5">
                           {opt}
                         </span>
                       ))}
@@ -919,52 +919,52 @@ const MaterialReceptionView = ({
   };
 
   return (
-    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex flex-col gap-8">
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 bg-white p-8 rounded-[3rem] shadow-xl shadow-black/5 border border-black/5">
+    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex flex-col gap-10">
+      <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-8 bg-zinc-900 p-10 rounded-[3rem] border border-white/5 shadow-2xl">
         <div className="flex items-center gap-6">
-          <div className="w-16 h-16 bg-blue-100 text-[#0052CC] rounded-2xl flex items-center justify-center shadow-inner">
-            <Layers size={32} />
+          <div className="w-20 h-20 bg-blue-500/10 text-[#3B82F6] rounded-3xl flex items-center justify-center shadow-inner border border-blue-500/20">
+            <Layers size={40} />
           </div>
           <div>
-            <h2 className="text-3xl font-black tracking-tight uppercase">Recepción de Material</h2>
-            <div className="flex items-center gap-2 mt-1">
-              <span className="text-black/40 font-bold uppercase text-[10px] tracking-widest">Página</span>
-              <span className="text-[#0052CC] font-black text-xs">{currentPage} de {totalPages}</span>
+            <h2 className="text-4xl font-black tracking-tighter uppercase leading-none text-white">Recepción de Material</h2>
+            <div className="flex items-center gap-3 mt-3">
+              <span className="text-white/20 font-black uppercase text-[10px] tracking-widest">Página</span>
+              <span className="text-[#3B82F6] font-black text-xs uppercase tracking-widest">{currentPage} de {totalPages}</span>
             </div>
           </div>
         </div>
-        <div className="flex items-center gap-4 w-full md:w-auto">
-          <div className="relative flex-1 md:w-64">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-black/40" size={20} />
+        <div className="flex flex-col sm:flex-row items-center gap-6 w-full lg:w-auto">
+          <div className="relative w-full sm:w-80">
+            <Search className="absolute left-6 top-1/2 -translate-y-1/2 text-white/20" size={24} />
             <input 
               type="text" 
-              placeholder="Buscar recepción..." 
+              placeholder="BUSCAR RECEPCIÓN..." 
               value={searchTerm}
               onChange={(e) => { setSearchTerm(e.target.value); setCurrentPage(1); }}
-              className="w-full h-14 pl-12 pr-4 bg-black/5 rounded-2xl border-none focus:ring-2 focus:ring-[#0052CC] font-bold outline-none transition-all"
+              className="w-full h-16 pl-16 pr-6 bg-white/5 rounded-2xl border border-white/10 focus:border-[#3B82F6] font-black text-white outline-none transition-all uppercase text-xs tracking-widest"
             />
           </div>
-          <div className="flex gap-2">
+          <div className="flex gap-3">
             <button 
               onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
               disabled={currentPage === 1}
-              className="w-14 h-14 rounded-2xl bg-black/5 flex items-center justify-center disabled:opacity-30 hover:bg-black/10 transition-colors shadow-sm"
+              className="w-16 h-16 rounded-2xl bg-white/5 flex items-center justify-center disabled:opacity-10 hover:bg-white/10 transition-colors border border-white/5"
             >
-              <ChevronLeft size={24} />
+              <ChevronLeft size={28} className="text-white" />
             </button>
             <button 
               onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
               disabled={currentPage === totalPages}
-              className="w-14 h-14 rounded-2xl bg-black/5 flex items-center justify-center disabled:opacity-30 hover:bg-black/10 transition-colors shadow-sm"
+              className="w-16 h-16 rounded-2xl bg-white/5 flex items-center justify-center disabled:opacity-10 hover:bg-white/10 transition-colors border border-white/5"
             >
-              <ChevronRight size={24} />
+              <ChevronRight size={28} className="text-white" />
             </button>
           </div>
           <button
             onClick={() => setIsAdding(true)}
-            className="flex items-center justify-center gap-2 h-14 px-6 bg-[#0052CC] text-white rounded-2xl font-black shadow-lg shadow-blue-200 hover:scale-105 active:scale-95 transition-all whitespace-nowrap"
+            className="flex items-center justify-center gap-3 h-16 px-10 bg-[#3B82F6] text-white rounded-2xl font-black uppercase tracking-widest text-xs shadow-xl shadow-blue-500/20 hover:scale-105 active:scale-95 transition-all whitespace-nowrap"
           >
-            <Plus size={20} /> <span className="hidden md:inline">Registrar Entrada</span>
+            <Plus size={24} /> <span>Registrar Entrada</span>
           </button>
         </div>
       </div>
@@ -979,46 +979,46 @@ const MaterialReceptionView = ({
             return (
               <button
                 key={rec.id}
-                className="p-8 rounded-[2rem] text-left transition-all flex flex-col gap-6 bg-white border border-black/5 hover:scale-[1.02] active:scale-[0.98] shadow-xl group relative"
+                className="p-8 rounded-[2rem] text-left transition-all flex flex-col gap-6 bg-zinc-900 border border-white/5 hover:border-[#3B82F6]/30 hover:scale-[1.02] active:scale-[0.98] shadow-2xl group relative"
               >
                 <div className="absolute top-8 right-8">
                   <span className={`px-4 py-2 rounded-xl text-[10px] font-black tracking-widest border ${
-                    rec.status === 'Bueno' ? 'bg-emerald-100 text-[#10B981] border-emerald-200' : 
-                    rec.status === 'Regular' ? 'bg-amber-100 text-amber-700 border-amber-200' : 
-                    'bg-red-100 text-red-700 border-red-200'
+                    rec.status === 'Bueno' ? 'bg-[#10B981]/10 text-[#10B981] border-[#10B981]/20' : 
+                    rec.status === 'Regular' ? 'bg-amber-500/10 text-amber-500 border-amber-500/20' : 
+                    'bg-red-500/10 text-red-500 border-red-500/20'
                   }`}>
                     {rec.status.toUpperCase()}
                   </span>
                 </div>
                 <div className="flex flex-col gap-6">
                   <div className="flex items-center gap-4">
-                    <div className="p-4 rounded-2xl bg-black/5 text-[#0052CC]">
+                    <div className="p-4 rounded-2xl bg-white/5 text-[#3B82F6] border border-white/5">
                       <Layers size={32} />
                     </div>
                     <div>
-                      <h4 className="font-black text-2xl tracking-tight">{rec.provider}</h4>
-                      <div className="flex items-center gap-2 text-black/40 text-[10px] font-black uppercase tracking-widest">
+                      <h4 className="font-black text-2xl tracking-tight text-white">{rec.provider}</h4>
+                      <div className="flex items-center gap-2 text-white/20 text-[10px] font-black uppercase tracking-widest">
                         <Clock size={12} /> {new Date(rec.date).toLocaleDateString()} • {lot?.lotCode}
                       </div>
                     </div>
                   </div>
                   <div className="grid grid-cols-2 gap-4">
-                    <div className="bg-black/5 p-4 rounded-2xl">
-                      <span className="text-[10px] uppercase font-black text-black/40 block mb-1">Bultos</span>
-                      <span className="text-xl font-black">{rec.bundleCount}</span>
+                    <div className="bg-white/5 p-4 rounded-2xl border border-white/5">
+                      <span className="text-[10px] uppercase font-black text-white/20 block mb-1">Bultos</span>
+                      <span className="text-xl font-black text-white">{rec.bundleCount}</span>
                     </div>
-                    <div className="bg-black/5 p-4 rounded-2xl">
-                      <span className="text-[10px] uppercase font-black text-black/40 block mb-1">Peso Prom.</span>
-                      <span className="text-xl font-black">{rec.averageWeight} Kg</span>
+                    <div className="bg-white/5 p-4 rounded-2xl border border-white/5">
+                      <span className="text-[10px] uppercase font-black text-white/20 block mb-1">Peso Prom.</span>
+                      <span className="text-xl font-black text-white">{rec.averageWeight} Kg</span>
                     </div>
                   </div>
-                  <div className="flex items-center justify-between bg-black/5 p-5 rounded-2xl">
+                  <div className="flex items-center justify-between bg-white/5 p-5 rounded-2xl border border-white/5">
                     <div className="flex items-center gap-3">
                       <span className="text-3xl">{crop?.icon}</span>
-                      <span className="font-black">{crop?.name}</span>
+                      <span className="font-black text-white">{crop?.name}</span>
                     </div>
                     <div className="text-right">
-                      <span className="text-[10px] uppercase font-black text-black/40 block">Health Score</span>
+                      <span className="text-[10px] uppercase font-black text-white/20 block">Health Score</span>
                       <span className={`text-2xl font-black ${rec.healthScore >= 80 ? 'text-[#10B981]' : rec.healthScore >= 50 ? 'text-amber-500' : 'text-red-500'}`}>
                         {rec.healthScore}%
                       </span>
@@ -1035,35 +1035,35 @@ const MaterialReceptionView = ({
         {isAdding && (
           <div className="fixed inset-0 z-50 flex items-center justify-center p-6">
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setIsAdding(false)} className="absolute inset-0 bg-black/40 backdrop-blur-sm" />
-            <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.9, opacity: 0 }} className="relative bg-white w-full max-w-5xl rounded-[3rem] shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
-              <div className="p-10 border-b border-black/5 flex justify-between items-center bg-white sticky top-0 z-10">
-                <h3 className="text-3xl font-bold tracking-tight">Recepción de Material Vegetal</h3>
-                <button onClick={() => setIsAdding(false)} className="p-4 bg-black/5 rounded-2xl"><Plus className="rotate-45" /></button>
+            <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.9, opacity: 0 }} className="relative bg-zinc-900 w-full max-w-5xl rounded-[3rem] shadow-2xl overflow-hidden flex flex-col max-h-[90vh] border border-white/10">
+              <div className="p-10 border-b border-white/5 flex justify-between items-center bg-zinc-900 sticky top-0 z-10">
+                <h3 className="text-3xl font-black tracking-tighter uppercase text-white">Recepción de Material Vegetal</h3>
+                <button onClick={() => setIsAdding(false)} className="p-4 bg-white/5 rounded-2xl text-white hover:bg-white/10 transition-colors"><Plus className="rotate-45" size={24} /></button>
               </div>
 
               <div className="p-10 flex flex-col gap-10 overflow-y-auto">
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
                   {/* Left Column: Basic Info */}
                   <div className="flex flex-col gap-8">
-                    <div className="flex flex-col gap-2">
-                      <span className="text-[10px] font-black text-black/40 uppercase tracking-widest">Proveedor</span>
+                    <div className="flex flex-col gap-3">
+                      <span className="text-[10px] font-black text-white/20 uppercase tracking-widest">Proveedor</span>
                       <input 
                         type="text" 
                         value={newReception.provider}
                         onChange={e => setNewReception(prev => ({ ...prev, provider: e.target.value }))}
-                        className="h-16 px-6 bg-black/5 rounded-2xl font-black text-xl"
-                        placeholder="Nombre del Proveedor"
+                        className="h-16 px-8 bg-white/5 rounded-2xl font-black text-white border border-white/10 focus:border-[#3B82F6] outline-none transition-all uppercase text-sm tracking-widest"
+                        placeholder="NOMBRE DEL PROVEEDOR"
                       />
                     </div>
 
-                    <div className="flex flex-col gap-2">
-                      <span className="text-[10px] font-black text-black/40 uppercase tracking-widest">Finca de Recepción</span>
-                      <div className="grid grid-cols-2 gap-2">
+                    <div className="flex flex-col gap-3">
+                      <span className="text-[10px] font-black text-white/20 uppercase tracking-widest">Finca de Recepción</span>
+                      <div className="grid grid-cols-2 gap-3">
                         {farms.map(f => (
                           <button
                             key={f.id}
                             onClick={() => setNewReception(prev => ({ ...prev, farmId: f.id, lotId: '' }))}
-                            className={`h-14 px-4 rounded-xl font-black border transition-all text-xs flex items-center justify-between ${newReception.farmId === f.id ? 'bg-[#0052CC] text-white border-[#0052CC]' : 'bg-white border-black/10 text-black/40'}`}
+                            className={`h-16 px-6 rounded-xl font-black border transition-all text-[10px] tracking-widest uppercase flex items-center justify-between ${newReception.farmId === f.id ? 'bg-[#3B82F6] text-white border-transparent shadow-xl' : 'bg-white/5 border-white/5 text-white/40 hover:border-white/20'}`}
                           >
                             {f.name}
                             {newReception.farmId === f.id && <CheckCircle2 size={16} />}
@@ -1072,29 +1072,29 @@ const MaterialReceptionView = ({
                       </div>
                     </div>
 
-                    <div className="flex flex-col gap-2">
-                      <span className="text-[10px] font-black text-black/40 uppercase tracking-widest">Rubro</span>
-                      <div className="flex gap-2 overflow-x-auto no-scrollbar pb-2">
+                    <div className="flex flex-col gap-3">
+                      <span className="text-[10px] font-black text-white/20 uppercase tracking-widest">Rubro</span>
+                      <div className="flex gap-3 overflow-x-auto no-scrollbar pb-2">
                         {crops.map(c => (
                           <button
                             key={c.id}
                             onClick={() => setNewReception(prev => ({ ...prev, cropId: c.id, lotId: '' }))}
-                            className={`px-6 py-4 rounded-2xl font-black border transition-all flex items-center gap-2 ${newReception.cropId === c.id ? 'bg-black text-white border-black' : 'bg-white text-black/40 border-black/10'}`}
+                            className={`px-8 py-5 rounded-2xl font-black border transition-all flex items-center gap-3 whitespace-nowrap ${newReception.cropId === c.id ? 'bg-white text-black border-transparent shadow-xl' : 'bg-white/5 border-white/5 text-white/40 hover:border-white/20'}`}
                           >
-                            <span>{c.icon}</span> {c.name}
+                            <span className="text-xl">{c.icon}</span> <span className="uppercase tracking-widest text-xs">{c.name}</span>
                           </button>
                         ))}
                       </div>
                     </div>
 
-                    <div className="flex flex-col gap-2">
-                      <span className="text-[10px] font-black text-black/40 uppercase tracking-widest">Lote de Destino</span>
-                      <div className="grid grid-cols-2 gap-2">
+                    <div className="flex flex-col gap-3">
+                      <span className="text-[10px] font-black text-white/20 uppercase tracking-widest">Lote de Destino</span>
+                      <div className="grid grid-cols-2 gap-3">
                         {filteredLots.map(l => (
                           <button
                             key={l.id}
                             onClick={() => setNewReception(prev => ({ ...prev, lotId: l.id }))}
-                            className={`h-14 px-4 rounded-xl font-black border transition-all text-[10px] flex items-center justify-between ${newReception.lotId === l.id ? 'bg-[#0052CC] text-white border-[#0052CC]' : 'bg-white border-black/10 text-black/40'}`}
+                            className={`h-16 px-6 rounded-xl font-black border transition-all text-[10px] tracking-widest uppercase flex items-center justify-between ${newReception.lotId === l.id ? 'bg-[#3B82F6] text-white border-transparent shadow-xl' : 'bg-white/5 border-white/5 text-white/40 hover:border-white/20'}`}
                           >
                             {l.lotCode}
                             {newReception.lotId === l.id && <CheckCircle2 size={16} />}
@@ -1103,16 +1103,16 @@ const MaterialReceptionView = ({
                       </div>
                     </div>
 
-                    <div className="grid grid-cols-1 gap-8 bg-black/5 p-8 rounded-[2rem]">
+                    <div className="grid grid-cols-1 gap-8 bg-white/5 p-8 rounded-[2rem] border border-white/5">
                       <Stepper 
-                        label="Cantidad de Bultos" 
+                        label="CANTIDAD DE BULTOS" 
                         value={newReception.bundleCount || 0} 
                         onChange={v => setNewReception(prev => ({ ...prev, bundleCount: v }))} 
                         step={1}
                         min={1}
                       />
                       <PrecisionSlider 
-                        label="Peso Promedio (Kg)" 
+                        label="PESO PROMEDIO (KG)" 
                         value={newReception.averageWeight || 0} 
                         onChange={v => setNewReception(prev => ({ ...prev, averageWeight: v }))} 
                         min={0.1} 
@@ -1123,12 +1123,12 @@ const MaterialReceptionView = ({
                   </div>
 
                   {/* Right Column: Dynamic Quality Parameters */}
-                  <div className="flex flex-col gap-6">
+                  <div className="flex flex-col gap-8">
                     <div className="flex justify-between items-center">
-                      <span className="text-[10px] font-black text-black/40 uppercase tracking-widest">Control de Calidad en Tiempo Real</span>
-                      <div className="flex items-center gap-2">
-                        <span className="text-[10px] font-black uppercase text-black/30">Score:</span>
-                        <span className="text-xl font-black text-[#0052CC]">{calculateHealthScore(newReception.qualityValues || {})}%</span>
+                      <span className="text-[10px] font-black text-white/20 uppercase tracking-widest">Control de Calidad en Tiempo Real</span>
+                      <div className="flex items-center gap-3">
+                        <span className="text-[10px] font-black uppercase text-white/10">Score:</span>
+                        <span className="text-2xl font-black text-[#3B82F6]">{calculateHealthScore(newReception.qualityValues || {})}%</span>
                       </div>
                     </div>
 
@@ -1141,10 +1141,10 @@ const MaterialReceptionView = ({
                         else if (param.type === 'SELECTION') isGood = (param.selectionCategories?.[val] || 'Bueno') === 'Bueno';
 
                         return (
-                          <div key={param.id} className={`p-6 rounded-3xl border-2 transition-all ${isGood ? 'bg-emerald-50 border-emerald-100' : 'bg-red-50 border-red-100'}`}>
-                            <div className="flex justify-between items-center mb-4">
-                              <span className="font-black text-black uppercase text-xs tracking-tight">{param.name}</span>
-                              {isGood ? <CheckCircle2 className="text-emerald-500" size={20} /> : <XCircle className="text-red-500" size={20} />}
+                          <div key={param.id} className={`p-8 rounded-[2rem] border transition-all ${isGood ? 'bg-emerald-500/5 border-emerald-500/20' : 'bg-red-500/5 border-red-500/20'}`}>
+                            <div className="flex justify-between items-center mb-6">
+                              <span className="font-black text-white uppercase text-[10px] tracking-widest">{param.name}</span>
+                              {isGood ? <CheckCircle2 className="text-[#10B981]" size={24} /> : <XCircle className="text-red-500" size={24} />}
                             </div>
 
                             {param.type === 'NUMERIC' && (
@@ -1242,98 +1242,98 @@ const DispatchManagementView = ({
   const paginatedDispatches = filteredDispatches.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 
   return (
-    <div className="flex flex-col gap-8">
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 bg-white p-8 rounded-[3rem] shadow-xl shadow-black/5 border border-black/5">
+    <div className="flex flex-col gap-10">
+      <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-8 bg-zinc-900 p-10 rounded-[3rem] border border-white/5 shadow-2xl">
         <div className="flex items-center gap-6">
-          <div className="w-16 h-16 bg-blue-100 text-[#0052CC] rounded-2xl flex items-center justify-center shadow-inner">
-            <Truck size={32} />
+          <div className="w-20 h-20 bg-blue-500/10 text-[#3B82F6] rounded-3xl flex items-center justify-center shadow-inner border border-blue-500/20">
+            <Truck size={40} />
           </div>
           <div>
-            <h2 className="text-3xl font-black tracking-tight uppercase">Despachos a Planta</h2>
-            <div className="flex items-center gap-2 mt-1">
-              <span className="text-black/40 font-bold uppercase text-[10px] tracking-widest">Página</span>
-              <span className="text-[#0052CC] font-black text-xs">{currentPage} de {totalPages}</span>
+            <h2 className="text-4xl font-black tracking-tighter uppercase leading-none text-white">Despachos a Planta</h2>
+            <div className="flex items-center gap-3 mt-3">
+              <span className="text-white/20 font-black uppercase text-[10px] tracking-widest">Página</span>
+              <span className="text-[#3B82F6] font-black text-xs uppercase tracking-widest">{currentPage} de {totalPages}</span>
             </div>
           </div>
         </div>
-        <div className="flex items-center gap-4 w-full md:w-auto">
-          <div className="relative flex-1 md:w-64">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-black/40" size={20} />
+        <div className="flex items-center gap-6 w-full lg:w-auto">
+          <div className="relative flex-1 lg:w-80">
+            <Search className="absolute left-6 top-1/2 -translate-y-1/2 text-white/20" size={24} />
             <input 
               type="text" 
-              placeholder="Buscar despacho..." 
+              placeholder="BUSCAR DESPACHO..." 
               value={searchTerm}
               onChange={(e) => { setSearchTerm(e.target.value); setCurrentPage(1); }}
-              className="w-full h-14 pl-12 pr-4 bg-black/5 rounded-2xl border-none focus:ring-2 focus:ring-[#0052CC] font-bold outline-none transition-all"
+              className="w-full h-16 pl-16 pr-6 bg-white/5 rounded-2xl border border-white/10 focus:border-[#3B82F6] font-black text-white outline-none transition-all uppercase text-xs tracking-widest"
             />
           </div>
-          <div className="flex gap-2">
+          <div className="flex gap-3">
             <button 
               onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
               disabled={currentPage === 1}
-              className="w-14 h-14 rounded-2xl bg-black/5 flex items-center justify-center disabled:opacity-30 hover:bg-black/10 transition-colors shadow-sm"
+              className="w-16 h-16 rounded-2xl bg-white/5 flex items-center justify-center disabled:opacity-10 hover:bg-white/10 transition-colors border border-white/5"
             >
-              <ChevronLeft size={24} />
+              <ChevronLeft size={28} className="text-white" />
             </button>
             <button 
               onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
               disabled={currentPage === totalPages}
-              className="w-14 h-14 rounded-2xl bg-black/5 flex items-center justify-center disabled:opacity-30 hover:bg-black/10 transition-colors shadow-sm"
+              className="w-16 h-16 rounded-2xl bg-white/5 flex items-center justify-center disabled:opacity-10 hover:bg-white/10 transition-colors border border-white/5"
             >
-              <ChevronRight size={24} />
+              <ChevronRight size={28} className="text-white" />
             </button>
           </div>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 gap-4">
+      <div className="grid grid-cols-1 gap-6">
         {paginatedDispatches.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-20 bg-white rounded-[3rem] border border-black/5 text-black/20">
-            <Truck size={64} strokeWidth={1} className="mb-4" />
-            <p className="font-bold">No hay despachos registrados.</p>
+          <div className="flex flex-col items-center justify-center py-32 bg-zinc-900 rounded-[3rem] border border-white/5 text-white/20">
+            <Truck size={80} strokeWidth={1} className="mb-6 opacity-20" />
+            <p className="font-black uppercase tracking-widest text-sm">No hay despachos registrados.</p>
           </div>
         ) : (
           paginatedDispatches.map(dispatch => {
             const lot = lots.find(l => l.id === dispatch.lotId);
             const farm = farms.find(f => f.id === dispatch.originFarmId);
             return (
-              <div key={dispatch.id} className="bg-white p-8 rounded-[2rem] border border-black/5 flex flex-col md:flex-row justify-between items-start md:items-center gap-6 shadow-xl hover:scale-[1.01] transition-all">
-                <div className="flex items-center gap-8">
-                  <div className="p-5 bg-[#0052CC] text-white rounded-2xl shadow-lg">
-                    <Truck size={24} />
+              <div key={dispatch.id} className="bg-zinc-900 p-10 rounded-[3rem] border border-white/5 flex flex-col lg:flex-row justify-between items-start lg:items-center gap-8 shadow-2xl hover:border-[#3B82F6]/30 transition-all group">
+                <div className="flex items-center gap-10">
+                  <div className="p-6 bg-white/5 text-[#3B82F6] rounded-3xl border border-white/5 group-hover:bg-[#3B82F6] group-hover:text-white transition-colors">
+                    <Truck size={32} />
                   </div>
                   <div>
-                    <div className="flex items-center gap-2 mb-1">
-                      <span className="font-black text-2xl tracking-tight">{dispatch.id.split('-')[1]}</span>
-                      <span className={`px-3 py-1 rounded-lg text-[10px] font-black tracking-widest ${dispatch.type === 'INTERNO' ? 'bg-blue-100 text-[#0052CC]' : 'bg-amber-100 text-amber-600'}`}>
+                    <div className="flex items-center gap-4 mb-2">
+                      <span className="font-black text-3xl tracking-tighter text-white uppercase">{dispatch.id.split('-')[1]}</span>
+                      <span className={`px-4 py-1.5 rounded-xl text-[10px] font-black tracking-widest border ${dispatch.type === 'INTERNO' ? 'bg-blue-500/10 text-[#3B82F6] border-blue-500/20' : 'bg-amber-500/10 text-amber-500 border-amber-500/20'}`}>
                         {dispatch.type}
                       </span>
                     </div>
-                    <p className="text-xs font-black text-black/40 uppercase tracking-widest">
+                    <p className="text-[10px] font-black text-white/20 uppercase tracking-widest">
                       {farm?.name || 'Proveedor Externo'} • {lot?.lotCode || 'N/A'}
                     </p>
                   </div>
                 </div>
 
-                <div className="flex flex-wrap gap-8 md:gap-12 items-center w-full md:w-auto justify-between md:justify-end">
+                <div className="flex flex-wrap gap-10 lg:gap-16 items-center w-full lg:w-auto justify-between lg:justify-end">
                   <div className="text-right">
-                    <span className="text-[10px] font-black text-black/40 uppercase tracking-widest block">Cantidad</span>
-                    <span className="text-2xl font-black">{dispatch.quantity} Kg</span>
+                    <span className="text-[10px] font-black text-white/20 uppercase tracking-widest block mb-1">Cantidad</span>
+                    <span className="text-3xl font-black text-white">{dispatch.quantity} Kg</span>
                   </div>
                   <div className="text-right">
-                    <span className="text-[10px] font-black text-black/40 uppercase tracking-widest block">Fecha</span>
-                    <span className="text-sm font-black">{new Date(dispatch.date).toLocaleDateString()}</span>
+                    <span className="text-[10px] font-black text-white/20 uppercase tracking-widest block mb-1">Fecha</span>
+                    <span className="text-sm font-black text-white uppercase tracking-widest">{new Date(dispatch.date).toLocaleDateString()}</span>
                   </div>
-                  <div className="flex items-center gap-4">
-                    <div className={`px-4 py-2 rounded-xl text-[10px] font-black border ${
-                      dispatch.status === 'RECIBIDO' ? 'bg-emerald-50 border-emerald-200 text-[#10B981]' : 'bg-blue-50 border-blue-200 text-[#0052CC]'
+                  <div className="flex items-center gap-6">
+                    <div className={`px-5 py-2.5 rounded-xl text-[10px] font-black tracking-widest border ${
+                      dispatch.status === 'RECIBIDO' ? 'bg-[#10B981]/10 border-[#10B981]/20 text-[#10B981]' : 'bg-blue-500/10 border-blue-500/20 text-[#3B82F6]'
                     }`}>
                       {dispatch.status}
                     </div>
                     {dispatch.status === 'PENDIENTE' && (
                       <button 
                         onClick={() => onReceiveDispatch(dispatch.id)}
-                        className="h-12 px-6 bg-black text-white rounded-xl font-black text-xs hover:scale-105 active:scale-95 transition-all shadow-lg"
+                        className="h-16 px-10 bg-white text-black rounded-2xl font-black text-xs uppercase tracking-widest hover:scale-105 active:scale-95 transition-all shadow-xl"
                       >
                         RECIBIR
                       </button>
@@ -1846,45 +1846,45 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-white text-black font-sans flex flex-col">
+    <div className="min-h-screen bg-black text-white font-sans flex flex-col">
       {/* Navigation Header */}
-      <div className="bg-white border-b border-black/5 px-10 py-6 flex justify-between items-center sticky top-0 z-40">
+      <div className="bg-black border-b border-white/5 px-10 py-6 flex justify-between items-center sticky top-0 z-40 backdrop-blur-xl bg-black/80">
         <div className="flex items-center gap-12">
           <button 
             onClick={() => setCurrentModule('home')}
-            className="flex items-center gap-2 text-[#0052CC] font-black tracking-tighter text-2xl hover:scale-105 transition-transform"
+            className="flex items-center gap-2 text-[#3B82F6] font-black tracking-tighter text-2xl hover:scale-105 transition-transform"
           >
             <Leaf fill="currentColor" />
             <span>TERRASYNC</span>
           </button>
           
           {currentModule !== 'home' && (
-            <nav className="flex bg-black/5 p-1.5 rounded-2xl">
+            <nav className="flex bg-white/5 p-1.5 rounded-2xl">
               {currentModule === 'maestros' && (
                 <>
-                  <button onClick={() => setActiveTab('crops')} className={`px-6 py-2.5 rounded-xl font-bold text-sm transition-all ${activeTab === 'crops' ? 'bg-white shadow-md text-[#0052CC]' : 'text-black/30'}`}>Rubros</button>
-                  <button onClick={() => setActiveTab('contacts')} className={`px-6 py-2.5 rounded-xl font-bold text-sm transition-all ${activeTab === 'contacts' ? 'bg-white shadow-md text-[#0052CC]' : 'text-black/30'}`}>Contactos</button>
+                  <button onClick={() => setActiveTab('crops')} className={`px-6 py-2.5 rounded-xl font-black text-xs uppercase tracking-widest transition-all ${activeTab === 'crops' ? 'bg-white text-black shadow-lg' : 'text-white/30'}`}>Rubros</button>
+                  <button onClick={() => setActiveTab('contacts')} className={`px-6 py-2.5 rounded-xl font-black text-xs uppercase tracking-widest transition-all ${activeTab === 'contacts' ? 'bg-white text-black shadow-lg' : 'text-white/30'}`}>Contactos</button>
                 </>
               )}
               {currentModule === 'campo' && (
                 <>
-                  <button onClick={() => setActiveTab('fincas')} className={`px-6 py-2.5 rounded-xl font-bold text-sm transition-all ${activeTab === 'fincas' ? 'bg-white shadow-md text-[#0052CC]' : 'text-black/30'}`}>Fincas</button>
-                  <button onClick={() => setActiveTab('lots')} className={`px-6 py-2.5 rounded-xl font-bold text-sm transition-all ${activeTab === 'lots' ? 'bg-white shadow-md text-[#0052CC]' : 'text-black/30'}`}>Lotes</button>
-                  <button onClick={() => setActiveTab('cura')} className={`px-6 py-2.5 rounded-xl font-bold text-sm transition-all ${activeTab === 'cura' ? 'bg-white shadow-md text-[#0052CC]' : 'text-black/30'}`}>Cura</button>
-                  <button onClick={() => setActiveTab('control-siembra')} className={`px-6 py-2.5 rounded-xl font-bold text-sm transition-all ${activeTab === 'control-siembra' ? 'bg-white shadow-md text-[#0052CC]' : 'text-black/30'}`}>Proyectos</button>
+                  <button onClick={() => setActiveTab('fincas')} className={`px-6 py-2.5 rounded-xl font-black text-xs uppercase tracking-widest transition-all ${activeTab === 'fincas' ? 'bg-white text-black shadow-lg' : 'text-white/30'}`}>Fincas</button>
+                  <button onClick={() => setActiveTab('lots')} className={`px-6 py-2.5 rounded-xl font-black text-xs uppercase tracking-widest transition-all ${activeTab === 'lots' ? 'bg-white text-black shadow-lg' : 'text-white/30'}`}>Lotes</button>
+                  <button onClick={() => setActiveTab('cura')} className={`px-6 py-2.5 rounded-xl font-black text-xs uppercase tracking-widest transition-all ${activeTab === 'cura' ? 'bg-white text-black shadow-lg' : 'text-white/30'}`}>Cura</button>
+                  <button onClick={() => setActiveTab('control-siembra')} className={`px-6 py-2.5 rounded-xl font-black text-xs uppercase tracking-widest transition-all ${activeTab === 'control-siembra' ? 'bg-white text-black shadow-lg' : 'text-white/30'}`}>Proyectos</button>
                 </>
               )}
               {currentModule === 'planta' && (
                 <>
-                  <button onClick={() => setActiveTab('recepcion')} className={`px-6 py-2.5 rounded-xl font-bold text-sm transition-all ${activeTab === 'recepcion' ? 'bg-white shadow-md text-[#0052CC]' : 'text-black/30'}`}>Recepción</button>
-                  <button onClick={() => setActiveTab('despacho')} className={`px-6 py-2.5 rounded-xl font-bold text-sm transition-all ${activeTab === 'despacho' ? 'bg-white shadow-md text-[#0052CC]' : 'text-black/30'}`}>Despacho</button>
-                  <button onClick={() => setActiveTab('silos')} className={`px-6 py-2.5 rounded-xl font-bold text-sm transition-all ${activeTab === 'silos' ? 'bg-white shadow-md text-[#0052CC]' : 'text-black/30'}`}>Silos</button>
+                  <button onClick={() => setActiveTab('recepcion')} className={`px-6 py-2.5 rounded-xl font-black text-xs uppercase tracking-widest transition-all ${activeTab === 'recepcion' ? 'bg-white text-black shadow-lg' : 'text-white/30'}`}>Recepción</button>
+                  <button onClick={() => setActiveTab('despacho')} className={`px-6 py-2.5 rounded-xl font-black text-xs uppercase tracking-widest transition-all ${activeTab === 'despacho' ? 'bg-white text-black shadow-lg' : 'text-white/30'}`}>Despacho</button>
+                  <button onClick={() => setActiveTab('silos')} className={`px-6 py-2.5 rounded-xl font-black text-xs uppercase tracking-widest transition-all ${activeTab === 'silos' ? 'bg-white text-black shadow-lg' : 'text-white/30'}`}>Silos</button>
                 </>
               )}
               {currentModule === 'calidad' && (
                 <>
-                  <button onClick={() => setActiveTab('analisis')} className={`px-6 py-2.5 rounded-xl font-bold text-sm transition-all ${activeTab === 'analisis' ? 'bg-white shadow-md text-[#0052CC]' : 'text-black/30'}`}>Calidad</button>
-                  <button onClick={() => setActiveTab('cuarentena')} className={`px-6 py-2.5 rounded-xl font-bold text-sm transition-all ${activeTab === 'cuarentena' ? 'bg-white shadow-md text-[#0052CC]' : 'text-black/30'}`}>Cuarentena</button>
+                  <button onClick={() => setActiveTab('analisis')} className={`px-6 py-2.5 rounded-xl font-black text-xs uppercase tracking-widest transition-all ${activeTab === 'analisis' ? 'bg-white text-black shadow-lg' : 'text-white/30'}`}>Calidad</button>
+                  <button onClick={() => setActiveTab('cuarentena')} className={`px-6 py-2.5 rounded-xl font-black text-xs uppercase tracking-widest transition-all ${activeTab === 'cuarentena' ? 'bg-white text-black shadow-lg' : 'text-white/30'}`}>Cuarentena</button>
                 </>
               )}
             </nav>
@@ -1892,25 +1892,14 @@ export default function App() {
         </div>
 
         <div className="flex items-center gap-6">
-          <button 
-            onClick={() => setTheme(theme === 'solar' ? 'plant' : 'solar')}
-            className="p-3 bg-black/5 rounded-xl text-black/40 hover:text-black transition-colors"
-          >
-            {theme === 'solar' ? <Moon size={20} /> : <Sun size={20} />}
-          </button>
-          <button 
-            onClick={handleSave}
-            disabled={isSaving}
-            className={`flex items-center gap-3 px-6 py-3 rounded-xl font-bold text-sm transition-all ${
-              isSaving ? 'bg-black/10 text-black/30' : 'bg-black text-white hover:scale-105 shadow-lg'
-            }`}
-          >
-            {isSaving ? '...' : <><Save size={18} /> Guardar</>}
-          </button>
+          <div className="flex items-center gap-2 px-4 py-2 bg-white/5 rounded-xl border border-white/10">
+            <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse" />
+            <span className="text-[10px] font-black tracking-widest uppercase opacity-40">Sistema Online</span>
+          </div>
         </div>
       </div>
 
-      <div className="p-6 md:p-10 flex-1 bg-[#F8F9FA]">
+      <div className="p-6 md:p-10 flex-1 bg-black">
         <main className="max-w-7xl mx-auto w-full">
           <AnimatePresence mode="wait">
             {currentModule === 'home' && (
@@ -2035,16 +2024,16 @@ export default function App() {
         </main>
       </div>
 
-      <footer className="bg-white border-t border-black/5 p-10">
-        <div className="max-w-7xl mx-auto w-full flex justify-between items-center text-black/20 text-[10px] font-black uppercase tracking-[0.2em]">
+      <footer className="bg-black border-t border-white/5 p-10">
+        <div className="max-w-7xl mx-auto w-full flex justify-between items-center text-white/10 text-[10px] font-black uppercase tracking-[0.2em]">
           <div className="flex items-center gap-6">
-            <span>TERRASYNC v2.0.0</span>
-            <span className="w-1.5 h-1.5 bg-black/5 rounded-full" />
-            <span>Arquitectura Modular Activa</span>
+            <span>TERRASYNC v2.1.0</span>
+            <span className="w-1.5 h-1.5 bg-white/10 rounded-full" />
+            <span>Industrial High-Contrast OS</span>
           </div>
           <div className="flex items-center gap-3">
             <Activity size={14} />
-            Optimizado para Operaciones de Campo
+            Silicon Valley Industrial Design
           </div>
         </div>
       </footer>

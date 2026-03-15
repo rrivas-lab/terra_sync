@@ -21,6 +21,7 @@ export const LotManagementView = ({
 }) => {
   const [selectedLotId, setSelectedLotId] = useState<string | null>(null);
   const [isAdding, setIsAdding] = useState(false);
+  const [editLot, setEditLot] = useState<Partial<Lot>>({});
   const [analyzingLotId, setAnalyzingLotId] = useState<string | null>(null);
   const [analysisValues, setAnalysisValues] = useState<{ [key: string]: any }>({});
   
@@ -51,10 +52,27 @@ export const LotManagementView = ({
   const analyzingLot = lots.find(l => l.id === analyzingLotId);
   const analyzingCrop = crops.find(c => c.id === analyzingLot?.cropId);
 
-  const selectedFarm = farms.find(f => f.id === (isAdding ? newLot.farmId : selectedLot?.farmId));
-  const occupiedArea = lots.filter(l => l.farmId === (isAdding ? newLot.farmId : selectedLot?.farmId) && l.id !== selectedLot?.id).reduce((acc, l) => acc + l.area, 0);
+  const lotData = selectedLot ? editLot : newLot;
+  const setLotData = selectedLot ? setEditLot : setNewLot;
+
+  const selectedFarm = farms.find(f => f.id === lotData.farmId);
+  const occupiedArea = lots.filter(l => l.farmId === lotData.farmId && l.id !== selectedLot?.id).reduce((acc, l) => acc + l.area, 0);
   const availableArea = selectedFarm ? selectedFarm.totalHectares - occupiedArea : 0;
-  const isAreaValid = ((isAdding ? newLot.area : selectedLot?.area) || 0) <= availableArea;
+  const isAreaValid = (lotData.area || 0) <= availableArea;
+
+  // Dirty state detection
+  const isDirty = useMemo(() => {
+    if (isAdding) return newLot.lotCode !== '' || newLot.farmId !== '';
+    if (selectedLot) {
+      return editLot.lotCode !== selectedLot.lotCode || 
+             editLot.farmId !== selectedLot.farmId || 
+             editLot.cropId !== selectedLot.cropId || 
+             editLot.area !== selectedLot.area || 
+             editLot.soilType !== selectedLot.soilType || 
+             editLot.status !== selectedLot.status;
+    }
+    return false;
+  }, [isAdding, newLot, selectedLot, editLot]);
 
   const handleStartAnalysis = (lot: Lot) => {
     setAnalyzingLotId(lot.id);
@@ -91,28 +109,8 @@ export const LotManagementView = ({
     setAnalyzingLotId(null);
   };
 
-  const handleGetLocation = () => {
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          setNewLot(prev => ({
-            ...prev,
-            location: { lat: position.coords.latitude, lng: position.coords.longitude }
-          }));
-        },
-        (error) => {
-          console.error("Error getting location:", error);
-          alert("No se pudo obtener la ubicación automáticamente.");
-        }
-      );
-    }
-  };
-
   const handleCreateLot = () => {
-    if (!newLot.farmId) {
-      alert("Debe seleccionar una finca para el nuevo lote.");
-      return;
-    }
+    if (!newLot.farmId) return;
     onAddLot(newLot);
     setIsAdding(false);
     setNewLot({
@@ -127,147 +125,146 @@ export const LotManagementView = ({
 
   if (selectedLot || isAdding) {
     const isEditing = !!selectedLot;
-    const lotData = isEditing ? selectedLot : newLot;
-    const farm = farms.find(f => f.id === lotData.farmId);
     const crop = crops.find(c => c.id === lotData.cropId);
 
+    if (isEditing && Object.keys(editLot).length === 0) {
+      setEditLot({ ...selectedLot });
+    }
+
     return (
-      <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="flex flex-col gap-8">
-        <div className="flex justify-between items-center bg-white p-8 rounded-[3rem] shadow-xl shadow-black/5 border border-black/5">
+      <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="flex flex-col gap-8 min-h-[80vh]">
+        <div className="flex justify-between items-center bg-zinc-900 p-8 rounded-[3rem] border border-white/5">
           <div className="flex items-center gap-6">
             <button 
-              onClick={() => { setSelectedLotId(null); setIsAdding(false); }}
-              className="w-16 h-16 bg-black/5 text-black/60 rounded-2xl flex items-center justify-center hover:bg-black/10 transition-colors"
+              onClick={() => { setSelectedLotId(null); setIsAdding(false); setEditLot({}); }}
+              className="w-16 h-16 bg-white/5 text-white/60 rounded-2xl flex items-center justify-center hover:bg-white/10 transition-colors"
             >
               <ArrowLeft size={32} />
             </button>
             <div>
-              <h2 className="text-3xl font-bold tracking-tight">{isEditing ? `Lote ${lotData.lotCode}` : 'Nuevo Lote'}</h2>
-              <p className="text-black/40 font-bold uppercase text-xs tracking-widest mt-1">Detalle de Lote</p>
+              <h2 className="text-3xl font-black tracking-tighter uppercase">{isEditing ? `Lote ${selectedLot.lotCode}` : 'Nuevo Lote'}</h2>
+              <p className="text-white/20 font-black uppercase text-[10px] tracking-[0.2em] mt-1">Configuración de Terreno</p>
             </div>
           </div>
-          {isEditing && (
-            <div className="flex items-center gap-4">
+
+          <div className="flex items-center gap-4">
+            {isEditing && (
               <button 
                 onClick={() => handleStartAnalysis(selectedLot)}
-                className="flex items-center gap-2 px-6 py-3 bg-amber-100 text-amber-700 rounded-xl font-bold hover:bg-amber-200 transition-colors"
+                className="flex items-center gap-3 px-8 py-4 bg-amber-500/10 text-amber-500 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-amber-500 hover:text-black transition-all"
               >
-                <Beaker size={18} /> Nuevo Análisis
+                <Beaker size={20} /> Nuevo Análisis
               </button>
-            </div>
-          )}
+            )}
+            {isDirty && (
+              <button 
+                onClick={() => {
+                  if (isAdding) {
+                    handleCreateLot();
+                  } else {
+                    onAddLot({ ...editLot, id: selectedLot.id });
+                    setSelectedLotId(null);
+                    setEditLot({});
+                  }
+                }}
+                disabled={!isAreaValid}
+                className="flex items-center gap-3 px-10 py-5 bg-[#3B82F6] text-white rounded-2xl font-black text-xs uppercase tracking-widest hover:scale-105 transition-all shadow-xl shadow-blue-500/20 disabled:opacity-50"
+              >
+                <Save size={20} /> Guardar Lote
+              </button>
+            )}
+          </div>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          <div className="lg:col-span-2 bg-white rounded-[3rem] shadow-xl shadow-black/5 border border-black/5 p-8 flex flex-col gap-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              <div className="flex flex-col gap-2">
-                <label className="text-[10px] font-black text-black/40 uppercase tracking-widest">Código de Lote</label>
+          <div className="lg:col-span-2 bg-zinc-900 rounded-[3rem] border border-white/5 p-10 flex flex-col gap-10">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+              <div className="flex flex-col gap-3">
+                <label className="text-[10px] font-black text-white/20 uppercase tracking-[0.2em]">Código de Lote</label>
                 <input 
                   type="text" 
                   value={lotData.lotCode || ''} 
-                  onChange={e => !isEditing && setNewLot({ ...newLot, lotCode: e.target.value })} 
-                  disabled={isEditing}
-                  className="w-full h-16 px-6 bg-black/5 rounded-2xl border-none focus:ring-2 focus:ring-[#0052CC] font-black text-lg outline-none transition-all disabled:opacity-70" 
+                  onChange={e => setLotData({ ...lotData, lotCode: e.target.value })} 
+                  className="w-full h-20 px-8 bg-white/5 rounded-3xl border border-white/10 focus:border-[#3B82F6] focus:ring-4 focus:ring-[#3B82F6]/10 font-black text-xl outline-none transition-all text-white" 
                 />
               </div>
-              <div className="flex flex-col gap-2">
-                <label className="text-[10px] font-black text-black/40 uppercase tracking-widest">Finca</label>
+              <div className="flex flex-col gap-3">
+                <label className="text-[10px] font-black text-white/20 uppercase tracking-[0.2em]">Finca Asociada</label>
                 <select 
                   value={lotData.farmId || ''} 
-                  onChange={e => !isEditing && setNewLot({ ...newLot, farmId: e.target.value })} 
-                  disabled={isEditing}
-                  className="w-full h-16 px-6 bg-black/5 rounded-2xl border-none focus:ring-2 focus:ring-[#0052CC] font-black text-lg outline-none transition-all disabled:opacity-70"
+                  onChange={e => setLotData({ ...lotData, farmId: e.target.value })} 
+                  className="w-full h-20 px-8 bg-white/5 rounded-3xl border border-white/10 focus:border-[#3B82F6] focus:ring-4 focus:ring-[#3B82F6]/10 font-black text-xl outline-none transition-all text-white appearance-none"
                 >
-                  <option value="">Seleccione una finca</option>
+                  <option value="" className="bg-zinc-900">Seleccione una finca</option>
                   {farms.map(f => (
-                    <option key={f.id} value={f.id}>{f.name}</option>
+                    <option key={f.id} value={f.id} className="bg-zinc-900">{f.name}</option>
                   ))}
                 </select>
               </div>
-              <div className="flex flex-col gap-2">
-                <label className="text-[10px] font-black text-black/40 uppercase tracking-widest">Cultivo</label>
+              <div className="flex flex-col gap-3">
+                <label className="text-[10px] font-black text-white/20 uppercase tracking-[0.2em]">Tipo de Cultivo</label>
                 <select 
                   value={lotData.cropId || ''} 
-                  onChange={e => !isEditing && setNewLot({ ...newLot, cropId: e.target.value })} 
-                  disabled={isEditing}
-                  className="w-full h-16 px-6 bg-black/5 rounded-2xl border-none focus:ring-2 focus:ring-[#0052CC] font-black text-lg outline-none transition-all disabled:opacity-70"
+                  onChange={e => setLotData({ ...lotData, cropId: e.target.value })} 
+                  className="w-full h-20 px-8 bg-white/5 rounded-3xl border border-white/10 focus:border-[#3B82F6] focus:ring-4 focus:ring-[#3B82F6]/10 font-black text-xl outline-none transition-all text-white appearance-none"
                 >
                   {crops.map(c => (
-                    <option key={c.id} value={c.id}>{c.name}</option>
+                    <option key={c.id} value={c.id} className="bg-zinc-900">{c.name}</option>
                   ))}
                 </select>
               </div>
-              <div className="flex flex-col gap-2">
-                <label className="text-[10px] font-black text-black/40 uppercase tracking-widest">Área (Ha)</label>
-                <input 
-                  type="number" 
-                  value={lotData.area || 0} 
-                  onChange={e => !isEditing && setNewLot({ ...newLot, area: parseFloat(e.target.value) })} 
-                  disabled={isEditing}
-                  className={`w-full h-16 px-6 bg-black/5 rounded-2xl border-none focus:ring-2 focus:ring-[#0052CC] font-black text-lg outline-none transition-all disabled:opacity-70 ${!isAreaValid && !isEditing ? 'ring-2 ring-red-500' : ''}`} 
-                />
-                {!isEditing && selectedFarm && (
-                  <span className={`text-[10px] font-black ${isAreaValid ? 'text-emerald-600' : 'text-red-500'} uppercase tracking-widest`}>
-                    Disponible: {availableArea} Ha
-                  </span>
-                )}
+              <div className="flex flex-col gap-3">
+                <label className="text-[10px] font-black text-white/20 uppercase tracking-[0.2em]">Área de Cultivo (Ha)</label>
+                <div className="flex flex-col gap-2">
+                  <input 
+                    type="number" 
+                    value={lotData.area || ''} 
+                    onChange={e => setLotData({ ...lotData, area: parseFloat(e.target.value) || 0 })} 
+                    className={`w-full h-20 px-8 bg-white/5 rounded-3xl border border-white/10 focus:border-[#3B82F6] focus:ring-4 focus:ring-[#3B82F6]/10 font-black text-xl outline-none transition-all text-white ${!isAreaValid ? 'border-red-500 ring-4 ring-red-500/10' : ''}`} 
+                  />
+                  {selectedFarm && (
+                    <span className={`text-[10px] font-black ${isAreaValid ? 'text-[#10B981]' : 'text-red-500'} uppercase tracking-widest`}>
+                      Capacidad Disponible: {availableArea.toFixed(2)} Ha
+                    </span>
+                  )}
+                </div>
               </div>
-              <div className="flex flex-col gap-2">
-                <label className="text-[10px] font-black text-black/40 uppercase tracking-widest">Tipo de Suelo</label>
+              <div className="flex flex-col gap-3">
+                <label className="text-[10px] font-black text-white/20 uppercase tracking-[0.2em]">Tipo de Suelo</label>
                 <select 
                   value={lotData.soilType || ''} 
-                  onChange={e => !isEditing && setNewLot({ ...newLot, soilType: e.target.value as SoilType })} 
-                  disabled={isEditing}
-                  className="w-full h-16 px-6 bg-black/5 rounded-2xl border-none focus:ring-2 focus:ring-[#0052CC] font-black text-lg outline-none transition-all disabled:opacity-70"
+                  onChange={e => setLotData({ ...lotData, soilType: e.target.value as SoilType })} 
+                  className="w-full h-20 px-8 bg-white/5 rounded-3xl border border-white/10 focus:border-[#3B82F6] focus:ring-4 focus:ring-[#3B82F6]/10 font-black text-xl outline-none transition-all text-white appearance-none"
                 >
                   {(['Arcilloso', 'Arenoso', 'Franco', 'Limoso'] as SoilType[]).map(t => (
-                    <option key={t} value={t}>{t}</option>
+                    <option key={t} value={t} className="bg-zinc-900">{t}</option>
                   ))}
                 </select>
               </div>
-              <div className="flex flex-col gap-2">
-                <label className="text-[10px] font-black text-black/40 uppercase tracking-widest">Estado</label>
+              <div className="flex flex-col gap-3">
+                <label className="text-[10px] font-black text-white/20 uppercase tracking-[0.2em]">Estado Operativo</label>
                 <select 
                   value={lotData.status || ''} 
-                  onChange={e => !isEditing && setNewLot({ ...newLot, status: e.target.value as LotStatus })} 
-                  disabled={isEditing}
-                  className="w-full h-16 px-6 bg-black/5 rounded-2xl border-none focus:ring-2 focus:ring-[#0052CC] font-black text-lg outline-none transition-all disabled:opacity-70"
+                  onChange={e => setLotData({ ...lotData, status: e.target.value as LotStatus })} 
+                  className="w-full h-20 px-8 bg-white/5 rounded-3xl border border-white/10 focus:border-[#3B82F6] focus:ring-4 focus:ring-[#3B82F6]/10 font-black text-xl outline-none transition-all text-white appearance-none"
                 >
                   {(['VACÍO', 'PREPARACIÓN', 'SEMBRADO', 'COSECHA', 'DESCANSO'] as LotStatus[]).map(s => (
-                    <option key={s} value={s}>{s}</option>
+                    <option key={s} value={s} className="bg-zinc-900">{s}</option>
                   ))}
                 </select>
               </div>
             </div>
 
-            {!isEditing && (
-              <div className="flex justify-end gap-4 mt-8 pt-8 border-t border-black/5">
-                <button 
-                  onClick={() => setIsAdding(false)} 
-                  className="px-8 py-4 rounded-2xl font-bold text-black/50 hover:bg-black/5 transition-colors"
-                >
-                  Cancelar
-                </button>
-                <button 
-                  onClick={handleCreateLot}
-                  disabled={!newLot.lotCode || !newLot.farmId || !isAreaValid}
-                  className="px-8 py-4 bg-[#0052CC] text-white rounded-2xl font-bold shadow-xl shadow-blue-200 hover:scale-105 active:scale-95 transition-all disabled:opacity-50 disabled:hover:scale-100"
-                >
-                  Guardar Lote
-                </button>
-              </div>
-            )}
             {isEditing && (
-              <div className="flex justify-end gap-4 mt-8 pt-8 border-t border-black/5">
+              <div className="flex justify-start mt-10 pt-10 border-t border-white/5">
                 <button 
                   onClick={() => {
-                    if (window.confirm('¿Está seguro de eliminar este lote?')) {
+                    if (confirm('¿Está seguro de eliminar este lote?')) {
                       onDeleteLot(selectedLot.id);
                       setSelectedLotId(null);
                     }
                   }}
-                  className="px-8 py-4 bg-red-100 text-red-700 rounded-2xl font-bold hover:bg-red-200 transition-colors"
+                  className="px-10 py-5 bg-red-500/10 text-red-500 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-red-500 hover:text-white transition-all"
                 >
                   Eliminar Lote
                 </button>
@@ -276,25 +273,28 @@ export const LotManagementView = ({
           </div>
 
           {isEditing && (
-            <div className="bg-white rounded-[3rem] shadow-xl shadow-black/5 border border-black/5 p-8 flex flex-col gap-6">
-              <h3 className="text-xl font-bold tracking-tight mb-4">Historial de Análisis</h3>
-              <div className="flex flex-col gap-4">
+            <div className="bg-zinc-900 rounded-[3rem] border border-white/5 p-10 flex flex-col gap-8">
+              <h3 className="text-xl font-black tracking-tighter uppercase text-white/40">Historial de Análisis</h3>
+              <div className="flex flex-col gap-6">
                 {selectedLot.analyses && selectedLot.analyses.length > 0 ? (
                   selectedLot.analyses.map(analysis => (
-                    <div key={analysis.id} className="p-4 bg-black/5 rounded-2xl flex flex-col gap-2">
+                    <div key={analysis.id} className="p-8 bg-white/5 rounded-[2rem] border border-white/5 flex flex-col gap-4">
                       <div className="flex justify-between items-center">
-                        <span className="text-sm font-bold text-black/60">{new Date(analysis.date).toLocaleDateString()}</span>
-                        <span className={`px-2 py-1 rounded-lg text-xs font-bold ${analysis.status === 'APROBADO' ? 'bg-emerald-100 text-emerald-700' : 'bg-red-100 text-red-700'}`}>
+                        <div className="flex items-center gap-3">
+                          <Clock size={16} className="text-white/20" />
+                          <span className="text-xs font-black text-white/40">{new Date(analysis.date).toLocaleDateString()}</span>
+                        </div>
+                        <span className={`px-4 py-1.5 rounded-xl text-[10px] font-black tracking-widest ${analysis.status === 'APROBADO' ? 'bg-[#10B981]/10 text-[#10B981]' : 'bg-red-500/10 text-red-500'}`}>
                           {analysis.status}
                         </span>
                       </div>
-                      <div className="grid grid-cols-2 gap-2 mt-2">
+                      <div className="grid grid-cols-1 gap-3 mt-2">
                         {Object.entries(analysis.values).map(([key, value]) => {
                           const param = crop?.parameters.find(p => p.id === key);
                           return (
-                            <div key={key} className="text-xs">
-                              <span className="text-black/40">{param?.name || key}: </span>
-                              <span className="font-bold">{String(value)}</span>
+                            <div key={key} className="flex justify-between items-center text-xs">
+                              <span className="text-white/20 font-black uppercase tracking-widest">{param?.name || key}</span>
+                              <span className="font-black text-white">{String(value)}</span>
                             </div>
                           );
                         })}
@@ -302,7 +302,9 @@ export const LotManagementView = ({
                     </div>
                   ))
                 ) : (
-                  <div className="text-center py-8 opacity-50 font-bold">No hay análisis registrados</div>
+                  <div className="text-center py-16 bg-white/5 rounded-[2rem] border border-white/5 border-dashed">
+                    <p className="text-white/10 font-black uppercase tracking-widest text-xs">Sin registros</p>
+                  </div>
                 )}
               </div>
             </div>
@@ -313,100 +315,116 @@ export const LotManagementView = ({
   }
 
   return (
-    <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 20 }} className="flex flex-col gap-8">
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 bg-white p-8 rounded-[3rem] shadow-xl shadow-black/5 border border-black/5">
-        <div className="flex items-center gap-6">
-          <div className="w-16 h-16 bg-emerald-100 text-[#10B981] rounded-2xl flex items-center justify-center shadow-inner">
-            <LayoutGrid size={32} />
+    <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="flex flex-col gap-8">
+      <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-8 bg-zinc-900 p-10 rounded-[3rem] border border-white/5">
+        <div className="flex items-center gap-8">
+          <div className="w-20 h-20 bg-[#10B981] text-black rounded-3xl flex items-center justify-center shadow-2xl shadow-[#10B981]/20">
+            <LayoutGrid size={40} />
           </div>
           <div>
-            <h2 className="text-3xl font-black tracking-tight uppercase">Gestión de Lotes</h2>
-            <div className="flex items-center gap-2 mt-1">
-              <span className="text-black/40 font-bold uppercase text-[10px] tracking-widest">Página</span>
-              <span className="text-[#0052CC] font-black text-xs">{currentPage} de {totalPages}</span>
+            <h2 className="text-4xl font-black tracking-tighter uppercase leading-none">Gestión de Lotes</h2>
+            <div className="flex items-center gap-3 mt-3">
+              <span className="px-3 py-1 bg-white/5 rounded-lg text-[10px] font-black uppercase tracking-widest text-white/40">
+                Página {currentPage} de {totalPages}
+              </span>
+              <span className="w-1.5 h-1.5 bg-white/10 rounded-full" />
+              <span className="text-[10px] font-black uppercase tracking-widest text-[#10B981]">
+                {filteredLots.length} Lotes Activos
+              </span>
             </div>
           </div>
         </div>
-        <div className="flex items-center gap-4 w-full md:w-auto">
-          <div className="relative flex-1 md:w-64">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-black/40" size={20} />
+        
+        <div className="flex flex-col sm:flex-row items-center gap-4 w-full lg:w-auto">
+          <div className="relative w-full sm:w-80">
+            <Search className="absolute left-6 top-1/2 -translate-y-1/2 text-white/20" size={24} />
             <input 
               type="text" 
-              placeholder="Buscar lote..." 
+              placeholder="BUSCAR LOTE..." 
               value={searchTerm}
               onChange={(e) => { setSearchTerm(e.target.value); setCurrentPage(1); }}
-              className="w-full h-14 pl-12 pr-4 bg-black/5 rounded-2xl border-none focus:ring-2 focus:ring-[#0052CC] font-bold outline-none transition-all"
+              className="w-full h-16 pl-16 pr-6 bg-white/5 rounded-2xl border border-white/10 focus:border-[#10B981] font-black text-sm uppercase tracking-widest outline-none transition-all text-white"
             />
           </div>
-          <div className="flex gap-2">
+          <div className="flex gap-3">
             <button 
               onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
               disabled={currentPage === 1}
-              className="w-14 h-14 rounded-2xl bg-black/5 flex items-center justify-center disabled:opacity-30 hover:bg-black/10 transition-colors shadow-sm"
+              className="w-16 h-16 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center disabled:opacity-10 hover:bg-white/10 transition-colors"
             >
-              <ChevronLeft size={24} />
+              <ChevronLeft size={28} />
             </button>
             <button 
               onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
               disabled={currentPage === totalPages}
-              className="w-14 h-14 rounded-2xl bg-black/5 flex items-center justify-center disabled:opacity-30 hover:bg-black/10 transition-colors shadow-sm"
+              className="w-16 h-16 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center disabled:opacity-10 hover:bg-white/10 transition-colors"
             >
-              <ChevronRight size={24} />
+              <ChevronRight size={28} />
             </button>
           </div>
           <button
             onClick={() => setIsAdding(true)}
-            className="flex items-center justify-center gap-2 h-14 px-6 bg-[#0052CC] text-white rounded-2xl font-black shadow-lg shadow-blue-200 hover:scale-105 active:scale-95 transition-all whitespace-nowrap"
+            className="w-full sm:w-auto flex items-center justify-center gap-3 h-16 px-10 bg-[#10B981] text-black rounded-2xl font-black text-xs uppercase tracking-widest hover:scale-105 active:scale-95 transition-all shadow-xl shadow-[#10B981]/20"
           >
-            <Plus size={20} /> <span className="hidden md:inline">Nuevo Lote</span>
+            <Plus size={24} /> Nuevo Lote
           </button>
         </div>
       </div>
 
-      <div className="bg-white rounded-[3rem] shadow-xl shadow-black/5 border border-black/5 p-8 flex flex-col gap-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {paginatedLots.length === 0 ? (
-            <div className="col-span-full text-center py-20 opacity-50 font-bold">No se encontraron lotes</div>
-          ) : (
-            paginatedLots.map(lot => {
-              const farm = farms.find(f => f.id === lot.farmId);
-              const crop = crops.find(c => c.id === lot.cropId);
-              return (
-                <button
-                  key={lot.id}
-                  onClick={() => setSelectedLotId(lot.id)}
-                  className="p-8 rounded-[2rem] text-left transition-all flex flex-col gap-4 bg-[#10B981] text-white border border-transparent hover:scale-[1.02] active:scale-[0.98] shadow-xl group"
-                >
-                  <div className="flex justify-between items-start w-full">
-                    <div className="p-4 rounded-2xl bg-white/20 text-white flex items-center justify-center">
-                      <LayoutGrid size={24} />
-                    </div>
-                    <ChevronRight size={24} className="text-white/50 group-hover:text-white transition-colors" />
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        {paginatedLots.length === 0 ? (
+          <div className="col-span-full text-center py-32 bg-zinc-900 rounded-[3rem] border border-white/5 border-dashed">
+            <p className="text-white/20 font-black uppercase tracking-[0.3em]">No se encontraron lotes</p>
+          </div>
+        ) : (
+          paginatedLots.map(lot => {
+            const farm = farms.find(f => f.id === lot.farmId);
+            const crop = crops.find(c => c.id === lot.cropId);
+            return (
+              <button
+                key={lot.id}
+                onClick={() => setSelectedLotId(lot.id)}
+                className="p-10 rounded-[3rem] text-left transition-all flex flex-col gap-6 bg-[#10B981] text-black hover:-translate-y-2 active:scale-95 shadow-2xl shadow-[#10B981]/10 group relative overflow-hidden h-[340px]"
+              >
+                <div className="absolute top-0 right-0 p-10 opacity-10 group-hover:scale-110 transition-transform">
+                  <LayoutGrid size={120} />
+                </div>
+                
+                <div className="flex justify-between items-start w-full z-10">
+                  <div className="p-4 rounded-2xl bg-black/10 backdrop-blur-md">
+                    <LayoutGrid size={28} />
                   </div>
-                  <div>
-                    <div className="font-black text-2xl text-white tracking-tight">Lote {lot.lotCode}</div>
-                    <div className="text-xs font-black uppercase tracking-widest mt-2 text-white/80 flex items-center gap-2">
-                      <MapPin size={14} /> {farm?.name || 'Sin Finca'}
-                    </div>
+                  <div className="w-12 h-12 rounded-full bg-black/5 flex items-center justify-center group-hover:bg-black/10 transition-colors">
+                    <ChevronRight size={24} />
                   </div>
-                  <div className="mt-4 pt-4 border-t border-white/20 flex justify-between items-center">
-                    <div className="flex items-center gap-2 text-white">
-                      <span className="text-sm font-black">{crop?.name}</span>
-                    </div>
-                    <div className="text-sm font-black text-white">
-                      {lot.area} Ha
-                    </div>
-                  </div>
-                  <div className="flex justify-between items-center mt-2">
-                    <span className={`text-[10px] font-black tracking-widest px-3 py-1 rounded-lg bg-white/20 text-white uppercase`}>
+                </div>
+
+                <div className="z-10 mt-auto">
+                  <div className="flex items-center gap-3 mb-2">
+                    <span className="px-3 py-1 bg-black/10 rounded-lg text-[10px] font-black uppercase tracking-widest">
                       {lot.status}
                     </span>
                   </div>
-                </button>
-              );
-            })
-          )}
-        </div>
+                  <h3 className="font-black text-4xl tracking-tighter leading-none mb-4">Lote {lot.lotCode}</h3>
+                  <div className="flex flex-wrap gap-3">
+                    <div className="px-3 py-1.5 bg-black/5 rounded-lg text-[10px] font-black uppercase tracking-widest flex items-center gap-2">
+                      <MapPin size={12} /> {farm?.name || 'Sin Finca'}
+                    </div>
+                    <div className="px-3 py-1.5 bg-black/5 rounded-lg text-[10px] font-black uppercase tracking-widest flex items-center gap-2">
+                      <Beaker size={12} /> {crop?.name}
+                    </div>
+                    <div className="px-3 py-1.5 bg-black/5 rounded-lg text-[10px] font-black uppercase tracking-widest flex items-center gap-2">
+                      {lot.area} Ha
+                    </div>
+                  </div>
+                </div>
+
+                <div className="absolute bottom-0 left-0 right-0 h-2 bg-black/10" />
+                <div className="absolute bottom-0 left-0 h-2 bg-black transition-all duration-500" style={{ width: '100%' }} />
+              </button>
+            );
+          })
+        )}
       </div>
 
       {/* Analysis Modal */}
@@ -416,47 +434,52 @@ export const LotManagementView = ({
             <motion.div 
               initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
               onClick={() => setAnalyzingLotId(null)}
-              className="absolute inset-0 bg-black/40 backdrop-blur-sm"
+              className="absolute inset-0 bg-black/80 backdrop-blur-xl"
             />
             <motion.div 
               initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.9, opacity: 0 }}
-              className="relative bg-white w-full max-w-2xl rounded-[3rem] shadow-2xl overflow-hidden"
+              className="relative bg-zinc-900 w-full max-w-2xl rounded-[3rem] shadow-2xl overflow-hidden border border-white/10"
             >
-              <div className="p-10 border-b border-black/5 flex justify-between items-center">
-                <h3 className="text-3xl font-bold tracking-tight">Análisis de Lote</h3>
-                <button onClick={() => setAnalyzingLotId(null)} className="p-4 bg-black/5 rounded-2xl"><Plus className="rotate-45" /></button>
+              <div className="p-10 border-b border-white/5 flex justify-between items-center">
+                <div>
+                  <h3 className="text-3xl font-black tracking-tighter uppercase">Análisis de Lote</h3>
+                  <p className="text-white/20 font-black uppercase text-[10px] tracking-widest mt-1">Registro de Parámetros</p>
+                </div>
+                <button onClick={() => setAnalyzingLotId(null)} className="p-4 bg-white/5 rounded-2xl hover:bg-white/10 transition-colors">
+                  <Plus className="rotate-45" />
+                </button>
               </div>
-              <div className="p-10 flex flex-col gap-8">
-                <div className="grid grid-cols-2 gap-6">
+              <div className="p-10 flex flex-col gap-10">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
                   {analyzingCrop?.parameters.map(param => (
-                    <div key={param.id} className="flex flex-col gap-2">
-                      <span className="text-xs font-bold text-black/40 uppercase tracking-widest">{param.name}</span>
+                    <div key={param.id} className="flex flex-col gap-3">
+                      <span className="text-[10px] font-black text-white/20 uppercase tracking-widest">{param.name}</span>
                       {param.type === 'NUMERIC' && (
                         <input 
                           type="number" 
                           value={analysisValues[param.id] || ''}
                           onChange={e => setAnalysisValues(prev => ({ ...prev, [param.id]: Number(e.target.value) }))}
-                          className="h-16 px-6 bg-black/5 rounded-2xl font-bold focus:outline-none focus:ring-4 focus:ring-blue-100"
+                          className="h-16 px-6 bg-white/5 rounded-2xl font-black text-white border border-white/10 focus:border-[#3B82F6] outline-none"
                         />
                       )}
                       {param.type === 'BOOLEAN' && (
                         <select 
                           value={String(analysisValues[param.id])}
                           onChange={e => setAnalysisValues(prev => ({ ...prev, [param.id]: e.target.value === 'true' }))}
-                          className="h-16 px-6 bg-black/5 rounded-2xl font-bold focus:outline-none focus:ring-4 focus:ring-blue-100 appearance-none"
+                          className="h-16 px-6 bg-white/5 rounded-2xl font-black text-white border border-white/10 focus:border-[#3B82F6] outline-none appearance-none"
                         >
-                          <option value="true">Sí</option>
-                          <option value="false">No</option>
+                          <option value="true" className="bg-zinc-900">Sí</option>
+                          <option value="false" className="bg-zinc-900">No</option>
                         </select>
                       )}
                       {param.type === 'SELECTION' && (
                         <select 
                           value={analysisValues[param.id] || ''}
                           onChange={e => setAnalysisValues(prev => ({ ...prev, [param.id]: e.target.value }))}
-                          className="h-16 px-6 bg-black/5 rounded-2xl font-bold focus:outline-none focus:ring-4 focus:ring-blue-100 appearance-none"
+                          className="h-16 px-6 bg-white/5 rounded-2xl font-black text-white border border-white/10 focus:border-[#3B82F6] outline-none appearance-none"
                         >
                           {param.options?.map(opt => (
-                            <option key={opt} value={opt}>{opt}</option>
+                            <option key={opt} value={opt} className="bg-zinc-900">{opt}</option>
                           ))}
                         </select>
                       )}
@@ -465,7 +488,7 @@ export const LotManagementView = ({
                 </div>
                 <button 
                   onClick={submitAnalysis}
-                  className="h-20 bg-[#0052CC] text-white font-bold rounded-3xl shadow-xl shadow-blue-200 mt-4"
+                  className="h-20 bg-[#3B82F6] text-white font-black text-xs uppercase tracking-widest rounded-3xl shadow-xl shadow-blue-500/20 hover:scale-[1.02] transition-all"
                 >
                   Registrar Análisis
                 </button>

@@ -8,330 +8,191 @@ import {
   Plus, Minus, Beaker, ShieldCheck, Clock, ChevronRight, Save, Leaf, 
   Map, LayoutGrid, MapPin, Layers, Info, Home, User, Settings, 
   Activity, Trash2, CheckCircle2, XCircle, ListFilter, Briefcase, Factory, Users, Search, Phone, CreditCard,
-  Droplets, Sprout, Truck, Box, Sun, Moon, FlaskConical, ClipboardCheck,
-  Flame, ShieldAlert, Shield, Lock
+  Droplets, Sprout, Truck, Box, Sun, Moon, FlaskConical, ClipboardCheck
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
+import { SiembraControlView } from './components/SiembraControlView';
 import { 
   Crop, INITIAL_CROPS, DynamicParameter, Lot, INITIAL_LOTS, 
   SoilType, LotStatus, Farm, INITIAL_FARMS, UnitSystem, 
   UNITS_MASTER, ParameterType, ParameterCategory, LotAnalysis,
   QualityCategory, MaterialReception, Contact, INITIAL_CONTACTS,
-  Chemical, INITIAL_CHEMICALS, CureRecord, SowingRecord, Barrel, DispatchRecord, BarrelStatus, SowingProject, ActivityLog,
-  Silo, INITIAL_SILOS
+  Chemical, INITIAL_CHEMICALS, CureRecord, SowingRecord, Barrel, DispatchRecord, BarrelStatus, SowingProject
 } from './types';
 
 // --- Reusable Components ---
 
-const HomeDashboardView = ({ onNavigate, sowingProjects, barrels, dispatches, silos }: { 
-  onNavigate: (tab: string) => void,
-  sowingProjects?: SowingProject[],
-  barrels?: Barrel[],
-  dispatches?: DispatchRecord[],
-  silos?: Silo[],
-  key?: React.Key 
-}) => (
-  <motion.div 
-    initial={{ opacity: 0, y: 20 }}
-    animate={{ opacity: 1, y: 0 }}
-    className="flex flex-col gap-8"
-  >
-    {/* Header */}
-    <div className="text-center pt-2">
-      <h1 className="text-5xl font-black tracking-tighter">TERRASYNC <span className="text-[#0052CC]">OS</span></h1>
-      <p className="text-black/40 font-mono text-sm tracking-widest mt-2">SISTEMA OPERATIVO AGROINDUSTRIAL — DUSA</p>
-    </div>
+const HomeDashboardView = ({ onNavigate }: { onNavigate: (tab: string) => void, key?: React.Key }) => {
+  const modules = [
+    { id: 'maestros', label: 'MAESTROS', icon: Briefcase, color: 'bg-blue-600', description: 'Configuración base y contactos' },
+    { id: 'campo', label: 'CAMPO', icon: Map, color: 'bg-emerald-700', description: 'Cura, Siembra y Lotes' },
+    { id: 'planta', label: 'PLANTA', icon: Factory, color: 'bg-slate-600', description: 'Recepción y Despacho' },
+    { id: 'calidad', label: 'CALIDAD', icon: ShieldCheck, color: 'bg-amber-500', description: 'Microbiología y Barriles' },
+  ];
 
-    {/* Two Giant Module Cards */}
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-      {/* CAMPO — Emerald Green */}
-      <button
-        onClick={() => onNavigate('campo')}
-        className="group bg-gradient-to-br from-emerald-600 to-emerald-800 rounded-[28px] p-12 flex flex-col justify-between text-white text-left transition-all hover:scale-[1.02] active:scale-[0.98] shadow-2xl shadow-emerald-200 relative overflow-hidden"
-      >
-        <div className="absolute top-0 right-0 p-10 opacity-[0.12] group-hover:scale-110 transition-transform duration-500">
-          <Map size={220} />
-        </div>
-        <div className="z-10">
-          <div className="p-4 bg-white/20 rounded-2xl w-fit mb-6">
-            <Map size={32} />
+  return (
+    <motion.div 
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="grid grid-cols-1 md:grid-cols-2 gap-8"
+    >
+      {modules.map((m) => (
+        <button
+          key={m.id}
+          onClick={() => onNavigate(m.id)}
+          className={`${m.color} rounded-[3rem] p-12 flex flex-col justify-between text-white text-left transition-all hover:scale-[1.02] active:scale-[0.98] shadow-2xl group relative overflow-hidden`}
+        >
+          <div className="absolute top-0 right-0 p-12 opacity-10 group-hover:scale-110 transition-transform">
+            <m.icon size={240} />
           </div>
-          <h2 className="text-5xl font-black tracking-tighter mb-3">OPERACIONES<br/>DE CAMPO</h2>
-          <p className="text-white/70 font-medium text-base">Siembra, Cura, Lotes, Inventario de insumos y Despachos</p>
-        </div>
-        <div className="z-10 flex items-center gap-2 font-bold text-sm uppercase tracking-widest mt-8">
-          ACCEDER MÓDULO <ChevronRight size={18} />
-        </div>
-      </button>
-
-      {/* PLANTA — Vibrant Blue */}
-      <button
-        onClick={() => onNavigate('planta')}
-        className="group bg-gradient-to-br from-[#0052CC] to-[#003399] rounded-[28px] p-12 flex flex-col justify-between text-white text-left transition-all hover:scale-[1.02] active:scale-[0.98] shadow-2xl shadow-blue-300 relative overflow-hidden"
-      >
-        <div className="absolute top-0 right-0 p-10 opacity-[0.12] group-hover:scale-110 transition-transform duration-500">
-          <Factory size={220} />
-        </div>
-        <div className="z-10">
-          <div className="p-4 bg-white/20 rounded-2xl w-fit mb-6">
-            <Factory size={32} />
+          <div className="z-10">
+            <div className="p-4 bg-white/20 rounded-2xl w-fit mb-6">
+              <m.icon size={32} />
+            </div>
+            <h2 className="text-5xl font-black tracking-tighter mb-4">{m.label}</h2>
+            <p className="text-white/70 font-medium text-lg">{m.description}</p>
           </div>
-          <h2 className="text-5xl font-black tracking-tighter mb-3">PROCESAMIENTO<br/>EN PLANTA</h2>
-          <p className="text-white/70 font-medium text-base">Romanero, Silos, Evaporador y Cuarentena Biológica</p>
-        </div>
-        <div className="z-10 flex items-center gap-2 font-bold text-sm uppercase tracking-widest mt-8">
-          ACCEDER MÓDULO <ChevronRight size={18} />
-        </div>
-      </button>
-    </div>
-
-    {/* Live Stats Row */}
-    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-      {[
-        { label: 'Proyectos Activos', value: sowingProjects?.filter(p => p.status === 'ACTIVO').length ?? 0, color: 'text-emerald-600', bg: 'bg-emerald-50', icon: Sprout },
-        { label: 'Silos con Carga', value: silos?.filter(s => s.currentLevel > 0).length ?? 0, color: 'text-blue-600', bg: 'bg-blue-50', icon: Layers },
-        { label: 'En Cuarentena', value: barrels?.filter(b => b.status === 'EN ESPERA').length ?? 0, color: 'text-amber-600', bg: 'bg-amber-50', icon: Box },
-        { label: 'Despachos Pendientes', value: dispatches?.filter(d => d.status === 'EN TRÁNSITO').length ?? 0, color: 'text-slate-600', bg: 'bg-slate-100', icon: Truck },
-      ].map(s => (
-        <div key={s.label} className={`${s.bg} rounded-[20px] p-6 flex items-center gap-4`}>
-          <div className={`w-12 h-12 bg-white rounded-2xl flex items-center justify-center ${s.color} shadow-sm`}>
-            <s.icon size={22} />
+          <div className="z-10 flex items-center gap-2 font-bold text-sm uppercase tracking-widest">
+            Acceder Módulo <ChevronRight size={18} />
           </div>
-          <div>
-            <p className={`text-3xl font-black ${s.color}`}>{s.value}</p>
-            <p className="text-[10px] font-bold text-black/40 uppercase tracking-wider leading-tight">{s.label}</p>
-          </div>
-        </div>
+        </button>
       ))}
-    </div>
-  </motion.div>
-);
+    </motion.div>
+  );
+};
 
-const SearchBar = ({ value, onChange, placeholder = "Buscar..." }: { value: string, onChange: (v: string) => void, placeholder?: string }) => (
-  <div className="relative w-full max-w-md group">
-    <div className="absolute inset-y-0 left-6 flex items-center text-black/20 group-focus-within:text-[#0052CC] transition-colors">
-      <Search size={20} />
-    </div>
-    <input 
-      type="text" 
-      value={value} 
-      onChange={(e) => onChange(e.target.value)}
-      placeholder={placeholder}
-      className="w-full h-14 pl-16 pr-6 bg-black/5 rounded-2xl font-bold text-sm focus:bg-white focus:ring-4 focus:ring-blue-50 focus:border-[#0052CC]/20 border border-transparent transition-all"
-    />
-  </div>
-);
-
-const Paginator = ({ current, total, onPageChange }: { current: number, total: number, onPageChange: (p: number) => void }) => (
-  <div className="flex items-center gap-3 bg-black/5 p-1.5 rounded-2xl w-fit">
-    <button 
-      onClick={() => onPageChange(Math.max(1, current - 1))}
-      disabled={current === 1}
-      className="p-3 bg-white rounded-xl text-black hover:bg-black hover:text-white disabled:opacity-30 disabled:hover:bg-white disabled:hover:text-black transition-all shadow-sm"
-    >
-      <Plus className="rotate-45" size={18} />
-    </button>
-    <span className="px-4 text-xs font-black uppercase tracking-widest text-black/40">
-      {current} de {total || 1}
-    </span>
-    <button 
-      onClick={() => onPageChange(Math.min(total, current + 1))}
-      disabled={current === total || total === 0}
-      className="p-3 bg-white rounded-xl text-black hover:bg-black hover:text-white disabled:opacity-30 disabled:hover:bg-white disabled:hover:text-black transition-all shadow-sm"
-    >
-      <Plus className="-rotate-45" size={18} />
-    </button>
-  </div>
-);
-
-const ViewToggle = ({ mode, onChange }: { mode: 'grid' | 'list', onChange: (m: 'grid' | 'list') => void }) => (
-  <div className="flex bg-black/5 p-1.5 rounded-2xl">
-    <button 
-      onClick={() => onChange('grid')}
-      className={`p-2.5 rounded-xl transition-all ${mode === 'grid' ? 'bg-white shadow-md text-[#0052CC]' : 'text-black/30'}`}
-    >
-      <LayoutGrid size={20} />
-    </button>
-    <button 
-      onClick={() => onChange('list')}
-      className={`p-2.5 rounded-xl transition-all ${mode === 'list' ? 'bg-white shadow-md text-[#0052CC]' : 'text-black/30'}`}
-    >
-      <ListFilter size={20} />
-    </button>
-  </div>
-);
 const ContactManagementView = ({ 
   contacts, 
   onAddContact, 
   onEditContact,
-  onDeleteContact,
-  viewMode,
-  setViewMode,
-  selectedId,
-  setSelectedId
+  onDeleteContact 
 }: { 
   contacts: Contact[], 
   onAddContact: (c: Partial<Contact>) => void, 
   onEditContact: (c: Contact) => void,
   onDeleteContact: (id: string) => void,
-  viewMode: 'list' | 'detail',
-  setViewMode: (v: 'list' | 'detail') => void,
-  selectedId: string | null,
-  setSelectedId: (id: string | null) => void,
   key?: React.Key
 }) => {
-  const [isCreating, setIsCreating] = useState(false);
-  const [form, setForm] = useState<Partial<Contact>>({ name: '', role: 'Administrador', phone: '', externalId: '' });
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingContact, setEditingContact] = useState<Contact | null>(null);
+  const [contactForm, setContactForm] = useState<Partial<Contact>>({
+    name: '',
+    role: 'Administrador',
+    phone: '',
+    externalId: ''
+  });
 
-  const selectedContact = contacts.find(c => c.id === selectedId);
-
-  const handleSelectContact = (id: string) => {
-    setSelectedId(id);
-    setViewMode('detail');
-    setIsCreating(false);
-    const c = contacts.find(x => x.id === id);
-    if (c) setForm(c);
-  };
-
-  const handleNewContact = () => {
-    setIsCreating(true);
-    setSelectedId(null);
-    setViewMode('detail');
-    setForm({ name: '', role: 'Administrador', phone: '', externalId: '' });
-  };
-
-  const handleSave = () => {
-    if (!form.name) return alert('El nombre es obligatorio.');
-    if (isCreating) {
-      onAddContact(form);
-      setIsCreating(false);
-    } else if (selectedContact) {
-      onEditContact({ ...selectedContact, ...form } as Contact);
-    }
-  };
-
-  const roleColor: Record<string, string> = {
-    Administrador: 'bg-blue-100 text-blue-700',
-    Operador: 'bg-emerald-100 text-emerald-700',
-    Proveedor: 'bg-amber-100 text-amber-700',
+  const openModal = (contact: Contact | null = null) => {
+    setEditingContact(contact);
+    setContactForm(contact || {
+      name: '',
+      role: 'Administrador',
+      phone: '',
+      externalId: ''
+    });
+    setIsModalOpen(true);
   };
 
   return (
-    <div className="flex flex-col gap-8">
+    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex flex-col gap-8">
       <div className="flex justify-between items-center">
-        <div>
-          <h2 className="text-4xl font-black tracking-tighter uppercase">Maestro de Contactos</h2>
-          <p className="text-black/40 font-mono text-sm">GESTIÓN DEL PERSONAL OPERATIVO Y PROVEEDORES</p>
-        </div>
-        <button onClick={handleNewContact} className="flex items-center gap-2 px-8 py-4 bg-black text-white rounded-2xl font-bold shadow-xl hover:scale-105 transition-transform">
+        <h2 className="text-3xl font-bold tracking-tight">Maestro de Contactos</h2>
+        <button 
+          onClick={() => openModal()}
+          className="flex items-center gap-2 px-8 py-4 bg-black text-white rounded-2xl font-bold shadow-xl hover:scale-105 transition-transform"
+        >
           <Plus size={20} /> Nuevo Contacto
         </button>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-        {/* List */}
-        <div className="lg:col-span-4 flex flex-col gap-3 overflow-y-auto no-scrollbar">
-          {contacts.map(contact => (
-            <button
-              key={contact.id}
-              onClick={() => handleSelectContact(contact.id)}
-              className={`p-6 rounded-2xl border-2 transition-all text-left flex items-center gap-4 ${selectedId === contact.id && !isCreating ? 'bg-white border-[#0052CC] shadow-lg ring-4 ring-blue-50' : 'bg-white border-black/5 hover:border-black/20'}`}
-            >
-              <div className="p-3 bg-black/5 rounded-2xl text-black/40">
-                <User size={22} />
-              </div>
-              <div>
-                <h4 className="font-bold text-lg leading-tight">{contact.name}</h4>
-                <span className={`text-[10px] font-black px-2 py-0.5 rounded-full ${roleColor[contact.role] || 'bg-slate-100 text-slate-600'}`}>
+      <Carousel>
+        {contacts.map(contact => (
+          <BentoCard key={contact.id} title={contact.name} icon={Users}>
+            <div className="flex flex-col gap-4">
+              <div className="flex items-center gap-3">
+                <div className="px-3 py-1 bg-blue-50 text-[#0052CC] text-[10px] font-black uppercase rounded-full">
                   {contact.role}
-                </span>
-              </div>
-            </button>
-          ))}
-          {contacts.length === 0 && (
-            <div className="p-8 text-center text-black/30 font-bold rounded-2xl border border-dashed border-black/10">
-              <Users size={32} className="mx-auto mb-3 opacity-40" />
-              No hay contactos registrados.
-            </div>
-          )}
-        </div>
-
-        {/* Detail / Form Panel */}
-        <div className="lg:col-span-8 bg-white rounded-[3rem] border border-black/10 shadow-2xl overflow-hidden flex flex-col">
-          {(selectedContact || isCreating) ? (
-            <>
-              <div className="p-10 border-b border-black/5 bg-slate-50/50 flex justify-between items-center">
-                <div>
-                  <span className="text-[10px] font-black text-[#0052CC] uppercase tracking-[0.3em] mb-2 block">
-                    {isCreating ? 'Nuevo Registro' : 'Detalles del Contacto'}
-                  </span>
-                  <h3 className="text-3xl font-black">{isCreating ? 'Registro de Contacto' : form.name}</h3>
                 </div>
-                {!isCreating && selectedContact && (
-                  <button
-                    onClick={() => onDeleteContact(selectedContact.id)}
-                    className="p-4 text-black/20 hover:text-red-500 transition-colors"
-                  >
-                    <Trash2 size={22} />
-                  </button>
-                )}
               </div>
+              <div className="flex items-center gap-3 text-black/60">
+                <Phone size={16} />
+                <span className="font-bold">{contact.phone}</span>
+              </div>
+              <div className="flex items-center gap-3 text-black/60">
+                <CreditCard size={16} />
+                <span className="font-bold">ID: {contact.externalId}</span>
+              </div>
+              <div className="pt-4 border-t border-black/5 flex justify-between items-center">
+                <button 
+                  onClick={() => openModal(contact)}
+                  className="px-4 py-2 bg-black/5 rounded-xl font-bold text-sm"
+                >
+                  Editar
+                </button>
+                <button 
+                  onClick={() => onDeleteContact(contact.id)}
+                  className="p-2 text-black/10 hover:text-red-500 transition-colors"
+                >
+                  <Trash2 size={18} />
+                </button>
+              </div>
+            </div>
+          </BentoCard>
+        ))}
+      </Carousel>
 
-              <div className="p-10 flex-1 overflow-y-auto no-scrollbar flex flex-col gap-8">
+      <AnimatePresence>
+        {isModalOpen && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-6">
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setIsModalOpen(false)} className="absolute inset-0 bg-black/40 backdrop-blur-sm" />
+            <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.9, opacity: 0 }} className="relative bg-white w-full max-w-xl rounded-[3rem] shadow-2xl p-10 flex flex-col gap-8">
+              <h3 className="text-3xl font-bold tracking-tight">{editingContact ? 'Editar Contacto' : 'Registrar Contacto'}</h3>
+              <div className="flex flex-col gap-6">
                 <div className="flex flex-col gap-2">
                   <span className="text-xs font-bold text-black/40 uppercase tracking-widest">Nombre Completo</span>
-                  <input type="text" value={form.name || ''} onChange={e => setForm(p => ({ ...p, name: e.target.value }))} className="h-16 px-6 bg-black/5 rounded-2xl font-bold text-lg focus:outline-none focus:ring-4 focus:ring-blue-100" />
+                  <input type="text" value={contactForm.name} onChange={e => setContactForm(prev => ({ ...prev, name: e.target.value }))} className="h-16 px-6 bg-black/5 rounded-2xl font-bold" />
                 </div>
-
                 <div className="flex flex-col gap-2">
                   <span className="text-xs font-bold text-black/40 uppercase tracking-widest">Cargo / Rol</span>
-                  <div className="flex gap-3">
-                    {(['Administrador', 'Operador', 'Proveedor'] as Contact['role'][]).map(r => (
-                      <button
-                        key={r}
-                        onClick={() => setForm(p => ({ ...p, role: r }))}
-                        className={`flex-1 h-14 rounded-2xl font-bold border-2 transition-all text-sm ${form.role === r ? 'bg-black text-white border-black' : 'bg-white text-black/40 border-black/10'}`}
-                      >
-                        {r}
-                      </button>
-                    ))}
-                  </div>
+                  <select 
+                    value={contactForm.role} 
+                    onChange={e => setContactForm(prev => ({ ...prev, role: e.target.value as any }))}
+                    className="h-16 px-6 bg-black/5 rounded-2xl font-bold appearance-none"
+                  >
+                    <option value="Administrador">Administrador</option>
+                    <option value="Operador">Operador</option>
+                    <option value="Proveedor">Proveedor</option>
+                  </select>
                 </div>
-
-                <div className="grid grid-cols-2 gap-6">
+                <div className="grid grid-cols-2 gap-4">
                   <div className="flex flex-col gap-2">
                     <span className="text-xs font-bold text-black/40 uppercase tracking-widest">Teléfono</span>
-                    <div className="flex items-center gap-3 h-16 px-6 bg-black/5 rounded-2xl">
-                      <Phone size={18} className="text-black/30" />
-                      <input type="text" value={form.phone || ''} onChange={e => setForm(p => ({ ...p, phone: e.target.value }))} className="bg-transparent font-bold flex-1 focus:outline-none" placeholder="+58 000-000-0000" />
-                    </div>
+                    <input type="text" value={contactForm.phone} onChange={e => setContactForm(prev => ({ ...prev, phone: e.target.value }))} className="h-16 px-6 bg-black/5 rounded-2xl font-bold" />
                   </div>
                   <div className="flex flex-col gap-2">
                     <span className="text-xs font-bold text-black/40 uppercase tracking-widest">ID / Cédula</span>
-                    <div className="flex items-center gap-3 h-16 px-6 bg-black/5 rounded-2xl">
-                      <CreditCard size={18} className="text-black/30" />
-                      <input type="text" value={form.externalId || ''} onChange={e => setForm(p => ({ ...p, externalId: e.target.value }))} className="bg-transparent font-bold flex-1 focus:outline-none" placeholder="V-00.000.000" />
-                    </div>
+                    <input type="text" value={contactForm.externalId} onChange={e => setContactForm(prev => ({ ...prev, externalId: e.target.value }))} className="h-16 px-6 bg-black/5 rounded-2xl font-bold" />
                   </div>
                 </div>
-
-                <button onClick={handleSave} className="h-20 bg-black text-white font-black rounded-3xl shadow-2xl hover:scale-[1.01] transition-transform mt-auto">
-                  {isCreating ? 'GUARDAR NUEVO CONTACTO' : 'GUARDAR CAMBIOS'}
+                <button 
+                  onClick={() => { 
+                    if (editingContact) {
+                      onEditContact({ ...editingContact, ...contactForm } as Contact);
+                    } else {
+                      onAddContact(contactForm);
+                    }
+                    setIsModalOpen(false); 
+                  }}
+                  className="h-20 bg-black text-white font-bold rounded-3xl shadow-xl mt-4"
+                >
+                  {editingContact ? 'Guardar Cambios' : 'Guardar Contacto'}
                 </button>
               </div>
-            </>
-          ) : (
-            <div className="flex-1 flex flex-col items-center justify-center p-20 text-center">
-              <div className="w-24 h-24 bg-black/5 rounded-full flex items-center justify-center mb-6 text-black/20">
-                <Users size={48} />
-              </div>
-              <h3 className="text-2xl font-bold mb-2">Seleccione un Contacto</h3>
-              <p className="text-black/40 max-w-xs">Elija un contacto de la lista o cree uno nuevo para ver sus detalles.</p>
-            </div>
-          )}
-        </div>
-      </div>
-    </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+    </motion.div>
   );
 };
 
@@ -455,24 +316,14 @@ const PrecisionSlider = ({
   </div>
 );
 
-const StatusBadge = ({ status }: { status: string }) => {
-  const styles: Record<string, string> = {
+const StatusBadge = ({ status }: { status: LotStatus }) => {
+  const styles = {
     'PREPARACIÓN': 'bg-amber-100 text-amber-700 border-amber-200',
     'SEMBRADO': 'bg-emerald-100 text-emerald-700 border-emerald-200',
-    'VACÍO': 'bg-slate-100 text-slate-700 border-slate-200',
-    'APROBADO': 'bg-emerald-500 text-white border-emerald-600',
-    'RECHAZADO': 'bg-rose-500 text-white border-rose-600',
-    'PENDIENTE': 'bg-amber-500 text-white border-amber-600',
-    'EN TRÁNSITO': 'bg-blue-100 text-blue-700 border-blue-200',
-    'RECIBIDO': 'bg-emerald-100 text-emerald-700 border-emerald-200',
-    'EN ESPERA': 'bg-amber-100 text-amber-700 border-amber-200',
-    'EN ANÁLISIS': 'bg-blue-100 text-blue-700 border-blue-200',
-    'LIBERADO': 'bg-emerald-500 text-white border-emerald-600',
-    'ACTIVO': 'bg-emerald-100 text-emerald-700 border-emerald-200',
-    'COSECHA': 'bg-amber-100 text-amber-700 border-amber-200',
+    'VACÍO': 'bg-slate-100 text-slate-700 border-slate-200'
   };
   return (
-    <span className={`px-3 py-1 rounded-full text-[10px] font-black tracking-widest border ${styles[status] || 'bg-slate-100 text-slate-700 border-slate-200'}`}>
+    <span className={`px-3 py-1 rounded-full text-[10px] font-black tracking-widest border ${styles[status]}`}>
       {status}
     </span>
   );
@@ -484,29 +335,22 @@ const FarmManagementView = ({
   farms, 
   contacts,
   onAddFarm, 
-  onDeleteFarm,
-  viewMode,
-  setViewMode,
-  selectedId,
-  setSelectedId
+  onDeleteFarm 
 }: { 
   farms: Farm[], 
   contacts: Contact[],
   onAddFarm: (farm: Partial<Farm>) => void, 
   onDeleteFarm: (id: string) => void,
-  viewMode: 'list' | 'detail',
-  setViewMode: (v: 'list' | 'detail') => void,
-  selectedId: string | null,
-  setSelectedId: (id: string | null) => void,
   key?: React.Key
 }) => {
-  const [isCreating, setIsCreating] = useState(false);
+  const [isAdding, setIsAdding] = useState(false);
   const [newFarm, setNewFarm] = useState<Partial<Farm>>({
-    name: '', location: '', adminId: '', totalHectares: 0, unitSystem: 'METRICO'
+    name: '',
+    location: '',
+    adminId: '',
+    totalHectares: 0,
+    unitSystem: 'METRICO'
   });
-
-  const selectedFarm = farms.find(f => f.id === selectedId);
-  const selectedFarmAdmin = contacts.find(c => c.id === selectedFarm?.adminId);
 
   const handleGetLocation = () => {
     if (navigator.geolocation) {
@@ -515,150 +359,187 @@ const FarmManagementView = ({
           setNewFarm(prev => ({
             ...prev,
             location: `${position.coords.latitude.toFixed(4)}, ${position.coords.longitude.toFixed(4)}`,
+            coordinates: { lat: position.coords.latitude, lng: position.coords.longitude }
           }));
         },
-        () => alert("No se pudo obtener la ubicación automáticamente.")
+        (error) => {
+          console.error("Error getting location:", error);
+          alert("No se pudo obtener la ubicación automáticamente.");
+        }
       );
     }
   };
 
   return (
-    <div className="flex flex-col gap-8">
+    <motion.div 
+      initial={{ opacity: 0, scale: 0.95 }}
+      animate={{ opacity: 1, scale: 1 }}
+      className="flex flex-col gap-8"
+    >
       <div className="flex justify-between items-center">
-        <div>
-          <h2 className="text-4xl font-black tracking-tighter uppercase">Gestión de Fincas</h2>
-          <p className="text-black/40 font-mono text-sm">REGISTRO Y ADMINISTRACIÓN DE UNIDADES PRODUCTIVAS</p>
-        </div>
+        <h2 className="text-3xl font-bold tracking-tight">Gestión de Fincas</h2>
         <button 
-          onClick={() => { setIsCreating(true); setSelectedId(null); setViewMode('detail'); }}
+          onClick={() => setIsAdding(true)}
           className="flex items-center gap-2 px-8 py-4 bg-black text-white rounded-2xl font-bold shadow-xl hover:scale-105 transition-transform"
         >
           <Plus size={20} /> Registrar Finca
         </button>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-        {/* Farm List */}
-        <div className="lg:col-span-4 flex flex-col gap-3 overflow-y-auto no-scrollbar">
-          {farms.map(farm => {
-            const admin = contacts.find(c => c.id === farm.adminId);
-            return (
-              <button key={farm.id}
-                onClick={() => { setSelectedId(farm.id); setIsCreating(false); setViewMode('detail'); }}
-                className={`p-6 rounded-2xl border-2 transition-all text-left flex items-center gap-4 ${selectedId === farm.id && !isCreating ? 'bg-white border-[#0052CC] shadow-lg ring-4 ring-blue-50' : 'bg-white border-black/5 hover:border-black/20'}`}
-              >
-                <div className="p-3 bg-emerald-50 text-emerald-600 rounded-2xl">
-                  <Home size={22} />
+      <Carousel>
+        {farms.map(farm => {
+          const admin = contacts.find(c => c.id === farm.adminId);
+          return (
+            <BentoCard key={farm.id} title={farm.name} icon={Home} className="relative group">
+              <div className="flex flex-col gap-6">
+                <div className="flex items-start gap-4">
+                  <div className="p-3 bg-black/5 rounded-xl text-black/40">
+                    <MapPin size={20} />
+                  </div>
+                  <div>
+                    <span className="text-[10px] uppercase font-bold text-black/40 block">Ubicación</span>
+                    <span className="font-bold">{farm.location}</span>
+                  </div>
                 </div>
-                <div className="flex-1">
-                  <h4 className="font-bold text-lg leading-tight">{farm.name}</h4>
-                  <p className="text-xs text-black/40 font-bold">{farm.totalHectares} Ha • {admin?.name || 'Sin Admin'}</p>
-                </div>
-              </button>
-            );
-          })}
-          {farms.length === 0 && (
-            <div className="p-8 text-center text-black/30 font-bold rounded-2xl border border-dashed border-black/10">
-              <Home size={32} className="mx-auto mb-3 opacity-40" />
-              No hay fincas registradas.
-            </div>
-          )}
-        </div>
 
-        {/* Detail / Create Panel */}
-        <div className="lg:col-span-8 bg-white rounded-[3rem] border border-black/10 shadow-2xl overflow-hidden flex flex-col">
-          {isCreating ? (
-            <>
-              <div className="p-10 border-b border-black/5 bg-slate-50/50">
-                <span className="text-[10px] font-black text-[#0052CC] uppercase tracking-[0.3em] mb-2 block">Nuevo Registro</span>
-                <h3 className="text-3xl font-black">Registrar Finca</h3>
+                <div className="flex items-start gap-4">
+                  <div className="p-3 bg-black/5 rounded-xl text-black/40">
+                    <User size={20} />
+                  </div>
+                  <div>
+                    <span className="text-[10px] uppercase font-bold text-black/40 block">Administrador</span>
+                    <span className="font-bold">{admin?.name || 'Sin asignar'}</span>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-4">
+                  <div className="p-3 bg-black/5 rounded-xl text-black/40">
+                    <Layers size={20} />
+                  </div>
+                  <div>
+                    <span className="text-[10px] uppercase font-bold text-black/40 block">Área Total</span>
+                    <span className="font-bold">{farm.totalHectares} Ha</span>
+                  </div>
+                </div>
+
+                <div className="flex items-center justify-between pt-6 border-t border-black/5">
+                  <div className="flex items-center gap-2">
+                    <Settings size={16} className="text-black/30" />
+                    <span className="text-xs font-bold text-black/40 uppercase tracking-widest">Sistema: {farm.unitSystem}</span>
+                  </div>
+                  <button 
+                    onClick={() => onDeleteFarm(farm.id)}
+                    className="p-2 text-black/10 hover:text-red-500 transition-colors"
+                  >
+                    <Trash2 size={18} />
+                  </button>
+                </div>
               </div>
-              <div className="p-10 flex-1 overflow-y-auto no-scrollbar flex flex-col gap-8">
+            </BentoCard>
+          );
+        })}
+      </Carousel>
+
+      {/* Add Farm Modal */}
+      <AnimatePresence>
+        {isAdding && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-6">
+            <motion.div 
+              initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+              onClick={() => setIsAdding(false)}
+              className="absolute inset-0 bg-black/40 backdrop-blur-sm"
+            />
+            <motion.div 
+              initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.9, opacity: 0 }}
+              className="relative bg-white w-full max-w-2xl rounded-[3rem] shadow-2xl overflow-hidden"
+            >
+              <div className="p-10 border-b border-black/5 flex justify-between items-center">
+                <h3 className="text-3xl font-bold tracking-tight">Nueva Finca</h3>
+                <button onClick={() => setIsAdding(false)} className="p-4 bg-black/5 rounded-2xl"><Plus className="rotate-45" /></button>
+              </div>
+              <div className="p-10 flex flex-col gap-8">
                 <div className="grid grid-cols-2 gap-6">
                   <div className="flex flex-col gap-2">
                     <span className="text-xs font-bold text-black/40 uppercase tracking-widest">Nombre de la Finca</span>
-                    <input type="text" value={newFarm.name} onChange={e => setNewFarm(p => ({ ...p, name: e.target.value }))} className="h-16 px-6 bg-black/5 rounded-2xl font-bold focus:outline-none focus:ring-4 focus:ring-blue-100" placeholder="Ej: Hacienda La Palma" />
+                    <input 
+                      type="text" 
+                      value={newFarm.name}
+                      onChange={e => setNewFarm(prev => ({ ...prev, name: e.target.value }))}
+                      className="h-16 px-6 bg-black/5 rounded-2xl font-bold focus:outline-none focus:ring-4 focus:ring-blue-100"
+                    />
                   </div>
                   <div className="flex flex-col gap-2">
                     <span className="text-xs font-bold text-black/40 uppercase tracking-widest">Hectáreas Totales</span>
-                    <input type="number" value={newFarm.totalHectares} onChange={e => setNewFarm(p => ({ ...p, totalHectares: Number(e.target.value) }))} className="h-16 px-6 bg-black/5 rounded-2xl font-bold focus:outline-none focus:ring-4 focus:ring-blue-100" />
+                    <input 
+                      type="number" 
+                      value={newFarm.totalHectares}
+                      onChange={e => setNewFarm(prev => ({ ...prev, totalHectares: Number(e.target.value) }))}
+                      className="h-16 px-6 bg-black/5 rounded-2xl font-bold focus:outline-none focus:ring-4 focus:ring-blue-100"
+                    />
                   </div>
                 </div>
                 <div className="flex flex-col gap-2">
                   <span className="text-xs font-bold text-black/40 uppercase tracking-widest">Ubicación</span>
                   <div className="flex gap-2">
-                    <input type="text" placeholder="Ej: Yaracuy, Venezuela" value={newFarm.location} onChange={e => setNewFarm(p => ({ ...p, location: e.target.value }))} className="flex-1 h-16 px-6 bg-black/5 rounded-2xl font-bold focus:outline-none focus:ring-4 focus:ring-blue-100" />
-                    <button onClick={handleGetLocation} className="px-6 bg-black text-white rounded-2xl flex items-center justify-center" title="GPS"><MapPin size={24} /></button>
+                    <input 
+                      type="text" 
+                      placeholder="Ej: Yaracuy, Venezuela"
+                      value={newFarm.location}
+                      onChange={e => setNewFarm(prev => ({ ...prev, location: e.target.value }))}
+                      className="flex-1 h-16 px-6 bg-black/5 rounded-2xl font-bold focus:outline-none focus:ring-4 focus:ring-blue-100"
+                    />
+                    <button 
+                      onClick={handleGetLocation}
+                      className="px-6 bg-black text-white rounded-2xl flex items-center justify-center"
+                      title="Obtener ubicación actual"
+                    >
+                      <MapPin size={24} />
+                    </button>
                   </div>
                 </div>
                 <div className="grid grid-cols-2 gap-6">
                   <div className="flex flex-col gap-2">
                     <span className="text-xs font-bold text-black/40 uppercase tracking-widest">Administrador</span>
-                    <select value={newFarm.adminId} onChange={e => setNewFarm(p => ({ ...p, adminId: e.target.value }))} className="h-16 px-6 bg-black/5 rounded-2xl font-bold appearance-none">
+                    <select 
+                      value={newFarm.adminId}
+                      onChange={e => setNewFarm(prev => ({ ...prev, adminId: e.target.value }))}
+                      className="h-16 px-6 bg-black/5 rounded-2xl font-bold focus:outline-none focus:ring-4 focus:ring-blue-100 appearance-none"
+                    >
                       <option value="">Seleccionar...</option>
-                      {contacts.filter(c => c.role === 'Administrador').map(c => (<option key={c.id} value={c.id}>{c.name}</option>))}
+                      {contacts.filter(c => c.role === 'Administrador').map(c => (
+                        <option key={c.id} value={c.id}>{c.name}</option>
+                      ))}
                     </select>
                   </div>
                   <div className="flex flex-col gap-2">
                     <span className="text-xs font-bold text-black/40 uppercase tracking-widest">Sistema de Unidades</span>
                     <div className="flex bg-black/5 p-1 rounded-2xl h-16">
                       {(['METRICO', 'IMPERIAL'] as UnitSystem[]).map(u => (
-                        <button key={u} onClick={() => setNewFarm(p => ({ ...p, unitSystem: u }))} className={`flex-1 rounded-xl font-bold transition-all ${newFarm.unitSystem === u ? 'bg-white shadow-sm text-[#0052CC]' : 'text-black/40'}`}>{u}</button>
+                        <button
+                          key={u}
+                          onClick={() => setNewFarm(prev => ({ ...prev, unitSystem: u }))}
+                          className={`flex-1 rounded-xl font-bold transition-all ${newFarm.unitSystem === u ? 'bg-white shadow-sm text-[#0052CC]' : 'text-black/40'}`}
+                        >
+                          {u}
+                        </button>
                       ))}
                     </div>
                   </div>
                 </div>
-                <div className="flex gap-4 mt-auto">
-                  <button onClick={() => setIsCreating(false)} className="flex-1 h-20 bg-black/5 text-black font-black rounded-3xl">CANCELAR</button>
-                  <button onClick={() => { onAddFarm(newFarm); setIsCreating(false); }} className="flex-1 h-20 bg-emerald-600 text-white font-black rounded-3xl shadow-xl shadow-emerald-200">CONFIRMAR REGISTRO</button>
-                </div>
-              </div>
-            </>
-          ) : selectedFarm ? (
-            <>
-              <div className="p-10 border-b border-black/5 bg-slate-50/50 flex justify-between items-center">
-                <div>
-                  <span className="text-[10px] font-black text-[#0052CC] uppercase tracking-[0.3em] mb-2 block">Detalles de la Finca</span>
-                  <h3 className="text-3xl font-black">{selectedFarm.name}</h3>
-                </div>
-                <button onClick={() => onDeleteFarm(selectedFarm.id)} className="p-4 text-black/20 hover:text-red-500 transition-colors">
-                  <Trash2 size={22} />
+                <button 
+                  onClick={() => { onAddFarm(newFarm); setIsAdding(false); }}
+                  className="h-20 bg-[#0052CC] text-white font-bold rounded-3xl shadow-xl shadow-blue-200 mt-4"
+                >
+                  Confirmar Registro
                 </button>
               </div>
-              <div className="p-10 flex-1 grid grid-cols-2 gap-6 content-start">
-                <div className="p-6 bg-black/5 rounded-2xl flex items-start gap-4">
-                  <div className="p-3 bg-white rounded-2xl text-black/40"><MapPin size={20} /></div>
-                  <div><span className="text-[10px] uppercase font-bold text-black/40 block">Ubicación</span><span className="font-bold">{selectedFarm.location || '—'}</span></div>
-                </div>
-                <div className="p-6 bg-black/5 rounded-2xl flex items-start gap-4">
-                  <div className="p-3 bg-white rounded-2xl text-black/40"><Layers size={20} /></div>
-                  <div><span className="text-[10px] uppercase font-bold text-black/40 block">Área Total</span><span className="font-bold">{selectedFarm.totalHectares} Ha</span></div>
-                </div>
-                <div className="p-6 bg-black/5 rounded-2xl flex items-start gap-4">
-                  <div className="p-3 bg-white rounded-2xl text-black/40"><User size={20} /></div>
-                  <div><span className="text-[10px] uppercase font-bold text-black/40 block">Administrador</span><span className="font-bold">{selectedFarmAdmin?.name || 'Sin asignar'}</span></div>
-                </div>
-                <div className="p-6 bg-black/5 rounded-2xl flex items-start gap-4">
-                  <div className="p-3 bg-white rounded-2xl text-black/40"><Settings size={20} /></div>
-                  <div><span className="text-[10px] uppercase font-bold text-black/40 block">Sistema</span><span className="font-bold">{selectedFarm.unitSystem}</span></div>
-                </div>
-              </div>
-            </>
-          ) : (
-            <div className="flex-1 flex flex-col items-center justify-center p-20 text-center">
-              <div className="w-24 h-24 bg-black/5 rounded-full flex items-center justify-center mb-6 text-black/20">
-                <Home size={48} />
-              </div>
-              <h3 className="text-2xl font-bold mb-2">Seleccione una Finca</h3>
-              <p className="text-black/40 max-w-xs">Elija una finca de la lista o registre una nueva.</p>
-            </div>
-          )}
-        </div>
-      </div>
-    </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+    </motion.div>
   );
 };
-
 
 const CropMasterView = ({ 
   crops, 
@@ -1036,21 +917,13 @@ const MaterialReceptionView = ({
   crops, 
   lots, 
   farms,
-  onAddReception,
-  viewMode,
-  setViewMode,
-  selectedId,
-  setSelectedId
+  onAddReception 
 }: { 
   receptions: MaterialReception[], 
   crops: Crop[], 
   lots: Lot[], 
   farms: Farm[],
   onAddReception: (reception: MaterialReception) => void,
-  viewMode: 'list' | 'detail',
-  setViewMode: (v: 'list' | 'detail') => void,
-  selectedId: string | null,
-  setSelectedId: (id: string | null) => void,
   key?: React.Key
 }) => {
   const [isAdding, setIsAdding] = useState(false);
@@ -1121,7 +994,6 @@ const MaterialReceptionView = ({
       farmId: newReception.farmId!,
       bundleCount: newReception.bundleCount!,
       averageWeight: newReception.averageWeight!,
-      availableQuantity: newReception.bundleCount! * newReception.averageWeight!,
       qualityValues: newReception.qualityValues!,
       healthScore: score,
       status: getStatusFromScore(score)
@@ -1373,631 +1245,507 @@ const MaterialReceptionView = ({
   );
 };
 
-
-const EvaporatorManagementView = ({ 
-  silos, 
-  crops,
-  onProcessEvaporation,
-  viewMode,
-  setViewMode,
-  selectedId,
-  setSelectedId
+const DispatchManagementView = ({ 
+  dispatches, 
+  lots, 
+  farms 
 }: { 
-  silos: Silo[], 
-  crops: Crop[],
-  onProcessEvaporation: (siloId: string, consumedLiters: number, barrelCount: number) => void,
-  viewMode: 'list' | 'detail',
-  setViewMode: (v: 'list' | 'detail') => void,
-  selectedId: string | null,
-  setSelectedId: (id: string | null) => void,
-  key?: React.Key
-}) => {
-  const [page, setPage] = useState(1);
-  const selectedSilo = silos.find(s => s.id === selectedId);
-  const [consumedLiters, setConsumedLiters] = useState(1000);
-  const [barrelCount, setBarrelCount] = useState(1);
-
-  const filtered = silos.filter(s => s.currentLevel > 0);
-  const itemsPerPage = 8;
-  const totalPages = Math.ceil(filtered.length / itemsPerPage);
-  const paged = filtered.slice((page - 1) * itemsPerPage, page * itemsPerPage);
-
-  const handleSelect = (id: string) => {
-    setSelectedId(id);
-    setViewMode('detail');
-    const silo = silos.find(s => s.id === id);
-    if (silo) setConsumedLiters(Math.min(1000, silo.currentLevel));
-  };
-
-  if (viewMode === 'detail' && selectedSilo) {
-    const selectedCrop = crops.find(c => c.id === selectedSilo.cropId);
-    return (
-      <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="flex flex-col gap-10">
-        <div className="bg-white p-10 rounded-[3rem] border border-black/5 shadow-xl flex justify-between items-center">
-          <div>
-            <span className="text-[10px] font-black text-[#0052CC] uppercase tracking-[0.3em] mb-2 block">Célula de Evaporación</span>
-            <h2 className="text-5xl font-black tracking-tighter uppercase">{selectedSilo.name}</h2>
-          </div>
-          <div className="text-right">
-             <span className="text-[10px] font-black text-black/30 uppercase tracking-widest block">Disponible</span>
-             <span className="text-3xl font-black">{selectedSilo.currentLevel} {selectedSilo.unit}</span>
-          </div>
-        </div>
-
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
-          <div className="lg:col-span-8">
-            <BentoCard title="Parámetros de Evaporación" icon={Box}>
-               <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-                  <div className="flex flex-col gap-8">
-                    <Stepper label={`Consumo (${selectedSilo.unit})`} value={consumedLiters} onChange={setConsumedLiters} min={100} max={selectedSilo.currentLevel} step={100} />
-                    <Stepper label="Barriles a Generar" value={barrelCount} onChange={setBarrelCount} min={1} max={50} step={1} />
-                  </div>
-                  <div className="flex flex-col gap-6">
-                    <div className="p-8 bg-blue-50/50 rounded-[2rem] border border-blue-100">
-                       <h4 className="text-xs font-black text-blue-900 uppercase mb-4 tracking-widest">Resumen de Activos</h4>
-                       <div className="flex justify-between items-center mb-2">
-                          <span className="font-bold text-xs text-blue-800/60">Rubro:</span>
-                          <span className="font-black text-xs text-blue-900">{selectedCrop?.name || 'Varios'}</span>
-                       </div>
-                       <div className="flex justify-between items-center">
-                          <span className="font-bold text-xs text-blue-800/60">Estado:</span>
-                          <span className="font-black text-[10px] text-amber-600 bg-amber-50 px-2 py-0.5 rounded border border-amber-100 uppercase">En Espera</span>
-                       </div>
-                    </div>
-                    <button 
-                      onClick={() => {
-                        onProcessEvaporation(selectedSilo.id, consumedLiters, barrelCount);
-                        alert("Proceso iniciado. Barriles enviados a cuarentena.");
-                        setViewMode('list');
-                      }}
-                      className="h-20 bg-[#0052CC] text-white font-black rounded-3xl shadow-xl mt-auto uppercase tracking-widest"
-                    >
-                      Iniciar Evaporación
-                    </button>
-                  </div>
-               </div>
-            </BentoCard>
-          </div>
-          <div className="lg:col-span-4">
-             <BentoCard title="Info Industrial" icon={Activity}>
-                <div className="flex flex-col gap-4 text-xs font-bold opacity-60">
-                   <p>Operación de alta presión. Verifique válvulas antes de confirmar.</p>
-                   <div className="h-2 w-full bg-slate-100 rounded-full overflow-hidden">
-                      <div className="h-full bg-[#0052CC]" style={{ width: `${(selectedSilo.currentLevel / selectedSilo.capacity) * 100}%` }} />
-                   </div>
-                </div>
-             </BentoCard>
-          </div>
-        </div>
-      </motion.div>
-    );
-  }
-
-  return (
-    <div className="flex flex-col gap-12">
-      <div className="flex justify-between items-center">
-         <div>
-            <h2 className="text-5xl font-black tracking-tighter uppercase">Evaporador</h2>
-            <p className="text-black/40 font-mono text-sm tracking-[0.2em]">SISTEMA DE CONCENTRACIÓN Y LLENADO</p>
-         </div>
-         <Paginator current={page} total={totalPages} onPageChange={setPage} />
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-         {paged.map(s => (
-           <button key={s.id} onClick={() => handleSelect(s.id)} className="group bg-[#0052CC] p-8 rounded-[3rem] h-[300px] flex flex-col justify-between text-white text-left transition-all hover:scale-[1.03] shadow-2xl shadow-blue-200 relative overflow-hidden">
-             <div className="absolute -top-10 -right-10 opacity-10 group-hover:scale-110 transition-transform duration-700"><Factory size={180} /></div>
-             <div>
-                <div className="w-14 h-14 bg-white/20 rounded-2xl flex items-center justify-center mb-6"><Layers size={28} /></div>
-                <h3 className="text-3xl font-black tracking-tighter uppercase leading-tight">{s.name}</h3>
-                <p className="text-white/60 font-bold text-[10px] uppercase tracking-widest">{s.currentLevel} {s.unit} Disponibles</p>
-             </div>
-             <div className="z-10 border-t border-white/10 pt-6 flex justify-between items-center font-black text-[10px] uppercase tracking-widest">
-                <span>Extraer y Llenar</span>
-                <ChevronRight size={18} />
-             </div>
-           </button>
-         ))}
-         {paged.length === 0 && (
-            <div className="col-span-full py-20 text-center opacity-20 font-bold uppercase tracking-[0.2em] border-2 border-dashed rounded-[3rem]">No hay materia prima disponible en silos</div>
-         )}
-      </div>
-    </div>
-  );
-};
-
-
-
-   const DispatchManagementView = ({ 
-  dispatches,
-  lots,
-  farms,
-  silos,
-  onReceiveDispatch,
-  viewMode,
-  setViewMode,
-  selectedId,
-  setSelectedId
-}: { 
-  dispatches: DispatchRecord[],
-  lots: Lot[],
+  dispatches: DispatchRecord[], 
+  lots: Lot[], 
   farms: Farm[],
-  silos: Silo[],
-  onReceiveDispatch: (dispatchId: string, siloId: string, brix: number) => void,
-  viewMode: 'list' | 'detail',
-  setViewMode: (v: 'list' | 'detail') => void,
-  selectedId: string | null,
-  setSelectedId: (id: string | null) => void,
   key?: React.Key
 }) => {
-  const [search, setSearch] = useState('');
-  const [page, setPage] = useState(1);
-  const selectedDispatch = dispatches.find(d => d.id === selectedId);
-  const [selectedSiloId, setSelectedSiloId] = useState(silos[0]?.id || '');
-  const [brixValue, setBrixValue] = useState(12.5);
-
-  const filtered = dispatches.filter(d => d.status === 'EN TRÁNSITO');
-  const itemsPerPage = 6;
-  const totalPages = Math.ceil(filtered.length / itemsPerPage);
-  const paged = filtered.slice((page - 1) * itemsPerPage, page * itemsPerPage);
-
-  const handleSelect = (id: string) => {
-    setSelectedId(id);
-    setViewMode('detail');
-  };
-
-  if (viewMode === 'detail' && selectedDispatch) {
-    return (
-      <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="flex flex-col gap-10">
-        <div className="bg-white p-10 rounded-[3rem] border border-black/5 shadow-xl flex justify-between items-center">
-          <div>
-            <span className="text-[10px] font-black text-[#0052CC] uppercase tracking-[0.3em] mb-2 block">Recepción en Planta (Romanero)</span>
-            <h2 className="text-5xl font-black tracking-tighter uppercase">Despacho {selectedDispatch.id.slice(-4)}</h2>
-          </div>
-          <StatusBadge status={selectedDispatch.status as any} />
-        </div>
-
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
-          <div className="lg:col-span-8">
-            <BentoCard title="Asignación de Silo" icon={Flame}>
-               <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-                  <div className="flex flex-col gap-4">
-                     <span className="text-xs font-bold text-black/40 uppercase tracking-widest">Silo Destino</span>
-                     <div className="grid grid-cols-1 gap-3">
-                        {silos.map(s => (
-                          <button key={s.id} onClick={() => setSelectedSiloId(s.id)} className={`h-16 px-6 rounded-2xl font-bold border-2 transition-all ${selectedSiloId === s.id ? 'bg-[#0052CC] text-white border-[#0052CC]' : 'bg-black/5 border-transparent'}`}>
-                            {s.name} ({s.currentLevel}%)
-                          </button>
-                        ))}
-                     </div>
-                  </div>
-                  <div className="flex flex-col gap-6">
-                     <Stepper label="Grados Brix (°Bx)" value={brixValue} onChange={setBrixValue} min={8} max={25} step={0.1} />
-                     <button 
-                        onClick={() => {
-                          onReceiveDispatch(selectedDispatch.id, selectedSiloId, brixValue);
-                          alert("Materia prima recibida y almacenada.");
-                          setViewMode('list');
-                        }}
-                        className="h-20 bg-[#0052CC] text-white font-black rounded-3xl shadow-xl mt-auto uppercase tracking-widest"
-                      >
-                        Confirmar Versado
-                      </button>
-                  </div>
-               </div>
-            </BentoCard>
-          </div>
-          <div className="lg:col-span-4">
-             <BentoCard title="Detalles del Origen" icon={Truck}>
-                <div className="flex flex-col gap-4 text-sm font-bold">
-                   <div className="flex justify-between"><span>Cantidad:</span> <span>{selectedDispatch.quantity} Kg</span></div>
-                   <div className="flex justify-between"><span>Fecha:</span> <span>{selectedDispatch.date}</span></div>
-                </div>
-             </BentoCard>
-          </div>
-        </div>
-      </motion.div>
-    );
-  }
-
   return (
-    <div className="flex flex-col gap-12">
+    <div className="flex flex-col gap-8">
       <div className="flex justify-between items-center">
-         <div>
-            <h2 className="text-5xl font-black tracking-tighter uppercase">Romanero Planta</h2>
-            <p className="text-black/40 font-mono text-sm tracking-[0.2em]">RECEPCIÓN Y CONTROL DE MATERIA PRIMA</p>
-         </div>
-         <Paginator current={page} total={totalPages} onPageChange={setPage} />
+        <div>
+          <h2 className="text-4xl font-black tracking-tighter uppercase">Despachos a Planta</h2>
+          <p className="text-black/40 font-mono text-sm">LOGÍSTICA Y TRAZABILIDAD DE SALIDA</p>
+        </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-         {paged.map(d => (
-           <button key={d.id} onClick={() => handleSelect(d.id)} className="group bg-[#0052CC] p-8 rounded-[3rem] h-[300px] flex flex-col justify-between text-white text-left transition-all hover:scale-[1.03] shadow-2xl shadow-blue-200 relative overflow-hidden">
-             <div className="absolute -top-10 -right-10 opacity-10 group-hover:scale-110 transition-transform duration-700"><Truck size={180} /></div>
-             <div className="z-10">
-                <div className="w-14 h-14 bg-white/20 rounded-2xl flex items-center justify-center mb-6"><Flame size={28} /></div>
-                <h3 className="text-3xl font-black tracking-tighter uppercase leading-tight">Despacho {d.id.slice(-4)}</h3>
-                <p className="text-white/60 font-bold text-[10px] uppercase tracking-widest">{d.quantity} Kg • {d.date}</p>
-             </div>
-             <div className="z-10 border-t border-white/10 pt-6 flex justify-between items-center font-black text-[10px] uppercase tracking-widest">
-                <span>Ingresar al Silo</span>
-                <ChevronRight size={18} />
-             </div>
-           </button>
-         ))}
-         {paged.length === 0 && (
-            <div className="col-span-full py-20 text-center opacity-20 font-bold uppercase tracking-[0.2em] border-2 border-dashed rounded-[3rem]">No hay camiones en tránsito</div>
-         )}
+      <div className="grid grid-cols-1 gap-4">
+        {dispatches.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-20 bg-white rounded-[3rem] border border-black/5 text-black/20">
+            <Truck size={64} strokeWidth={1} className="mb-4" />
+            <p className="font-bold">No hay despachos registrados.</p>
+          </div>
+        ) : (
+          dispatches.map(dispatch => {
+            const lot = lots.find(l => l.id === dispatch.lotId);
+            const farm = farms.find(f => f.id === dispatch.originFarmId);
+            return (
+              <div key={dispatch.id} className="bg-white p-8 rounded-[2rem] border border-black/5 flex justify-between items-center industrial-btn">
+                <div className="flex items-center gap-8">
+                  <div className="p-5 bg-black text-white rounded-2xl">
+                    <Truck size={24} />
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="font-mono font-black text-xl">{dispatch.id.split('-')[1]}</span>
+                      <span className={`px-2 py-0.5 rounded text-[8px] font-black tracking-widest ${dispatch.type === 'INTERNO' ? 'bg-blue-100 text-blue-600' : 'bg-amber-100 text-amber-600'}`}>
+                        {dispatch.type}
+                      </span>
+                    </div>
+                    <p className="text-xs font-bold text-black/40 uppercase tracking-widest">
+                      {farm?.name || 'Proveedor Externo'} • {lot?.lotCode || 'N/A'}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex gap-12 items-center">
+                  <div className="text-right">
+                    <span className="text-[10px] font-black text-black/30 uppercase tracking-widest block">Cantidad</span>
+                    <span className="text-2xl font-black">{dispatch.quantity} Kg</span>
+                  </div>
+                  <div className="text-right">
+                    <span className="text-[10px] font-black text-black/30 uppercase tracking-widest block">Fecha</span>
+                    <span className="text-sm font-bold">{new Date(dispatch.date).toLocaleDateString()}</span>
+                  </div>
+                  <div className={`px-4 py-2 rounded-xl text-[10px] font-black border ${
+                    dispatch.status === 'RECIBIDO' ? 'bg-emerald-50 border-emerald-200 text-emerald-600' : 'bg-blue-50 border-blue-200 text-blue-600'
+                  }`}>
+                    {dispatch.status}
+                  </div>
+                </div>
+              </div>
+            );
+          })
+        )}
       </div>
     </div>
   );
 };
-
 const QualityManagementView = ({ 
   barrels, 
   crops, 
   lots,
-  onUpdateBarrel,
-  viewMode,
-  setViewMode,
-  selectedId,
-  setSelectedId
+  onUpdateBarrel
 }: { 
   barrels: Barrel[], 
   crops: Crop[], 
   lots: Lot[],
-  onUpdateBarrel: (id: string, updates: Partial<Barrel>) => void,
-  viewMode: 'list' | 'detail',
-  setViewMode: (v: 'list' | 'detail') => void,
-  selectedId: string | null,
-  setSelectedId: (id: string | null) => void,
+  onUpdateBarrel: (barrel: Barrel) => void,
   key?: React.Key
 }) => {
-  const [search, setSearch] = useState('');
-  const [page, setPage] = useState(1);
-  const selectedBarrel = barrels.find(b => b.id === selectedId);
-  const [brixValue, setBrixValue] = useState(selectedBarrel?.brix || 12);
+  const [selectedBarrelId, setSelectedBarrelId] = useState<string | null>(null);
+  const selectedBarrel = barrels.find(b => b.id === selectedBarrelId);
+  const selectedCrop = crops.find(c => c.id === selectedBarrel?.cropId);
 
-  const filtered = barrels.filter(b => b.id.toLowerCase().includes(search.toLowerCase()));
-  const itemsPerPage = 8;
-  const totalPages = Math.ceil(filtered.length / itemsPerPage);
-  const paged = filtered.slice((page - 1) * itemsPerPage, page * itemsPerPage);
-
-  const handleSelect = (id: string) => {
-    setSelectedId(id);
-    setViewMode('detail');
+  const handleStatusChange = (status: BarrelStatus) => {
+    if (selectedBarrel) {
+      onUpdateBarrel({ ...selectedBarrel, status });
+    }
   };
 
-  const isLocked = (barrel: Barrel) => {
-    const now = new Date();
-    const end = new Date(barrel.incubationEndDate);
-    return now < end;
+  const handleValueChange = (paramId: string, value: any) => {
+    if (selectedBarrel) {
+      onUpdateBarrel({
+        ...selectedBarrel,
+        analysisValues: { ...selectedBarrel.analysisValues, [paramId]: value }
+      });
+    }
   };
-
-  const getRemainingTime = (barrel: Barrel) => {
-    const diff = new Date(barrel.incubationEndDate).getTime() - new Date().getTime();
-    if (diff <= 0) return 'Listo';
-    const hours = Math.floor(diff / (1000 * 60 * 60));
-    const mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-    return `${hours}h ${mins}m`;
-  };
-
-  if (viewMode === 'detail' && selectedBarrel) {
-    const locked = isLocked(selectedBarrel);
-    return (
-      <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="flex flex-col gap-10">
-        <div className="bg-white p-10 rounded-[3rem] border border-black/5 shadow-xl flex justify-between items-center">
-          <div>
-            <span className="text-[10px] font-black text-[#0052CC] uppercase tracking-[0.3em] mb-2 block">Laboratorio Microbiológico</span>
-            <h2 className="text-5xl font-black tracking-tighter uppercase">Barril {selectedBarrel.id.slice(-6)}</h2>
-          </div>
-          <StatusBadge status={selectedBarrel.status} />
-        </div>
-
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
-          <div className="lg:col-span-8">
-            <BentoCard title="Liberación Biológica" icon={ShieldAlert}>
-               {locked ? (
-                 <div className="p-10 bg-amber-50 rounded-[2rem] border-2 border-amber-200 text-center flex flex-col items-center gap-6">
-                    <div className="w-20 h-20 bg-amber-100 rounded-full flex items-center justify-center text-amber-600 animate-pulse">
-                      <Lock size={40} />
-                    </div>
-                    <h3 className="text-2xl font-black text-amber-900 uppercase">Bloqueo de Cuarentena (72h)</h3>
-                    <p className="text-amber-800/60 font-bold">Tiempo restante: {getRemainingTime(selectedBarrel)}</p>
-                    <button disabled className="px-10 py-5 bg-amber-200 text-amber-800 rounded-2xl font-black opacity-50 cursor-not-allowed">LIBERACIÓN RESTRINGIDA</button>
-                 </div>
-               ) : (
-                 <div className="flex flex-col gap-10">
-                    <div className="grid grid-cols-2 gap-8">
-                       <Stepper label="Grados Brix Final" value={brixValue} onChange={setBrixValue} min={10} max={30} step={0.1} />
-                       <div className="flex flex-col gap-4">
-                          <span className="text-xs font-bold text-black/40 uppercase tracking-widest">Análisis Microbiológico</span>
-                          <div className="h-14 bg-black/5 rounded-2xl flex items-center px-6 font-bold text-emerald-600 uppercase">Libre de Patógenos</div>
-                       </div>
-                    </div>
-                    <button 
-                      onClick={() => {
-                        onUpdateBarrel(selectedBarrel.id, { status: 'LIBERADO', brix: brixValue });
-                        alert("Barril liberado para exportación.");
-                        setViewMode('list');
-                      }}
-                      className="h-24 bg-[#0052CC] text-white font-black rounded-[2rem] shadow-xl uppercase tracking-widest text-lg"
-                    >
-                      LIBERAR BARRIL
-                    </button>
-                 </div>
-               )}
-            </BentoCard>
-          </div>
-          <div className="lg:col-span-4">
-             <BentoCard title="Trazabilidad" icon={Activity}>
-                <div className="text-xs font-bold flex flex-col gap-4">
-                   <div className="flex justify-between"><span>Creado:</span> <span>{new Date(selectedBarrel.creationTimestamp).toLocaleDateString()}</span></div>
-                   <div className="flex justify-between"><span>Categoría:</span> <span>ORGANIC MD2</span></div>
-                </div>
-             </BentoCard>
-          </div>
-        </div>
-      </motion.div>
-    );
-  }
 
   return (
-    <div className="flex flex-col gap-12">
+    <div className="flex flex-col gap-8 h-full">
       <div className="flex justify-between items-center">
-         <div>
-            <h2 className="text-5xl font-black tracking-tighter uppercase">Cuarentena y Calidad</h2>
-            <p className="text-black/40 font-mono text-sm tracking-[0.2em]">SISTEMA DE SEGURIDAD BIOLÓGICA</p>
-         </div>
-         <SearchBar value={search} onChange={setSearch} placeholder="Buscar barril..." />
+        <div>
+          <h2 className="text-4xl font-black tracking-tighter">CUARENTENA DE BARRILES</h2>
+          <p className="text-black/40 font-mono text-sm">SISTEMA DE CONTROL MICROBIOLÓGICO</p>
+        </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-         {paged.map(b => (
-           <button key={b.id} onClick={() => handleSelect(b.id)} className={`group p-8 rounded-[3rem] h-[320px] flex flex-col justify-between text-left transition-all hover:scale-[1.03] shadow-2xl relative overflow-hidden ${isLocked(b) ? 'bg-amber-400 text-black shadow-amber-200' : 'bg-[#0052CC] text-white shadow-blue-200'}`}>
-             <div className="absolute -top-10 -right-10 opacity-10 group-hover:scale-110 transition-transform duration-700"><Shield size={180} /></div>
-             <div>
-                <div className="flex justify-between items-start mb-6">
-                   <div className={`p-4 rounded-2xl ${isLocked(b) ? 'bg-black/10' : 'bg-white/20'}`}><FlaskConical size={28} /></div>
-                   <StatusBadge status={b.status} />
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 flex-1 overflow-hidden">
+        {/* Barrel List */}
+        <div className="lg:col-span-5 flex flex-col gap-4 overflow-y-auto no-scrollbar pr-2">
+          {barrels.map(barrel => (
+            <button
+              key={barrel.id}
+              onClick={() => setSelectedBarrelId(barrel.id)}
+              className={`p-6 rounded-3xl border-2 transition-all text-left flex justify-between items-center industrial-btn ${
+                selectedBarrelId === barrel.id 
+                  ? 'bg-white border-[#0052CC] shadow-xl ring-4 ring-blue-50' 
+                  : 'bg-white border-black/5 hover:border-black/20'
+              }`}
+            >
+              <div className="flex items-center gap-4">
+                <div className={`p-4 rounded-2xl ${
+                  barrel.status === 'LIBERADO' ? 'bg-emerald-100 text-emerald-600' :
+                  barrel.status === 'RECHAZADO' ? 'bg-red-100 text-red-600' :
+                  barrel.status === 'EN ANÁLISIS' ? 'bg-blue-100 text-blue-600' :
+                  'bg-slate-100 text-slate-600'
+                }`}>
+                  <Box size={24} />
                 </div>
-                <h3 className="text-3xl font-black tracking-tighter uppercase leading-tight">Barril {b.id.slice(-6)}</h3>
-                {isLocked(b) && <p className="font-black text-xs uppercase mt-2">🔒 {getRemainingTime(b)}</p>}
-             </div>
-             <div className="z-10 border-t border-black/10 pt-6 flex justify-between items-center font-black text-[10px] uppercase tracking-widest">
-                <span>{isLocked(b) ? 'Ver Bloqueo' : 'Realizar Análisis'}</span>
-                <ChevronRight size={18} />
-             </div>
-           </button>
-         ))}
+                <div>
+                  <h4 className="font-mono font-bold text-xl">{barrel.code}</h4>
+                  <p className="text-xs font-bold text-black/40 uppercase tracking-widest">
+                    {crops.find(c => c.id === barrel.cropId)?.name} • {new Date(barrel.date).toLocaleDateString()}
+                  </p>
+                </div>
+              </div>
+              <span className={`px-3 py-1 rounded-lg text-[10px] font-black tracking-widest border ${
+                barrel.status === 'LIBERADO' ? 'bg-emerald-50 border-emerald-200 text-emerald-600' :
+                barrel.status === 'RECHAZADO' ? 'bg-red-50 border-red-200 text-red-600' :
+                barrel.status === 'EN ANÁLISIS' ? 'bg-blue-50 border-blue-200 text-blue-600' :
+                'bg-slate-50 border-slate-200 text-slate-600'
+              }`}>
+                {barrel.status}
+              </span>
+            </button>
+          ))}
+        </div>
+
+        {/* Barrel Details & Analysis */}
+        <div className="lg:col-span-7 bg-white rounded-[3rem] border border-black/10 shadow-2xl overflow-hidden flex flex-col">
+          {selectedBarrel ? (
+            <>
+              <div className="p-10 border-b border-black/5 bg-slate-50/50 flex justify-between items-center">
+                <div>
+                  <span className="text-[10px] font-black text-[#0052CC] uppercase tracking-[0.3em] mb-2 block">Detalles del Activo</span>
+                  <h3 className="text-3xl font-black font-mono">{selectedBarrel.code}</h3>
+                </div>
+                <div className="flex gap-2">
+                  {(['EN ESPERA', 'EN ANÁLISIS', 'LIBERADO', 'RECHAZADO'] as BarrelStatus[]).map(s => (
+                    <button
+                      key={s}
+                      onClick={() => handleStatusChange(s)}
+                      className={`px-4 py-2 rounded-xl text-[10px] font-black transition-all border ${
+                        selectedBarrel.status === s 
+                          ? 'bg-black text-white border-black shadow-lg' 
+                          : 'bg-white text-black/40 border-black/5 hover:border-black/20'
+                      }`}
+                    >
+                      {s}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="p-10 flex-1 overflow-y-auto no-scrollbar">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                  {selectedCrop?.parameters.filter(p => p.category === 'MICROBIOLOGICO').map(param => (
+                    <div key={param.id} className="p-6 bg-black/5 rounded-[2rem] border border-black/5 flex flex-col gap-4">
+                      <div className="flex justify-between items-center">
+                        <span className="text-xs font-bold text-black/40 uppercase tracking-widest">{param.name}</span>
+                        <span className="text-[10px] font-black px-2 py-1 bg-white rounded-lg border border-black/5">{param.unit}</span>
+                      </div>
+                      
+                      {param.type === 'NUMERIC' && (
+                        <Stepper 
+                          label="Resultado"
+                          value={selectedBarrel.analysisValues[param.id] || 0}
+                          onChange={v => handleValueChange(param.id, v)}
+                          min={0}
+                          max={1000}
+                          step={0.1}
+                        />
+                      )}
+
+                      {param.type === 'BOOLEAN' && (
+                        <div className="flex bg-white p-1 rounded-2xl h-16 border border-black/5">
+                          {[true, false].map(v => (
+                            <button
+                              key={v.toString()}
+                              onClick={() => handleValueChange(param.id, v)}
+                              className={`flex-1 rounded-xl font-bold transition-all ${selectedBarrel.analysisValues[param.id] === v ? 'bg-black text-white shadow-lg' : 'text-black/40'}`}
+                            >
+                              {v ? 'POSITIVO' : 'NEGATIVO'}
+                            </button>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+                
+                {selectedCrop?.parameters.filter(p => p.category === 'MICROBIOLOGICO').length === 0 && (
+                  <div className="flex flex-col items-center justify-center py-20 text-black/20">
+                    <FlaskConical size={64} strokeWidth={1} className="mb-4" />
+                    <p className="font-bold">No hay parámetros microbiológicos definidos para este rubro.</p>
+                  </div>
+                )}
+              </div>
+            </>
+          ) : (
+            <div className="flex-1 flex flex-col items-center justify-center p-20 text-center">
+              <div className="w-24 h-24 bg-black/5 rounded-full flex items-center justify-center mb-6 text-black/20">
+                <Search size={48} />
+              </div>
+              <h3 className="text-2xl font-bold mb-2">Seleccione un Barril</h3>
+              <p className="text-black/40 max-w-xs">Elija un barril de la lista para ver su trazabilidad y registrar análisis de laboratorio.</p>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
 };
 
-const ProjectManagementView = ({ 
-  projects,
-  receptions,
+const CureManagementView = ({ 
+  lots, 
+  chemicals, 
   contacts,
-  onAddActivityLog,
-  onGenerateDispatch,
-  onAddProject,
-  lots,
-  viewMode,
-  setViewMode,
-  selectedId,
-  setSelectedId
+  onAddCureRecord
 }: { 
-  projects: SowingProject[],
-  receptions: MaterialReception[],
+  lots: Lot[], 
+  chemicals: Chemical[], 
   contacts: Contact[],
-  onAddActivityLog: (projectId: string, record: Omit<ActivityLog, 'id'>) => void,
-  onGenerateDispatch: (projectId: string, quantity: number) => void,
-  onAddProject: (project: Omit<SowingProject, 'id' | 'activityRecords'>) => void,
-  lots: Lot[],
-  viewMode: 'list' | 'detail',
-  setViewMode: (v: 'list' | 'detail') => void,
-  selectedId: string | null,
-  setSelectedId: (id: string | null) => void,
+  onAddCureRecord: (record: Partial<CureRecord>) => void,
   key?: React.Key
 }) => {
-  const [search, setSearch] = useState('');
-  const [page, setPage] = useState(1);
-  const [showConfig, setShowConfig] = useState(false);
-  const [activeDetailTab, setActiveDetailTab] = useState<'info' | 'history' | 'trace'>('info');
-
-  const selectedProject = projects.find(p => p.id === selectedId);
-  const filteredProjects = projects.filter(p => p.name.toLowerCase().includes(search.toLowerCase()));
-  const itemsPerPage = 8;
-  const totalPages = Math.ceil(filteredProjects.length / itemsPerPage);
-  const pagedProjects = filteredProjects.slice((page - 1) * itemsPerPage, page * itemsPerPage);
-
-  const [newSowing, setNewSowing] = useState<Partial<ActivityLog>>({
-    type: 'Siembra',
-    resource: 'Cuadrilla',
-    date: new Date().toISOString().split('T')[0],
-    consumedQuantity: 1000,
+  const [selectedLotId, setSelectedLotId] = useState<string>('');
+  const [newCure, setNewCure] = useState<Partial<CureRecord>>({
+    chemicalId: chemicals[0]?.id || '',
+    dosage: 1.0,
+    responsibleId: contacts[0]?.id || '',
+    date: new Date().toISOString().split('T')[0]
   });
 
-  const handleSelect = (id: string) => {
-    setSelectedId(id);
-    setViewMode('detail');
-  };
-
-  if (viewMode === 'detail' && selectedProject) {
-    return (
-      <motion.div 
-        initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }}
-        className="flex flex-col gap-10"
-      >
-        {/* Detail Header */}
-        <div className="flex justify-between items-end bg-white p-10 rounded-[3rem] border border-black/5 shadow-xl">
-          <div>
-            <span className="text-[10px] font-black text-[#10B981] uppercase tracking-[0.3em] mb-3 block">EXPEDIENTE DE PROYECTO</span>
-            <h2 className="text-5xl font-black tracking-tighter uppercase">{selectedProject.name}</h2>
-            <div className="flex gap-4 mt-6">
-              <StatusBadge status={selectedProject.status as any} />
-              <span className="text-xs font-bold text-black/30 bg-black/5 px-4 py-2 rounded-full uppercase tracking-wider">
-                Inicio: {selectedProject.startDate}
-              </span>
-            </div>
-          </div>
-          
-          <div className="flex bg-black/5 p-2 rounded-3xl">
-            {(['info', 'history', 'trace'] as const).map(tab => (
-              <button
-                key={tab}
-                onClick={() => setActiveDetailTab(tab)}
-                className={`px-8 py-3 rounded-2xl font-bold text-xs uppercase tracking-widest transition-all ${
-                  activeDetailTab === tab ? 'bg-white shadow-lg text-[#10B981]' : 'text-black/30'
-                }`}
-              >
-                {tab === 'info' ? 'General' : tab === 'history' ? 'Actividades' : 'Trazabilidad'}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
-          <div className="lg:col-span-8">
-            {activeDetailTab === 'info' && (
-              <div className="flex flex-col gap-8">
-                <BentoCard title="Registro de Actividad" icon={Activity}>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                    <div className="flex flex-col gap-6">
-                      <div className="flex flex-col gap-2">
-                        <span className="text-xs font-bold text-black/40 uppercase tracking-widest">Tipo de Labor</span>
-                        <select 
-                          value={newSowing.type}
-                          onChange={e => setNewSowing({...newSowing, type: e.target.value})}
-                          className="h-16 px-6 bg-black/5 rounded-2xl font-bold"
-                        >
-                          <option value="Siembra">Siembra</option>
-                          <option value="Riego">Riego</option>
-                          <option value="Fertilización">Fertilización</option>
-                          <option value="Cura">Mantenimiento / Cura</option>
-                        </select>
-                      </div>
-                      <div className="flex flex-col gap-2">
-                         <span className="text-xs font-bold text-black/40 uppercase tracking-widest">Fecha</span>
-                         <input type="date" value={newSowing.date} onChange={e => setNewSowing({...newSowing, date: e.target.value})} className="h-16 px-6 bg-black/5 rounded-2xl font-bold" />
-                      </div>
-                    </div>
-                    <div className="flex flex-col gap-6">
-                      <div className="flex flex-col gap-2">
-                         <span className="text-xs font-bold text-black/40 uppercase tracking-widest">Maquinaria / Equipo</span>
-                         <input type="text" placeholder="Ej: Tractor T-45" value={newSowing.machinery || ''} onChange={e => setNewSowing({...newSowing, machinery: e.target.value})} className="h-16 px-6 bg-black/5 rounded-2xl font-bold" />
-                      </div>
-                      <button 
-                        onClick={() => {
-                          onAddActivityLog(selectedProject.id, newSowing as any);
-                          alert("Actividad registrada.");
-                        }}
-                        className="h-20 bg-[#10B981] text-white font-black rounded-3xl shadow-xl mt-auto"
-                      >
-                        CONFIRMAR ACTIVIDAD
-                      </button>
-                    </div>
-                  </div>
-                </BentoCard>
-
-                <BentoCard title="Acciones de Salida" icon={Truck}>
-                  <div className="flex items-center justify-between p-4 bg-emerald-50 rounded-[2rem] border border-emerald-100">
-                    <div>
-                      <h4 className="font-bold text-emerald-900">Listo para Cosecha</h4>
-                      <p className="text-xs text-emerald-700/60 font-medium">Se requiere análisis APROBADO para despachar.</p>
-                    </div>
-                    <button 
-                      onClick={() => onGenerateDispatch(selectedProject.id, 15000)}
-                      className="px-8 py-4 bg-emerald-600 text-white font-black rounded-2xl shadow-lg hover:scale-105 transition-all text-sm uppercase tracking-widest"
-                    >
-                      Generar Despacho
-                    </button>
-                  </div>
-                </BentoCard>
-              </div>
-            )}
-
-            {activeDetailTab === 'history' && (
-              <BentoCard title="Bitácora Histórica" icon={Clock}>
-                <div className="flex flex-col gap-4">
-                  {selectedProject.activityRecords.map(act => (
-                    <div key={act.id} className="p-6 bg-black/5 rounded-3xl flex items-center justify-between">
-                      <div className="flex items-center gap-6">
-                        <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center text-[#10B981] shadow-sm">
-                          <Activity size={20} />
-                        </div>
-                        <div>
-                          <p className="font-black text-lg">{act.type}</p>
-                          <p className="text-[10px] font-bold text-black/30 uppercase tracking-widest">
-                            {act.date} • {act.machinery || act.crew || 'General'}
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                  )).reverse()}
-                </div>
-              </BentoCard>
-            )}
-          </div>
-          <div className="lg:col-span-4">
-             {/* Side info */}
-             <BentoCard title="Lotes Vinculados" icon={Map}>
-                <div className="flex flex-col gap-3">
-                   {selectedProject.lotIds.map(id => (
-                     <div key={id} className="p-4 bg-black/5 rounded-2xl font-bold text-sm">{lots.find(l => l.id === id)?.lotCode || id}</div>
-                   ))}
-                </div>
-             </BentoCard>
-          </div>
-        </div>
-      </motion.div>
-    );
-  }
+  const selectedChemical = chemicals.find(c => c.id === newCure.chemicalId);
 
   return (
-    <div className="flex flex-col gap-12">
+    <div className="flex flex-col gap-8">
       <div className="flex justify-between items-center">
         <div>
-          <h2 className="text-5xl font-black tracking-tighter uppercase">Gestión de Proyectos</h2>
-          <p className="text-black/40 font-mono text-sm tracking-[0.2em]">CONTROL INTEGRAL DEL CICLO DE VIDA AGRÍCOLA</p>
+          <h2 className="text-4xl font-black tracking-tighter uppercase">Tratamiento de Semilla (Cura)</h2>
+          <p className="text-black/40 font-mono text-sm">REGISTRO DE APLICACIÓN FITOSANITARIA</p>
         </div>
-        <button onClick={() => setShowConfig(true)} className="flex items-center gap-3 px-10 py-5 bg-[#10B981] text-white rounded-[2rem] font-black shadow-xl hover:scale-105 transition-transform uppercase tracking-widest text-sm">
-          <Plus size={24} /> Nuevo Proyecto
-        </button>
       </div>
 
-      <div className="flex flex-col md:flex-row justify-between items-center gap-8 bg-white p-6 rounded-[2.5rem] border border-black/5 shadow-sm">
-        <SearchBar value={search} onChange={setSearch} placeholder="Buscar proyecto..." />
-        <Paginator current={page} total={totalPages} onPageChange={setPage} />
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-        {pagedProjects.map(project => (
-          <button
-            key={project.id}
-            onClick={() => handleSelect(project.id)}
-            className="group bg-[#10B981] hover:bg-[#059669] p-8 rounded-[3rem] h-[320px] flex flex-col justify-between text-white text-left transition-all hover:scale-[1.03] shadow-2xl relative overflow-hidden"
-          >
-            <div className="absolute -top-10 -right-10 opacity-10 group-hover:rotate-12 transition-transform duration-700">
-               <Sprout size={180} />
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+        <div className="lg:col-span-4 flex flex-col gap-6">
+          <BentoCard title="Selección de Lote" icon={Map}>
+            <div className="flex flex-col gap-4">
+              {lots.filter(l => l.status === 'VACÍO' || l.status === 'PREPARACIÓN').map(lot => (
+                <button
+                  key={lot.id}
+                  onClick={() => setSelectedLotId(lot.id)}
+                  className={`p-6 rounded-2xl border-2 transition-all text-left industrial-btn ${
+                    selectedLotId === lot.id ? 'bg-white border-[#0052CC] shadow-lg' : 'bg-black/5 border-transparent'
+                  }`}
+                >
+                  <span className="font-mono font-bold text-lg">{lot.lotCode}</span>
+                  <span className="block text-[10px] font-black text-black/40 uppercase tracking-widest">{lot.soilType} • {lot.area} Ha</span>
+                </button>
+              ))}
             </div>
-            <div>
-              <div className="flex justify-between items-start mb-6">
-                <div className="p-4 bg-white/20 rounded-2xl">
-                  <Briefcase size={28} />
+          </BentoCard>
+        </div>
+
+        <div className="lg:col-span-8 flex flex-col gap-6">
+          <BentoCard title="Detalles del Tratamiento" icon={Droplets}>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <div className="flex flex-col gap-6">
+                <div className="flex flex-col gap-2">
+                  <span className="text-xs font-bold text-black/40 uppercase tracking-widest">Producto Químico</span>
+                  <div className="grid grid-cols-1 gap-2">
+                    {chemicals.map(c => (
+                      <button
+                        key={c.id}
+                        onClick={() => setNewCure(prev => ({ ...prev, chemicalId: c.id }))}
+                        className={`h-16 px-6 rounded-2xl font-bold border-2 transition-all text-left flex justify-between items-center ${
+                          newCure.chemicalId === c.id ? 'bg-white border-[#0052CC] text-[#0052CC]' : 'bg-black/5 border-transparent text-black/40'
+                        }`}
+                      >
+                        {c.name}
+                        <span className="text-[10px] opacity-50">{c.type}</span>
+                      </button>
+                    ))}
+                  </div>
                 </div>
-                <StatusBadge status={project.status as any} />
+                <div className="flex flex-col gap-2">
+                  <span className="text-xs font-bold text-black/40 uppercase tracking-widest">Fecha de Aplicación</span>
+                  <input 
+                    type="date" 
+                    value={newCure.date}
+                    onChange={e => setNewCure(prev => ({ ...prev, date: e.target.value }))}
+                    className="h-16 px-6 bg-black/5 rounded-2xl font-bold text-xl"
+                  />
+                </div>
               </div>
-              <h3 className="text-3xl font-black tracking-tighter uppercase leading-tight mb-2">{project.name}</h3>
-              <p className="text-white/60 font-bold text-xs uppercase tracking-widest">{project.lotIds.length} Lotes</p>
+
+              <div className="flex flex-col gap-8">
+                <Stepper 
+                  label={`Dosis (${selectedChemical?.unit || 'ml/L'})`}
+                  value={newCure.dosage || 0}
+                  onChange={v => setNewCure(prev => ({ ...prev, dosage: v }))}
+                  min={0.1}
+                  max={50}
+                  step={0.1}
+                />
+                
+                <div className="flex flex-col gap-2">
+                  <span className="text-xs font-bold text-black/40 uppercase tracking-widest">Responsable de Aplicación</span>
+                  <select 
+                    value={newCure.responsibleId}
+                    onChange={e => setNewCure(prev => ({ ...prev, responsibleId: e.target.value }))}
+                    className="h-16 px-6 bg-black/5 rounded-2xl font-bold appearance-none"
+                  >
+                    {contacts.filter(c => c.role === 'Operador' || c.role === 'Administrador').map(c => (
+                      <option key={c.id} value={c.id}>{c.name}</option>
+                    ))}
+                  </select>
+                </div>
+
+                <button 
+                  onClick={() => {
+                    if (!selectedLotId) return alert('Seleccione un lote');
+                    onAddCureRecord({ ...newCure, lotId: selectedLotId });
+                  }}
+                  className="h-20 bg-black text-white font-black rounded-3xl shadow-2xl industrial-btn mt-auto"
+                >
+                  REGISTRAR CURA
+                </button>
+              </div>
             </div>
-             <div className="z-10 flex items-center justify-between border-t border-white/10 pt-6 font-black text-[10px] uppercase tracking-widest">
-               <span>Ver Expediente</span>
-               <ChevronRight size={18} />
+          </BentoCard>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const SowingManagementView = ({ 
+  lots, 
+  contacts,
+  onAddSowingRecord,
+  onGenerateDispatch
+}: { 
+  lots: Lot[], 
+  contacts: Contact[],
+  onAddSowingRecord: (record: Partial<SowingRecord>) => void,
+  onGenerateDispatch: (lotId: string, quantity: number) => void,
+  key?: React.Key
+}) => {
+  const [selectedLotId, setSelectedLotId] = useState<string>('');
+  const [newSowing, setNewSowing] = useState<Partial<SowingRecord>>({
+    density: 35000,
+    responsibleId: contacts[0]?.id || '',
+    date: new Date().toISOString().split('T')[0]
+  });
+  const [dispatchQty, setDispatchQty] = useState(1000);
+
+  const selectedLot = lots.find(l => l.id === selectedLotId);
+
+  return (
+    <div className="flex flex-col gap-8">
+      <div className="flex justify-between items-center">
+        <div>
+          <h2 className="text-4xl font-black tracking-tighter uppercase">Registro de Siembra</h2>
+          <p className="text-black/40 font-mono text-sm">CONTROL DE DENSIDAD Y TRAZABILIDAD</p>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 flex-1">
+        <div className="lg:col-span-4 flex flex-col gap-6">
+          <BentoCard title="Lotes Listos" icon={Sprout}>
+            <div className="flex flex-col gap-4">
+              {lots.filter(l => l.status === 'EN_CURA' || l.status === 'PREPARACIÓN').map(lot => (
+                <button
+                  key={lot.id}
+                  onClick={() => setSelectedLotId(lot.id)}
+                  className={`p-6 rounded-2xl border-2 transition-all text-left industrial-btn ${
+                    selectedLotId === lot.id ? 'bg-white border-[#0052CC] shadow-lg' : 'bg-black/5 border-transparent'
+                  }`}
+                >
+                  <span className="font-mono font-bold text-lg">{lot.lotCode}</span>
+                  <span className="block text-[10px] font-black text-black/40 uppercase tracking-widest">{lot.soilType} • {lot.area} Ha</span>
+                </button>
+              ))}
             </div>
-          </button>
-        ))}
+          </BentoCard>
+        </div>
+
+        <div className="lg:col-span-8 grid grid-cols-1 md:grid-cols-2 gap-8">
+          <div className="flex flex-col gap-6">
+            <BentoCard title="Parámetros de Siembra" icon={ClipboardCheck}>
+              <div className="flex flex-col gap-8">
+                <div className="flex flex-col gap-2">
+                  <span className="text-xs font-bold text-black/40 uppercase tracking-widest">Fecha de Siembra</span>
+                  <input 
+                    type="date" 
+                    value={newSowing.date}
+                    onChange={e => setNewSowing(prev => ({ ...prev, date: e.target.value }))}
+                    className="h-16 px-6 bg-black/5 rounded-2xl font-bold text-xl"
+                  />
+                </div>
+                
+                <Stepper 
+                  label="Densidad (Plantas/Ha)"
+                  value={newSowing.density || 0}
+                  onChange={v => setNewSowing(prev => ({ ...prev, density: v }))}
+                  min={1000}
+                  max={100000}
+                  step={500}
+                />
+
+                <div className="flex flex-col gap-2">
+                  <span className="text-xs font-bold text-black/40 uppercase tracking-widest">Responsable</span>
+                  <select 
+                    value={newSowing.responsibleId}
+                    onChange={e => setNewSowing(prev => ({ ...prev, responsibleId: e.target.value }))}
+                    className="h-16 px-6 bg-black/5 rounded-2xl font-bold appearance-none"
+                  >
+                    {contacts.filter(c => c.role === 'Operador' || c.role === 'Administrador').map(c => (
+                      <option key={c.id} value={c.id}>{c.name}</option>
+                    ))}
+                  </select>
+                </div>
+
+                <button 
+                  onClick={() => {
+                    if (!selectedLotId) return alert('Seleccione un lote');
+                    onAddSowingRecord({ ...newSowing, lotId: selectedLotId });
+                  }}
+                  className="h-20 bg-emerald-600 text-white font-black rounded-3xl shadow-2xl industrial-btn"
+                >
+                  REGISTRAR SIEMBRA
+                </button>
+              </div>
+            </BentoCard>
+          </div>
+
+          <div className="flex flex-col gap-6">
+            <BentoCard title="Despacho a Planta" icon={Truck} className="bg-slate-50">
+              <div className="flex flex-col gap-8">
+                <p className="text-sm font-medium text-black/60">Genera un despacho directo a planta heredando toda la trazabilidad del lote.</p>
+                
+                <Stepper 
+                  label="Cantidad a Despachar (Kg)"
+                  value={dispatchQty}
+                  onChange={setDispatchQty}
+                  min={100}
+                  max={50000}
+                  step={100}
+                />
+
+                <div className="p-6 bg-white rounded-2xl border border-black/5 flex flex-col gap-2">
+                  <span className="text-[10px] font-black text-black/30 uppercase tracking-widest">Resumen de Trazabilidad</span>
+                  <div className="flex justify-between items-center">
+                    <span className="font-bold text-sm">Lote:</span>
+                    <span className="font-mono text-sm">{selectedLot?.lotCode || '---'}</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="font-bold text-sm">Estado:</span>
+                    <span className="text-xs font-black">{selectedLot?.status || '---'}</span>
+                  </div>
+                </div>
+
+                <button 
+                  disabled={!selectedLot || selectedLot.status !== 'SEMBRADO'}
+                  onClick={() => onGenerateDispatch(selectedLotId, dispatchQty)}
+                  className={`h-20 font-black rounded-3xl shadow-2xl industrial-btn transition-all ${
+                    selectedLot?.status === 'SEMBRADO' ? 'bg-black text-white' : 'bg-black/10 text-black/30 cursor-not-allowed'
+                  }`}
+                >
+                  GENERAR DESPACHO
+                </button>
+              </div>
+            </BentoCard>
+          </div>
+        </div>
       </div>
     </div>
   );
@@ -2009,11 +1757,7 @@ const LotManagementView = ({
   farms,
   onAddLot,
   onDeleteLot,
-  onAddAnalysis,
-  viewMode,
-  setViewMode,
-  selectedId,
-  setSelectedId
+  onAddAnalysis
 }: { 
   lots: Lot[], 
   crops: Crop[], 
@@ -2021,257 +1765,374 @@ const LotManagementView = ({
   onAddLot: (lot: Partial<Lot>) => void,
   onDeleteLot: (id: string) => void,
   onAddAnalysis: (lotId: string, analysis: LotAnalysis) => void,
-  viewMode: 'list' | 'detail',
-  setViewMode: (v: 'list' | 'detail') => void,
-  selectedId: string | null,
-  setSelectedId: (id: string | null) => void,
   key?: React.Key
 }) => {
-  const [search, setSearch] = useState('');
-  const [page, setPage] = useState(1);
+  const [analyzingLotId, setAnalyzingLotId] = useState<string | null>(null);
+  const [viewingHistoryLotId, setViewingHistoryLotId] = useState<string | null>(null);
   const [isAdding, setIsAdding] = useState(false);
-  
   const [newLot, setNewLot] = useState<Partial<Lot>>({
-    lotCode: '', area: 10, soilType: 'Arcilloso', cropId: crops[0].id, farmId: farms[0]?.id || '', status: 'VACÍO'
+    lotCode: '',
+    area: 10,
+    soilType: 'Arcilloso',
+    cropId: crops[0].id,
+    farmId: '', // Start empty to force selection
+    status: 'VACÍO'
   });
 
+  const analyzingLot = lots.find(l => l.id === analyzingLotId);
+  const analyzingCrop = crops.find(c => c.id === analyzingLot?.cropId);
   const [analysisValues, setAnalysisValues] = useState<{ [key: string]: any }>({});
-  
-  const filteredLots = lots.filter(l => l.lotCode.toLowerCase().includes(search.toLowerCase()));
-  const itemsPerPage = 8;
-  const totalPages = Math.ceil(filteredLots.length / itemsPerPage);
-  const pagedLots = filteredLots.slice((page - 1) * itemsPerPage, page * itemsPerPage);
 
-  const selectedLot = lots.find(l => l.id === selectedId);
-  const selectedCrop = crops.find(c => c.id === selectedLot?.cropId);
+  const historyLot = lots.find(l => l.id === viewingHistoryLotId);
 
-  useEffect(() => {
-    if (selectedLot && selectedCrop) {
-      const initialValues: any = {};
-      selectedCrop.parameters.forEach(p => {
-        if (p.type === 'NUMERIC') initialValues[p.id] = (p.min! + p.max!) / 2;
-        if (p.type === 'BOOLEAN') initialValues[p.id] = true;
-        if (p.type === 'SELECTION') initialValues[p.id] = p.options?.[0] || '';
-      });
-      setAnalysisValues(initialValues);
-    }
-  }, [selectedId]);
+  const selectedFarm = farms.find(f => f.id === newLot.farmId);
+  const occupiedArea = lots.filter(l => l.farmId === newLot.farmId).reduce((acc, l) => acc + l.area, 0);
+  const availableArea = selectedFarm ? selectedFarm.totalHectares - occupiedArea : 0;
+  const isAreaValid = (newLot.area || 0) <= availableArea;
 
-  const handleSelect = (id: string) => {
-    setSelectedId(id);
-    setViewMode('detail');
+  const handleStartAnalysis = (lot: Lot) => {
+    setAnalyzingLotId(lot.id);
+    const initialValues: any = {};
+    const crop = crops.find(c => c.id === lot.cropId);
+    crop?.parameters.forEach(p => {
+      if (p.type === 'NUMERIC') initialValues[p.id] = (p.min! + p.max!) / 2;
+      if (p.type === 'BOOLEAN') initialValues[p.id] = true;
+      if (p.type === 'SELECTION') initialValues[p.id] = p.options?.[0] || '';
+    });
+    setAnalysisValues(initialValues);
   };
 
-  if (viewMode === 'detail' && selectedLot) {
-    return (
-      <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="flex flex-col gap-10">
-        <div className="bg-white p-10 rounded-[3rem] border border-black/5 shadow-xl flex justify-between items-center">
-          <div>
-            <span className="text-[10px] font-black text-[#10B981] uppercase tracking-[0.3em] mb-2 block">Control de Calidad en Lote</span>
-            <h2 className="text-5xl font-black tracking-tighter uppercase">{selectedLot.lotCode}</h2>
-          </div>
-          <StatusBadge status={selectedLot.status} />
-        </div>
+  const submitAnalysis = () => {
+    if (!analyzingLotId) return;
+    
+    // Simple status logic: if any numeric value is out of range, it's RECHAZADO
+    let status: 'APROBADO' | 'RECHAZADO' = 'APROBADO';
+    analyzingCrop?.parameters.forEach(p => {
+      if (p.type === 'NUMERIC') {
+        const val = analysisValues[p.id];
+        if (val < p.min! || val > p.max!) status = 'RECHAZADO';
+      }
+    });
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
-          <div className="lg:col-span-8 flex flex-col gap-8">
-            <BentoCard title="Nuevos Resultados" icon={ClipboardCheck}>
-               <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-                  {selectedCrop?.parameters.map(p => (
-                    <div key={p.id} className="flex flex-col gap-4">
-                      <span className="text-xs font-bold text-black/40 uppercase tracking-widest">{p.name}</span>
-                      <Stepper label={p.unit || ''} value={analysisValues[p.id] || 0} onChange={v => setAnalysisValues({...analysisValues, [p.id]: v})} min={0} max={100} />
-                    </div>
-                  ))}
-               </div>
-               <button onClick={() => {
-                 onAddAnalysis(selectedLot.id, { id: `an-${Date.now()}`, lotId: selectedLot.id, date: new Date().toISOString(), values: analysisValues, status: 'APROBADO' });
-                 alert("Análisis registrado.");
-               }} className="h-20 bg-[#10B981] text-white font-black rounded-3xl shadow-xl mt-10 uppercase tracking-widest">Guardar Resultados</button>
-            </BentoCard>
-          </div>
-          <div className="lg:col-span-4 flex flex-col gap-8">
-             <BentoCard title="Historial" icon={Clock}>
-                <div className="flex flex-col gap-4">
-                  {selectedLot.analyses?.map(an => (
-                    <div key={an.id} className="p-4 bg-black/5 rounded-2xl flex justify-between items-center">
-                       <span className="font-bold text-xs">{new Date(an.date).toLocaleDateString()}</span>
-                       <StatusBadge status={an.status} />
-                    </div>
-                  )).reverse()}
-                </div>
-             </BentoCard>
-          </div>
-        </div>
-      </motion.div>
-    );
-  }
+    const analysis = {
+      id: `an-${Date.now()}`,
+      lotId: analyzingLotId,
+      date: new Date().toISOString(),
+      values: analysisValues,
+      status
+    };
+
+    onAddAnalysis(analyzingLotId, analysis);
+    setAnalyzingLotId(null);
+  };
+
+  const handleGetLocation = () => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          setNewLot(prev => ({
+            ...prev,
+            location: { lat: position.coords.latitude, lng: position.coords.longitude }
+          }));
+        },
+        (error) => {
+          console.error("Error getting location:", error);
+          alert("No se pudo obtener la ubicación automáticamente.");
+        }
+      );
+    }
+  };
+
+  const handleCreateLot = () => {
+    if (!newLot.farmId) {
+      alert("Debe seleccionar una finca para el nuevo lote.");
+      return;
+    }
+    onAddLot(newLot);
+    setIsAdding(false);
+    setNewLot({
+      lotCode: '',
+      area: 10,
+      soilType: 'Arcilloso',
+      cropId: crops[0].id,
+      farmId: '',
+      status: 'VACÍO'
+    });
+  };
 
   return (
-    <div className="flex flex-col gap-12">
+    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex flex-col gap-8">
       <div className="flex justify-between items-center">
-        <div>
-          <h2 className="text-5xl font-black tracking-tighter uppercase">Laboratorio de Lotes</h2>
-          <p className="text-black/40 font-mono text-sm tracking-[0.2em]">CONTROL BIOLÓGICO Y FISICOQUÍMICO</p>
-        </div>
-        <button onClick={() => setIsAdding(true)} className="flex items-center gap-3 px-10 py-5 bg-[#10B981] text-white rounded-[2rem] font-black shadow-xl hover:scale-105 transition-transform uppercase tracking-widest text-sm text-[10px]">
-          <Plus size={24} /> Registrar Lote
+        <h2 className="text-3xl font-bold tracking-tight">Inventario de Lotes</h2>
+        <button onClick={() => setIsAdding(true)} className="flex items-center gap-2 px-8 py-4 bg-[#0052CC] text-white rounded-2xl font-bold shadow-xl shadow-blue-200">
+          <Plus size={20} /> Nuevo Lote
         </button>
       </div>
 
-      <div className="flex flex-col md:flex-row justify-between items-center gap-8 bg-white p-6 rounded-[2.5rem] border border-black/5 shadow-sm">
-        <SearchBar value={search} onChange={setSearch} placeholder="Buscar lote..." />
-        <div className="flex items-center gap-8">
-           <Paginator current={page} total={totalPages} onPageChange={setPage} />
-        </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        {lots.map(lot => {
+          const crop = crops.find(c => c.id === lot.cropId);
+          const farm = farms.find(f => f.id === lot.farmId);
+          return (
+            <BentoCard key={lot.id} title={lot.lotCode} icon={Map} className="relative overflow-hidden">
+              <div className="absolute top-8 right-8"><StatusBadge status={lot.status} /></div>
+              <div className="flex flex-col gap-6">
+                <div className="flex items-center gap-2 text-black/40 text-xs font-bold uppercase tracking-widest">
+                  <Home size={14} /> {farm?.name}
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="bg-black/5 p-4 rounded-2xl">
+                    <span className="text-[10px] uppercase font-bold text-black/40 block mb-1">Área</span>
+                    <span className="text-xl font-black">{lot.area} Ha</span>
+                  </div>
+                  <div className="bg-black/5 p-4 rounded-2xl">
+                    <span className="text-[10px] uppercase font-bold text-black/40 block mb-1">Suelo</span>
+                    <span className="text-xl font-black">{lot.soilType}</span>
+                  </div>
+                </div>
+                <div className="flex items-center justify-between bg-blue-50/50 p-5 rounded-2xl border border-blue-100">
+                  <div className="flex items-center gap-3">
+                    <span className="text-3xl">{crop?.icon}</span>
+                    <div>
+                      <span className="text-[10px] uppercase font-bold text-blue-400 block">Cultivo</span>
+                      <span className="font-black text-blue-900">{crop?.name}</span>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <span className="text-[10px] uppercase font-bold text-blue-400 block">Análisis</span>
+                    <span className="text-xs font-bold text-blue-900">{crop?.parameters.length} Parámetros</span>
+                  </div>
+                </div>
+                  <button 
+                    onClick={() => handleStartAnalysis(lot)}
+                    className="flex-1 h-12 bg-black text-white rounded-xl font-bold flex items-center justify-center gap-2 shadow-lg active:scale-95 transition-transform"
+                  >
+                    <Beaker size={16} /> Analizar
+                  </button>
+                </div>
+                <div className="flex items-center justify-between pt-4 border-t border-black/5">
+                  <button 
+                    onClick={() => onDeleteLot(lot.id)}
+                    className="p-2 text-black/10 hover:text-red-500 transition-colors"
+                  >
+                    <Trash2 size={18} />
+                  </button>
+                  <button 
+                    onClick={() => setViewingHistoryLotId(lot.id)}
+                    className="text-[#0052CC] font-bold text-xs flex items-center gap-1"
+                  >
+                    Historial <ChevronRight size={14} />
+                  </button>
+                </div>
+            </BentoCard>
+          );
+        })}
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-        {pagedLots.map(lot => (
-          <button key={lot.id} onClick={() => handleSelect(lot.id)} className="group bg-[#10B981] p-8 rounded-[3rem] h-[300px] flex flex-col justify-between text-white text-left transition-all hover:scale-[1.03] shadow-2xl shadow-emerald-200 relative overflow-hidden">
-            <div className="absolute -top-10 -right-10 opacity-10 group-hover:scale-110 transition-transform duration-700"><Map size={180} /></div>
-            <div className="z-10 flex flex-col gap-4">
-               <div className="w-14 h-14 bg-white/20 rounded-2xl flex items-center justify-center"><MapPin size={28} /></div>
-               <div>
-                  <h3 className="text-3xl font-black tracking-tighter uppercase leading-tight">{lot.lotCode}</h3>
-                  <p className="text-white/60 font-bold text-[10px] uppercase tracking-widest">{lot.area} Hectáreas • {crops.find(c => c.id === lot.cropId)?.name}</p>
-               </div>
-            </div>
-            <div className="z-10 flex items-center justify-between border-t border-white/10 pt-6 font-black text-[10px] uppercase tracking-widest">
-               <span>Análisis Disponibles</span>
-               <ChevronRight size={18} />
-            </div>
-          </button>
-        ))}
-      </div>
-      
-      {isAdding && (
-          <div className="fixed inset-0 z-[60] flex items-center justify-center p-6">
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setIsAdding(false)} className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
-            <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.9, opacity: 0 }} className="relative bg-white w-full max-w-2xl rounded-[3rem] p-10">
-              <h3 className="text-3xl font-black uppercase text-[#10B981] mb-6">Nuevo Lote</h3>
-              <div className="flex flex-col gap-6">
-                 <input type="text" placeholder="Código de Lote" className="h-16 px-6 bg-black/5 rounded-2xl font-bold" value={newLot.lotCode} onChange={e => setNewLot({...newLot, lotCode: e.target.value})} />
-                 <button onClick={() => { onAddLot(newLot); setIsAdding(false); }} className="h-20 bg-[#10B981] text-white font-black rounded-3xl uppercase tracking-widest">Confirmar Registro</button>
+      {/* Analysis Entry Modal */}
+      <AnimatePresence>
+        {analyzingLotId && analyzingLot && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-6">
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setAnalyzingLotId(null)} className="absolute inset-0 bg-black/40 backdrop-blur-sm" />
+            <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.9, opacity: 0 }} className="relative bg-white w-full max-w-4xl rounded-[3rem] shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+              <div className="p-10 border-b border-black/5 flex justify-between items-center bg-white sticky top-0 z-10">
+                <div>
+                  <h3 className="text-3xl font-bold tracking-tight">Nuevo Análisis</h3>
+                  <p className="text-black/40 font-bold uppercase text-xs tracking-widest mt-1">Lote: {analyzingLot.lotCode} • {analyzingCrop?.name}</p>
+                </div>
+                <button onClick={() => setAnalyzingLotId(null)} className="p-4 bg-black/5 rounded-2xl"><Plus className="rotate-45" /></button>
+              </div>
+              
+              <div className="p-10 flex flex-col gap-10 overflow-y-auto">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+                  {analyzingCrop?.parameters.map(param => (
+                    <div key={param.id} className="flex flex-col gap-4 p-6 bg-black/5 rounded-3xl border border-black/5">
+                      <div className="flex justify-between items-center">
+                        <span className="text-xs font-bold text-black/40 uppercase tracking-widest">{param.name}</span>
+                        <span className="text-[10px] font-black px-2 py-1 bg-white rounded-lg border border-black/5">{param.category.replace('_', ' ')}</span>
+                      </div>
+
+                      {param.type === 'NUMERIC' && (
+                        <Stepper 
+                          label={`Valor (${param.unit})`}
+                          value={analysisValues[param.id]}
+                          onChange={v => setAnalysisValues(prev => ({ ...prev, [param.id]: v }))}
+                          min={0}
+                          max={1000}
+                          step={0.1}
+                        />
+                      )}
+
+                      {param.type === 'BOOLEAN' && (
+                        <div className="flex bg-white p-1 rounded-2xl h-16 border border-black/5">
+                          {[true, false].map(v => (
+                            <button
+                              key={v.toString()}
+                              onClick={() => setAnalysisValues(prev => ({ ...prev, [param.id]: v }))}
+                              className={`flex-1 rounded-xl font-bold transition-all ${analysisValues[param.id] === v ? 'bg-black text-white shadow-lg' : 'text-black/40'}`}
+                            >
+                              {v ? 'SI' : 'NO'}
+                            </button>
+                          ))}
+                        </div>
+                      )}
+
+                      {param.type === 'SELECTION' && (
+                        <div className="flex flex-wrap gap-2">
+                          {param.options?.map(opt => (
+                            <button
+                              key={opt}
+                              onClick={() => setAnalysisValues(prev => ({ ...prev, [param.id]: opt }))}
+                              className={`px-4 py-2 rounded-xl font-bold text-sm border transition-all ${analysisValues[param.id] === opt ? 'bg-[#0052CC] text-white border-[#0052CC] shadow-md' : 'bg-white text-black/40 border-black/10'}`}
+                            >
+                              {opt}
+                            </button>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="p-10 border-t border-black/5 bg-white sticky bottom-0">
+                <button 
+                  onClick={submitAnalysis}
+                  className="w-full h-20 bg-[#0052CC] text-white font-bold rounded-3xl shadow-xl shadow-blue-200 text-xl active:scale-95 transition-transform"
+                >
+                  Registrar Análisis de Campo
+                </button>
               </div>
             </motion.div>
           </div>
-      )}
-    </div>
-  );
-};
+        )}
+      </AnimatePresence>
 
-const SiloManagementView = ({ 
-  silos, 
-  crops, 
-  onAddSilo, 
-  onDeleteSilo,
-  viewMode,
-  setViewMode,
-  selectedId,
-  setSelectedId
-}: { 
-  silos: Silo[], 
-  crops: Crop[],
-  onAddSilo: (s: Partial<Silo>) => void,
-  onDeleteSilo: (id: string) => void,
-  viewMode: 'list' | 'detail',
-  setViewMode: (v: 'list' | 'detail') => void,
-  selectedId: string | null,
-  setSelectedId: (id: string | null) => void,
-  key?: React.Key
-}) => {
-  const [search, setSearch] = useState('');
-  const [page, setPage] = useState(1);
-  const filtered = silos.filter(s => s.name.toLowerCase().includes(search.toLowerCase()));
-  const itemsPerPage = 8;
-  const totalPages = Math.ceil(filtered.length / itemsPerPage);
-  const paged = filtered.slice((page - 1) * itemsPerPage, page * itemsPerPage);
-
-  const selectedSilo = silos.find(s => s.id === selectedId);
-
-  if (viewMode === 'detail' && selectedSilo) {
-    return (
-      <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="flex flex-col gap-10">
-        <div className="bg-white p-10 rounded-[3rem] border border-black/5 shadow-xl flex justify-between items-center">
-          <div>
-            <span className="text-[10px] font-black text-[#0052CC] uppercase tracking-[0.3em] mb-2 block">Detalle de Almacenamiento</span>
-            <h2 className="text-5xl font-black tracking-tighter uppercase">{selectedSilo.name}</h2>
-          </div>
-          <div className="flex flex-col items-end">
-             <span className="text-3xl font-black text-[#0052CC]">{selectedSilo.currentLevel} Kg</span>
-             <span className="text-[10px] font-black opacity-30 uppercase tracking-widest">Capacidad: {selectedSilo.capacity} Kg</span>
-          </div>
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-           <BentoCard title="Estado de Carga" icon={Droplets}>
-              <div className="flex flex-col gap-6">
-                 <div className="h-4 bg-black/5 rounded-full overflow-hidden">
-                    <div className="h-full bg-[#0052CC]" style={{ width: `${Math.min(100, (selectedSilo.currentLevel / selectedSilo.capacity) * 100)}%` }} />
-                 </div>
-                 <div className="flex justify-between text-sm font-bold uppercase tracking-widest opacity-40">
-                    <span>Ocupación</span>
-                    <span>{Math.round((selectedSilo.currentLevel / selectedSilo.capacity) * 100)}%</span>
-                 </div>
-              </div>
-           </BentoCard>
-           <BentoCard title="Acciones" icon={Settings}>
-              <button onClick={() => { onDeleteSilo(selectedSilo.id); setViewMode('list'); }} className="w-full h-16 bg-red-50 text-red-600 font-black rounded-2xl flex items-center justify-center gap-2 hover:bg-red-100 transition-colors uppercase tracking-widest text-xs">
-                 <Trash2 size={18} /> Eliminar Silo
-              </button>
-           </BentoCard>
-        </div>
-      </motion.div>
-    );
-  }
-
-  return (
-    <div className="flex flex-col gap-12">
-      <div className="flex justify-between items-center">
-        <div>
-          <h2 className="text-5xl font-black tracking-tighter uppercase">Gestión de Silos</h2>
-          <p className="text-black/40 font-mono text-sm tracking-[0.2em]">CONTROL DE INVENTARIO EN PLANTA</p>
-        </div>
-        <button onClick={() => onAddSilo({})} className="flex items-center gap-3 px-10 py-5 bg-[#0052CC] text-white rounded-[2rem] font-black shadow-xl hover:scale-105 transition-transform uppercase tracking-widest text-sm">
-          <Plus size={24} /> Nuevo Silo
-        </button>
-      </div>
-
-      <div className="flex flex-col md:flex-row justify-between items-center gap-8 bg-white p-6 rounded-[2.5rem] border border-black/5 shadow-sm">
-        <SearchBar value={search} onChange={setSearch} placeholder="Buscar silo..." />
-        <Paginator current={page} total={totalPages} onPageChange={setPage} />
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-        {paged.map(silo => (
-          <button
-            key={silo.id}
-            onClick={() => { setSelectedId(silo.id); setViewMode('detail'); }}
-            className="group bg-white p-8 rounded-[3rem] h-[320px] flex flex-col justify-between border border-black/5 hover:border-[#0052CC]/40 transition-all hover:scale-[1.03] shadow-xl relative overflow-hidden"
-          >
-            <div className="absolute -top-10 -right-10 opacity-5 group-hover:rotate-12 transition-transform duration-700 text-[#0052CC]">
-               <Droplets size={180} />
-            </div>
-            <div>
-              <div className="flex justify-between items-start mb-6">
-                <div className="p-4 bg-[#0052CC]/10 text-[#0052CC] rounded-2xl">
-                  <Layers size={28} />
+      {/* History Modal */}
+      <AnimatePresence>
+        {viewingHistoryLotId && historyLot && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-6">
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setViewingHistoryLotId(null)} className="absolute inset-0 bg-black/40 backdrop-blur-sm" />
+            <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.9, opacity: 0 }} className="relative bg-white w-full max-w-4xl rounded-[3rem] shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+              <div className="p-10 border-b border-black/5 flex justify-between items-center bg-white">
+                <div>
+                  <h3 className="text-3xl font-bold tracking-tight">Historial de Análisis</h3>
+                  <p className="text-black/40 font-bold uppercase text-xs tracking-widest mt-1">Lote: {historyLot.lotCode}</p>
                 </div>
-                <div className="px-4 py-1.5 bg-blue-50 text-[#0052CC] rounded-full text-[10px] font-black uppercase tracking-widest">
-                  {Math.round((silo.currentLevel / silo.capacity) * 100)}%
-                </div>
+                <button onClick={() => setViewingHistoryLotId(null)} className="p-4 bg-black/5 rounded-2xl"><Plus className="rotate-45" /></button>
               </div>
-              <h3 className="text-3xl font-black tracking-tighter uppercase leading-tight mb-2">{silo.name}</h3>
-              <p className="text-black/40 font-bold text-xs uppercase tracking-widest">{silo.currentLevel} / {silo.capacity} Kg</p>
-            </div>
-             <div className="z-10 flex items-center justify-between border-t border-black/5 pt-6 font-black text-[10px] uppercase tracking-widest text-[#0052CC]">
-               <span>Ver Detalle</span>
-               <ChevronRight size={18} />
-            </div>
-          </button>
-        ))}
-      </div>
-    </div>
+              
+              <div className="p-10 overflow-y-auto">
+                {(!historyLot.analyses || historyLot.analyses.length === 0) ? (
+                  <div className="text-center py-20">
+                    <div className="w-20 h-20 bg-black/5 rounded-full flex items-center justify-center mx-auto mb-6 text-black/20">
+                      <ListFilter size={40} />
+                    </div>
+                    <p className="text-black/40 font-bold">No hay análisis registrados para este lote.</p>
+                  </div>
+                ) : (
+                  <div className="flex flex-col gap-6">
+                    {historyLot.analyses.map(analysis => (
+                      <div key={analysis.id} className="p-8 bg-black/5 rounded-[2rem] border border-black/5 flex flex-col gap-6">
+                        <div className="flex justify-between items-center">
+                          <div className="flex items-center gap-4">
+                            <div className="p-3 bg-white rounded-2xl shadow-sm">
+                              <Clock size={20} className="text-black/40" />
+                            </div>
+                            <div>
+                              <span className="text-lg font-black">{new Date(analysis.date).toLocaleDateString()}</span>
+                              <span className="text-[10px] block font-bold text-black/30 uppercase tracking-widest">{new Date(analysis.date).toLocaleTimeString()}</span>
+                            </div>
+                          </div>
+                          <span className={`px-4 py-2 rounded-xl text-xs font-black tracking-widest border ${
+                            analysis.status === 'APROBADO' ? 'bg-emerald-100 text-emerald-700 border-emerald-200' : 'bg-red-100 text-red-700 border-red-200'
+                          }`}>
+                            {analysis.status}
+                          </span>
+                        </div>
+                        
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                          {Object.entries(analysis.values).map(([paramId, value]) => {
+                            const param = crops.flatMap(c => c.parameters).find(p => p.id === paramId);
+                            return (
+                              <div key={paramId} className="bg-white p-4 rounded-2xl shadow-sm border border-black/5">
+                                <span className="text-[10px] uppercase font-bold text-black/30 block mb-1 truncate">{param?.name}</span>
+                                <span className="text-lg font-black">{value.toString()} <span className="text-[10px] font-normal text-black/30">{param?.unit}</span></span>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    )).reverse()}
+                  </div>
+                )}
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {isAdding && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-6">
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setIsAdding(false)} className="absolute inset-0 bg-black/40 backdrop-blur-sm" />
+            <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.9, opacity: 0 }} className="relative bg-white w-full max-w-4xl rounded-[3rem] shadow-2xl overflow-hidden">
+              <div className="p-10 border-b border-black/5 flex justify-between items-center">
+                <h3 className="text-3xl font-bold tracking-tight">Configurar Lote</h3>
+                <button onClick={() => setIsAdding(false)} className="p-4 bg-black/5 rounded-2xl"><Plus className="rotate-45" /></button>
+              </div>
+              <div className="p-10 flex flex-col gap-10 overflow-y-auto max-h-[70vh]">
+                <div className="grid grid-cols-2 gap-10">
+                  <div className="flex flex-col gap-2">
+                    <span className="text-xs font-bold text-black/40 uppercase tracking-widest">Finca Destino</span>
+                    <div className="grid grid-cols-1 gap-2">
+                      {farms.map(f => (
+                        <button
+                          key={f.id}
+                          onClick={() => setNewLot(prev => ({ ...prev, farmId: f.id }))}
+                          className={`h-16 px-6 rounded-2xl font-bold border transition-all text-left flex items-center justify-between ${newLot.farmId === f.id ? 'bg-blue-50 border-[#0052CC] text-[#0052CC]' : 'bg-white border-black/10 text-black/40'}`}
+                        >
+                          {f.name}
+                          {newLot.farmId === f.id && <CheckCircle2 size={20} />}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                  <div className="flex flex-col gap-6">
+                    <div className="flex flex-col gap-2">
+                      <span className="text-xs font-bold text-black/40 uppercase tracking-widest">Código Lote</span>
+                      <input type="text" value={newLot.lotCode} onChange={e => setNewLot(prev => ({ ...prev, lotCode: e.target.value }))} className="h-16 px-6 bg-black/5 rounded-2xl font-bold" />
+                    </div>
+                    <div className="flex flex-col gap-2">
+                      <div className="flex justify-between items-center">
+                        <span className="text-xs font-bold text-black/40 uppercase tracking-widest">Área (Ha)</span>
+                        {selectedFarm && (
+                          <span className={`text-[10px] font-black px-2 py-1 rounded-lg ${isAreaValid ? 'bg-emerald-50 text-emerald-600' : 'bg-red-50 text-red-600'}`}>
+                            Disponible: {availableArea.toFixed(2)} Ha
+                          </span>
+                        )}
+                      </div>
+                      <Stepper label="" value={newLot.area || 0} onChange={v => setNewLot(prev => ({ ...prev, area: v }))} step={0.5} />
+                    </div>
+                  </div>
+                </div>
+                    <div className="flex flex-col gap-2">
+                      <span className="text-xs font-bold text-black/40 uppercase tracking-widest">Coordenadas</span>
+                      <button 
+                        onClick={handleGetLocation}
+                        className={`h-16 px-6 rounded-2xl font-bold border flex items-center justify-center gap-3 transition-all ${newLot.location ? 'bg-emerald-50 border-emerald-200 text-emerald-600' : 'bg-black/5 border-transparent text-black/40'}`}
+                      >
+                        <MapPin size={20} />
+                        {newLot.location ? `${newLot.location.lat.toFixed(4)}, ${newLot.location.lng.toFixed(4)}` : 'Obtener GPS'}
+                      </button>
+                    </div>
+                    <button onClick={handleCreateLot} className="h-20 bg-[#0052CC] text-white font-bold rounded-3xl shadow-xl shadow-blue-200">Crear Lote</button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+    </motion.div>
   );
 };
 
@@ -2280,27 +2141,7 @@ const SiloManagementView = ({
 export default function App() {
   const [currentModule, setCurrentModule] = useState<'home' | 'maestros' | 'campo' | 'planta' | 'calidad'>('home');
   const [activeTab, setActiveTab] = useState<string>('');
-  const [viewMode, setViewMode] = useState<'list' | 'detail'>('list');
-  const [selectedId, setSelectedId] = useState<string | null>(null);
-
-  const handleAddSilo = (siloData: Partial<Silo>) => {
-    const newSilo: Silo = {
-      id: `silo-${Date.now()}`,
-      name: siloData.name || 'Nuevo Silo',
-      capacity: siloData.capacity || 50000,
-      currentLevel: 0,
-      unit: 'Kg'
-    };
-    setSilos(prev => [...prev, newSilo]);
-  };
-
-  const handleDeleteSilo = (id: string) => {
-    if (window.confirm('¿Está seguro de eliminar este silo?')) {
-      setSilos(prev => prev.filter(s => s.id !== id));
-    }
-  };
   
-  // Phase 4: Data Simulation
   const [contacts, setContacts] = useState<Contact[]>(() => {
     const saved = localStorage.getItem('dusa_contacts');
     return saved ? JSON.parse(saved) : INITIAL_CONTACTS;
@@ -2313,74 +2154,29 @@ export default function App() {
     const saved = localStorage.getItem('dusa_crops');
     return saved ? JSON.parse(saved) : INITIAL_CROPS;
   });
-  
   const [lots, setLots] = useState<Lot[]>(() => {
     const saved = localStorage.getItem('dusa_lots');
-    const baseLots = saved ? JSON.parse(saved) : INITIAL_LOTS;
-    // Phase 4: Add 3 lots to current project simulation if not present
-    return baseLots;
+    return saved ? JSON.parse(saved) : INITIAL_LOTS;
   });
-
   const [receptions, setReceptions] = useState<MaterialReception[]>(() => {
     const saved = localStorage.getItem('dusa_receptions');
     return saved ? JSON.parse(saved) : [];
   });
+  const [sowingProjects, setSowingProjects] = useState<SowingProject[]>([]);
 
-  const [sowingProjects, setSowingProjects] = useState<SowingProject[]>(() => {
-    const saved = localStorage.getItem('dusa_projects');
-    if (saved) return JSON.parse(saved);
-    
-    // Phase 4: Simulation Initial Data
-    const projectPast: SowingProject = {
-      id: 'proj-past-1',
-      name: 'Simulación: Cosecha 2025',
-      lotIds: ['lot-1'],
-      status: 'FINALIZADO',
-      startDate: '2025-01-01',
-      endDate: '2025-06-01',
-      activityRecords: [
-        { id: 'a1', date: '2025-01-05', type: 'Siembra', resource: 'Cuadrilla', crew: 'Cuadrilla Alfa', description: 'Siembra inicial' },
-        { id: 'a2', date: '2025-01-20', type: 'Riego', resource: 'Maquinaria', machinery: 'Sistema Riego 01' },
-        { id: 'a3', date: '2025-02-15', type: 'Fertilización', resource: 'Cuadrilla', supplyId: 'seed-1', consumedQuantity: 200 },
-        { id: 'a4', date: '2025-04-10', type: 'Cura', resource: 'Maquinaria', machinery: 'Tractor T1' },
-        { id: 'a5', date: '2025-05-30', type: 'Cosecha', resource: 'Cuadrilla', description: 'Cosecha finalizada con éxito' }
-      ]
-    };
-    
-    const projectCurrent: SowingProject = {
-      id: 'proj-now-1',
-      name: 'Siembra Actual: Piña MD2 (Demo)',
-      lotIds: ['lot-1'], // En una app real serían IDs dinámicos
-      status: 'ACTIVO',
-      startDate: new Date().toISOString().split('T')[0],
-      activityRecords: [
-        { id: 'b1', date: new Date().toISOString().split('T')[0], type: 'Mantenimiento', resource: 'Cuadrilla', crew: 'Equipo Campo B' }
-      ]
-    };
-    
-    return [projectPast, projectCurrent];
-  });
-
-  const [chemicals] = useState<Chemical[]>(INITIAL_CHEMICALS);
-  const [barrels, setBarrels] = useState<Barrel[]>([]);
-  const [dispatches, setDispatches] = useState<DispatchRecord[]>(() => {
-    // Phase 4: 2 Camiones viniendo de Campo
-    return [
-      { id: 'disp-sim-1', lotId: 'lot-1', cropId: 'pina', date: new Date().toISOString(), quantity: 15000, status: 'EN TRÁNSITO', type: 'INTERNO', originFarmId: 'farm-1' },
-      { id: 'disp-sim-2', lotId: 'lot-1', cropId: 'pina', date: new Date().toISOString(), quantity: 12000, status: 'EN TRÁNSITO', type: 'INTERNO', originFarmId: 'farm-1' }
-    ];
-  });
-  const [silos, setSilos] = useState<Silo[]>(INITIAL_SILOS);
-  const [theme, setTheme] = useState<'solar' | 'plant'>('solar');
-
-  const handleAddProject = (projectData: Omit<SowingProject, 'id' | 'activityRecords'>) => {
+  const handleAddProject = (projectData: Omit<SowingProject, 'id' | 'activityLogs'>) => {
     const newProject: SowingProject = {
       id: `project-${Date.now()}`,
       ...projectData,
-      activityRecords: []
+      activityLogs: []
     };
     setSowingProjects(prev => [...prev, newProject]);
   };
+
+  const [chemicals] = useState<Chemical[]>(INITIAL_CHEMICALS);
+  const [barrels, setBarrels] = useState<Barrel[]>([]);
+  const [dispatches, setDispatches] = useState<DispatchRecord[]>([]);
+  const [theme, setTheme] = useState<'solar' | 'plant'>('solar');
 
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme);
@@ -2479,16 +2275,11 @@ export default function App() {
         return {
           ...l,
           analyses: [...(l.analyses || []), analysis],
-          status: analysis.status === 'APROBADO' ? 'SEMBRADO' : l.status
+          status: analysis.status === 'APROBADO' ? 'SEMBRADO' : l.status // Example logic
         };
       }
       return l;
     }));
-  };
-
-  const clearNav = () => {
-    setViewMode('list');
-    setSelectedId(null);
   };
 
   const handleAddReception = (reception: MaterialReception) => {
@@ -2504,125 +2295,64 @@ export default function App() {
     }));
   };
 
-  const handleAddActivityLog = (projectId: string, activity: Omit<ActivityLog, 'id'>) => {
-    // 1. Add activity to SowingProject
-    const newActivityId = `act-${Date.now()}`;
-    setSowingProjects(prev => prev.map(p => {
-      if (p.id === projectId) {
+  const handleAddSowingRecord = (record: Partial<SowingRecord>) => {
+    setLots(prev => prev.map(l => {
+      if (l.id === record.lotId) {
         return {
-          ...p,
-          status: p.status === 'PREPARACIÓN' ? 'ACTIVO' : p.status,
-          activityRecords: [...p.activityRecords, { ...activity, id: newActivityId }]
+          ...l,
+          status: 'SEMBRADO',
+          sowingRecords: [...(l.sowingRecords || []), { ...record, id: `sow-${Date.now()}` } as SowingRecord]
         };
       }
-      return p;
+      return l;
     }));
-
-    // 2. Subtract from Inventory (Consumption Logic)
-    if (activity.supplyId && activity.consumedQuantity) {
-      setReceptions(prev => prev.map(r => {
-        if (r.id === activity.supplyId) {
-          return {
-            ...r,
-            availableQuantity: Math.max(0, r.availableQuantity - activity.consumedQuantity!)
-          };
-        }
-        return r;
-      }));
-    }
   };
 
-  const handleGenerateDispatch = (projectId: string, quantity: number) => {
-    const project = sowingProjects.find(p => p.id === projectId);
-    if (!project || project.lotIds.length === 0) return;
+  const handleAddCureRecord = (record: Partial<CureRecord>) => {
+    setLots(prev => prev.map(l => {
+      if (l.id === record.lotId) {
+        return {
+          ...l,
+          status: 'EN_CURA',
+          cureRecords: [...(l.cureRecords || []), { ...record, id: `cure-${Date.now()}` } as CureRecord]
+        };
+      }
+      return l;
+    }));
+  };
 
-    // Quality Logic check: Any lot in the project must have 'APROBADO' analysis
-    const hasApprovedAnalysis = lots.some(l => 
-      project.lotIds.includes(l.id) && l.analyses?.some(a => a.status === 'APROBADO')
-    );
+  const handleGenerateDispatch = (lotId: string, quantity: number) => {
+    const lot = lots.find(l => l.id === lotId);
+    if (!lot) return;
 
-    if (!hasApprovedAnalysis) {
-      alert("BLOQUEO DE CALIDAD: No se puede despachar. No hay un análisis 'APROBADO' vinculado a los lotes de este proyecto.");
-      return;
-    }
-
-    const firstLotId = project.lotIds[0];
-    const firstLot = lots.find(l => l.id === firstLotId);
-
-    // Logistic Bridge: Create EN TRÁNSITO dispatch
     const dispatch: DispatchRecord = {
       id: `disp-${Date.now()}`,
-      lotId: firstLotId,
-      cropId: firstLot?.cropId,
+      lotId,
       quantity,
       date: new Date().toISOString(),
-      status: 'EN TRÁNSITO',
+      status: 'PENDIENTE',
       type: 'INTERNO',
-      originFarmId: firstLot?.farmId
+      originFarmId: lot.farmId
     };
 
     setDispatches(prev => [...prev, dispatch]);
-    setSowingProjects(prev => prev.map(p => p.id === projectId ? { ...p, status: 'COSECHA' } : p));
+    setLots(prev => prev.map(l => l.id === lotId ? { ...l, status: 'DESPACHADO' } : l));
+
+    // Create a barrel for quality control
+    const newBarrel: Barrel = {
+      id: `bar-${Date.now()}`,
+      code: `B-${lot.lotCode}-${Date.now().toString().slice(-4)}`,
+      lotId,
+      cropId: lot.cropId,
+      status: 'EN ESPERA',
+      date: new Date().toISOString(),
+      analysisValues: {}
+    };
+    setBarrels(prev => [...prev, newBarrel]);
   };
 
-  const handleReceiveDispatch = (dispatchId: string, siloId: string, brix: number) => {
-    // Update dispatch status
-    setDispatches(prev => prev.map(d => {
-      if (d.id === dispatchId) {
-        return { ...d, status: 'RECIBIDO' };
-      }
-      return d;
-    }));
-
-    // Update Silo volume and average brix
-    const dispatch = dispatches.find(d => d.id === dispatchId);
-    if (!dispatch) return;
-
-    setSilos(prev => prev.map(s => {
-      if (s.id === siloId) {
-        const currentTotalBrix = s.currentLevel * (s.averageBrix || 0);
-        const newTotalBrix = currentTotalBrix + (dispatch.quantity * brix);
-        const newLevel = s.currentLevel + dispatch.quantity;
-        return { 
-          ...s, 
-          currentLevel: newLevel,
-          averageBrix: Number((newTotalBrix / newLevel).toFixed(2)),
-          cropId: dispatch.cropId 
-        };
-      }
-      return s;
-    }));
-  };
-
-  const handleProcessEvaporation = (siloId: string, consumedLiters: number, barrelCount: number) => {
-    const silo = silos.find(s => s.id === siloId);
-    if (!silo || !silo.cropId) return;
-
-    // Deduct from silo
-    setSilos(prev => prev.map(s => {
-      if (s.id === siloId) {
-        return { ...s, currentLevel: Math.max(0, s.currentLevel - consumedLiters) };
-      }
-      return s;
-    }));
-
-    const ts = Date.now();
-    const newBarrels: Barrel[] = Array.from({ length: barrelCount }).map((_, i) => ({
-       id: `bar-${ts}-${i}`,
-       code: `B-${silo.name.substring(0,2).toUpperCase()}-${ts.toString().slice(-4)}-${i+1}`,
-       cropId: silo.cropId!,
-       status: 'EN ESPERA',
-       date: new Date().toISOString(),
-       analysisValues: {},
-       creationTimestamp: ts,
-       incubationEndDate: ts + (72 * 60 * 60 * 1000), // 72 hours
-    }));
-
-    setBarrels(prev => [...prev, ...newBarrels]);
-  };
-
-  const handleUpdateBarrel = (id: string, updates: Partial<Barrel>) => {
-    setBarrels(prev => prev.map(b => b.id === id ? { ...b, ...updates } : b));
+  const handleUpdateBarrel = (updatedBarrel: Barrel) => {
+    setBarrels(prev => prev.map(b => b.id === updatedBarrel.id ? updatedBarrel : b));
   };
 
   const handleSave = () => {
@@ -2648,20 +2378,31 @@ export default function App() {
           
           {currentModule !== 'home' && (
             <nav className="flex bg-black/5 p-1.5 rounded-2xl">
+              {currentModule === 'maestros' && (
+                <>
+                  <button onClick={() => setActiveTab('crops')} className={`px-6 py-2.5 rounded-xl font-bold text-sm transition-all ${activeTab === 'crops' ? 'bg-white shadow-md text-[#0052CC]' : 'text-black/30'}`}>Rubros</button>
+                  <button onClick={() => setActiveTab('contacts')} className={`px-6 py-2.5 rounded-xl font-bold text-sm transition-all ${activeTab === 'contacts' ? 'bg-white shadow-md text-[#0052CC]' : 'text-black/30'}`}>Contactos</button>
+                </>
+              )}
               {currentModule === 'campo' && (
                 <>
-                  <button onClick={() => setActiveTab('recepcion-campo')} className={`px-6 py-2.5 rounded-xl font-bold text-sm transition-all ${activeTab === 'recepcion-campo' ? 'bg-white shadow-md text-[#0052CC]' : 'text-black/30'}`}>Inventario</button>
-                  <button onClick={() => setActiveTab('siembra')} className={`px-6 py-2.5 rounded-xl font-bold text-sm transition-all ${activeTab === 'siembra' ? 'bg-white shadow-md text-[#0052CC]' : 'text-black/30'}`}>Operaciones</button>
-                  <button onClick={() => setActiveTab('lots')} className={`px-6 py-2.5 rounded-xl font-bold text-sm transition-all ${activeTab === 'lots' ? 'bg-white shadow-md text-[#0052CC]' : 'text-black/30'}`}>Calidad</button>
-                  <button onClick={() => setActiveTab('fincas')} className={`px-6 py-2.5 rounded-xl font-bold text-sm transition-all ${activeTab === 'fincas' ? 'bg-white shadow-md text-[#0052CC]' : 'text-black/30'}`}>Maestros</button>
+                  <button onClick={() => setActiveTab('fincas')} className={`px-6 py-2.5 rounded-xl font-bold text-sm transition-all ${activeTab === 'fincas' ? 'bg-white shadow-md text-[#0052CC]' : 'text-black/30'}`}>Fincas</button>
+                  <button onClick={() => setActiveTab('lots')} className={`px-6 py-2.5 rounded-xl font-bold text-sm transition-all ${activeTab === 'lots' ? 'bg-white shadow-md text-[#0052CC]' : 'text-black/30'}`}>Lotes</button>
+                  <button onClick={() => setActiveTab('cura')} className={`px-6 py-2.5 rounded-xl font-bold text-sm transition-all ${activeTab === 'cura' ? 'bg-white shadow-md text-[#0052CC]' : 'text-black/30'}`}>Cura</button>
+                  <button onClick={() => setActiveTab('siembra')} className={`px-6 py-2.5 rounded-xl font-bold text-sm transition-all ${activeTab === 'siembra' ? 'bg-white shadow-md text-[#0052CC]' : 'text-black/30'}`}>Siembra</button>
+                  <button onClick={() => setActiveTab('control-siembra')} className={`px-6 py-2.5 rounded-xl font-bold text-sm transition-all ${activeTab === 'control-siembra' ? 'bg-white shadow-md text-[#0052CC]' : 'text-black/30'}`}>Control Siembra</button>
                 </>
               )}
               {currentModule === 'planta' && (
                 <>
-                  <button onClick={() => setActiveTab('despacho')} className={`px-6 py-2.5 rounded-xl font-bold text-sm transition-all ${activeTab === 'despacho' ? 'bg-white shadow-md text-[#0052CC]' : 'text-black/30'}`}>Inventario</button>
-                  <button onClick={() => setActiveTab('evaporador')} className={`px-6 py-2.5 rounded-xl font-bold text-sm transition-all ${activeTab === 'evaporador' ? 'bg-white shadow-md text-[#0052CC]' : 'text-black/30'}`}>Operaciones</button>
-                  <button onClick={() => setActiveTab('cuarentena')} className={`px-6 py-2.5 rounded-xl font-bold text-sm transition-all ${activeTab === 'cuarentena' ? 'bg-white shadow-md text-[#0052CC]' : 'text-black/30'}`}>Calidad</button>
-                  <button onClick={() => setActiveTab('recepcion')} className={`px-6 py-2.5 rounded-xl font-bold text-sm transition-all ${activeTab === 'recepcion' ? 'bg-white shadow-md text-[#0052CC]' : 'text-black/30'}`}>Maestros</button>
+                  <button onClick={() => setActiveTab('recepcion')} className={`px-6 py-2.5 rounded-xl font-bold text-sm transition-all ${activeTab === 'recepcion' ? 'bg-white shadow-md text-[#0052CC]' : 'text-black/30'}`}>Recepción</button>
+                  <button onClick={() => setActiveTab('despacho')} className={`px-6 py-2.5 rounded-xl font-bold text-sm transition-all ${activeTab === 'despacho' ? 'bg-white shadow-md text-[#0052CC]' : 'text-black/30'}`}>Despacho</button>
+                </>
+              )}
+              {currentModule === 'calidad' && (
+                <>
+                  <button onClick={() => setActiveTab('analisis')} className={`px-6 py-2.5 rounded-xl font-bold text-sm transition-all ${activeTab === 'analisis' ? 'bg-white shadow-md text-[#0052CC]' : 'text-black/30'}`}>Calidad</button>
+                  <button onClick={() => setActiveTab('cuarentena')} className={`px-6 py-2.5 rounded-xl font-bold text-sm transition-all ${activeTab === 'cuarentena' ? 'bg-white shadow-md text-[#0052CC]' : 'text-black/30'}`}>Cuarentena</button>
                 </>
               )}
             </nav>
@@ -2669,14 +2410,12 @@ export default function App() {
         </div>
 
         <div className="flex items-center gap-6">
-          {viewMode === 'detail' && (
-            <button 
-              onClick={() => { setViewMode('list'); setSelectedId(null); }}
-              className="flex items-center gap-2 px-6 py-3 bg-black/5 text-black font-bold rounded-xl hover:bg-black/10 transition-all"
-            >
-              <ChevronRight className="rotate-180" size={18} /> Volver
-            </button>
-          )}
+          <button 
+            onClick={() => setTheme(theme === 'solar' ? 'plant' : 'solar')}
+            className="p-3 bg-black/5 rounded-xl text-black/40 hover:text-black transition-colors"
+          >
+            {theme === 'solar' ? <Moon size={20} /> : <Sun size={20} />}
+          </button>
           <button 
             onClick={handleSave}
             disabled={isSaving}
@@ -2695,15 +2434,11 @@ export default function App() {
             {currentModule === 'home' && (
               <HomeDashboardView 
                 key="home" 
-                sowingProjects={sowingProjects}
-                barrels={barrels}
-                dispatches={dispatches}
-                silos={silos}
                 onNavigate={(mod) => {
                   setCurrentModule(mod as any);
                   if (mod === 'maestros') setActiveTab('crops');
-                  if (mod === 'campo') setActiveTab('siembra');
-                  if (mod === 'planta') setActiveTab('despacho');
+                  if (mod === 'campo') setActiveTab('fincas');
+                  if (mod === 'planta') setActiveTab('recepcion');
                   if (mod === 'calidad') setActiveTab('analisis');
                 }} 
               />
@@ -2724,50 +2459,6 @@ export default function App() {
                 onAddContact={handleAddContact}
                 onEditContact={handleEditContact}
                 onDeleteContact={handleDeleteContact}
-                viewMode={viewMode}
-                setViewMode={setViewMode}
-                selectedId={selectedId}
-                setSelectedId={setSelectedId}
-              />
-            )}
-            {currentModule === 'maestros' && activeTab === 'fincas' && (
-              <FarmManagementView 
-                key="fincas" 
-                farms={farms} 
-                contacts={contacts}
-                onAddFarm={handleAddFarm} 
-                onDeleteFarm={handleDeleteFarm} 
-                viewMode={viewMode}
-                setViewMode={setViewMode}
-                selectedId={selectedId}
-                setSelectedId={setSelectedId}
-              />
-            )}
-            {currentModule === 'maestros' && activeTab === 'silos' && (
-              <SiloManagementView
-                key="silos"
-                silos={silos}
-                crops={crops}
-                onAddSilo={handleAddSilo}
-                onDeleteSilo={handleDeleteSilo}
-                viewMode={viewMode}
-                setViewMode={setViewMode}
-                selectedId={selectedId}
-                setSelectedId={setSelectedId}
-              />
-            )}
-            {currentModule === 'campo' && activeTab === 'recepcion-campo' && (
-              <MaterialReceptionView 
-                key="recepcion-campo"
-                receptions={receptions}
-                crops={crops}
-                lots={lots}
-                farms={farms}
-                onAddReception={handleAddReception}
-                viewMode={viewMode}
-                setViewMode={setViewMode}
-                selectedId={selectedId}
-                setSelectedId={setSelectedId}
               />
             )}
             {currentModule === 'campo' && activeTab === 'fincas' && (
@@ -2776,11 +2467,7 @@ export default function App() {
                 farms={farms} 
                 contacts={contacts}
                 onAddFarm={handleAddFarm} 
-                onDeleteFarm={handleDeleteFarm}
-                viewMode={viewMode}
-                setViewMode={setViewMode}
-                selectedId={selectedId}
-                setSelectedId={setSelectedId}
+                onDeleteFarm={handleDeleteFarm} 
               />
             )}
             {currentModule === 'campo' && activeTab === 'lots' && (
@@ -2792,53 +2479,50 @@ export default function App() {
                 onAddLot={handleAddLot}
                 onDeleteLot={handleDeleteLot}
                 onAddAnalysis={handleAddAnalysis}
-                viewMode={viewMode}
-                setViewMode={setViewMode}
-                selectedId={selectedId}
-                setSelectedId={setSelectedId}
+              />
+            )}
+            {currentModule === 'campo' && activeTab === 'cura' && (
+              <CureManagementView 
+                key="cura"
+                lots={lots}
+                chemicals={chemicals}
+                contacts={contacts}
+                onAddCureRecord={handleAddCureRecord}
               />
             )}
             {currentModule === 'campo' && activeTab === 'siembra' && (
-              <ProjectManagementView 
+              <SowingManagementView 
                 key="siembra"
-                projects={sowingProjects}
-                receptions={receptions}
-                contacts={contacts}
                 lots={lots}
-                onAddActivityLog={handleAddActivityLog}
+                contacts={contacts}
+                onAddSowingRecord={handleAddSowingRecord}
                 onGenerateDispatch={handleGenerateDispatch}
-                onAddProject={handleAddProject}
-                viewMode={viewMode}
-                setViewMode={setViewMode}
-                selectedId={selectedId}
-                setSelectedId={setSelectedId}
               />
             )}
-            {/* SiembraControlView removed, now part of ProjectManagementView */}
+            {currentModule === 'campo' && activeTab === 'control-siembra' && (
+              <SiembraControlView 
+                key="control-siembra"
+                sowingProjects={sowingProjects}
+                lots={lots}
+                onAddProject={handleAddProject}
+              />
+            )}
+            {currentModule === 'planta' && activeTab === 'recepcion' && (
+              <MaterialReceptionView 
+                key="recepcion"
+                receptions={receptions}
+                crops={crops}
+                lots={lots}
+                farms={farms}
+                onAddReception={handleAddReception}
+              />
+            )}
             {currentModule === 'planta' && activeTab === 'despacho' && (
               <DispatchManagementView 
                 key="despacho"
                 dispatches={dispatches}
                 lots={lots}
                 farms={farms}
-                silos={silos}
-                onReceiveDispatch={handleReceiveDispatch}
-                viewMode={viewMode}
-                setViewMode={setViewMode}
-                selectedId={selectedId}
-                setSelectedId={setSelectedId}
-              />
-            )}
-            {currentModule === 'planta' && activeTab === 'evaporador' && (
-              <EvaporatorManagementView
-                key="evaporador"
-                silos={silos}
-                crops={crops}
-                onProcessEvaporation={handleProcessEvaporation}
-                viewMode={viewMode}
-                setViewMode={setViewMode}
-                selectedId={selectedId}
-                setSelectedId={setSelectedId}
               />
             )}
             {currentModule === 'calidad' && activeTab === 'analisis' && (
@@ -2850,10 +2534,6 @@ export default function App() {
                 onAddLot={handleAddLot}
                 onDeleteLot={handleDeleteLot}
                 onAddAnalysis={handleAddAnalysis}
-                viewMode={viewMode}
-                setViewMode={setViewMode}
-                selectedId={selectedId}
-                setSelectedId={setSelectedId}
               />
             )}
             {currentModule === 'calidad' && activeTab === 'cuarentena' && (
@@ -2863,10 +2543,6 @@ export default function App() {
                 crops={crops}
                 lots={lots}
                 onUpdateBarrel={handleUpdateBarrel}
-                viewMode={viewMode}
-                setViewMode={setViewMode}
-                selectedId={selectedId}
-                setSelectedId={setSelectedId}
               />
             )}
           </AnimatePresence>

@@ -27,28 +27,22 @@ export type SoilType = 'Arcilloso' | 'Limoso' | 'Arenoso' | 'Franco';
 export type LotStatus = 'PREPARACIÓN' | 'SEMBRADO' | 'VACÍO' | 'EN_CURA';
 export type UnitSystem = 'METRICO' | 'IMPERIAL';
 
-export type SowingStatus = 'PREPARACIÓN' | 'ACTIVO' | 'COSECHA' | 'FINALIZADO';
-
-export type ActivityType = 'Siembra' | 'Riego' | 'Fertilización' | 'Cura' | 'Cosecha' | 'Otra';
-export type ActivityResource = 'Maquinaria' | 'Cuadrilla' | 'Ninguno';
+export type SowingStatus = 'PREPARACIÓN' | 'CRECIMIENTO' | 'COSECHA' | 'FINALIZADA';
 
 export interface ActivityLog {
   id: string;
   date: string;
-  type: ActivityType | string;
-  resource: ActivityResource;
-  machinery?: string; // Added for specific machinery tracking
-  crew?: string;      // Added for specific crew/cuadrilla tracking
-  supplyId?: string; 
-  consumedQuantity?: number;
-  description?: string;
+  description: string;
+  machineryIds: string[];
+  inputIds: string[];
+  laborIds: string[];
 }
 
 export interface SowingProject {
   id: string;
   name: string;
   lotIds: string[];
-  activityRecords: ActivityLog[];
+  activityLogs: ActivityLog[];
   status: SowingStatus;
   startDate: string;
   endDate?: string;
@@ -99,14 +93,11 @@ export interface SowingRecord {
 export interface DispatchRecord {
   id: string;
   lotId: string;
-  cropId?: string;
   date: string;
   quantity: number;
-  status: 'PENDIENTE' | 'EN TRÁNSITO' | 'RECIBIDO';
+  status: 'PENDIENTE' | 'RECIBIDO';
   type: 'INTERNO' | 'EXTERNO';
   originFarmId?: string;
-  originProjectId?: string; // Vincula al SowingProject de origen
-  estimatedBrix?: number;   // °Brix estimados del campo
   providerName?: string;
 }
 
@@ -118,19 +109,6 @@ export interface Barrel {
   status: BarrelStatus;
   analysisValues: { [parameterId: string]: any };
   date: string;
-  creationTimestamp: number;   // Unix ms — inicio de la cuarentena
-  incubationEndDate: number;   // creationTimestamp + 72h (ms)
-  brix?: number;               // Grados Brix finales
-}
-
-export interface Silo {
-  id: string;
-  name: string;
-  capacity: number;
-  currentLevel: number;
-  unit: string;
-  cropId?: string;
-  averageBrix?: number; // Brix promedio calculado al mezclar cargas
 }
 
 export interface LotAnalysis {
@@ -146,11 +124,10 @@ export interface MaterialReception {
   date: string;
   provider: string;
   cropId: string;
-  lotId?: string; // Optional since it could be an external supply
-  farmId?: string;
+  lotId: string;
+  farmId: string;
   bundleCount: number;
   averageWeight: number;
-  availableQuantity: number; // STOCK MANAGEMENT: subtract when assigned to SowingProject
   qualityValues: { [parameterId: string]: any };
   healthScore: number;
   status: QualityCategory;
@@ -181,11 +158,6 @@ export const INITIAL_CHEMICALS: Chemical[] = [
   { id: 'chem-2', name: 'Cruiser 350', type: 'Insecticida', unit: 'ml/Kg' },
   { id: 'chem-3', name: 'Maxim XL', type: 'Fungicida', unit: 'ml/Kg' },
   { id: 'chem-4', name: 'Apron XL', type: 'Fungicida', unit: 'ml/Kg' }
-];
-
-export const INITIAL_SILOS: Silo[] = [
-  { id: 'silo-1', name: 'Silo A1', capacity: 100000, currentLevel: 0, unit: 'L' },
-  { id: 'silo-2', name: 'Silo B2', capacity: 150000, currentLevel: 0, unit: 'L' },
 ];
 
 export const INITIAL_CONTACTS: Contact[] = [

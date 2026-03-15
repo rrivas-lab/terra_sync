@@ -1,7 +1,7 @@
 export type ParameterType = 'NUMERIC' | 'BOOLEAN' | 'SELECTION';
 export type ParameterCategory = 'FISICO_QUIMICO' | 'MICROBIOLOGICO';
 export type QualityCategory = 'Bueno' | 'Regular' | 'Malo';
-export type BarrelStatus = 'EN ESPERA' | 'EN ANÁLISIS' | 'LIBERADO' | 'RECHAZADO';
+export type BarrelStatus = 'EN ESPERA' | 'EN ANÁLISIS' | 'LIBERADO' | 'RECHAZADO' | 'EN CUARENTENA';
 
 export interface DynamicParameter {
   id: string;
@@ -36,6 +36,8 @@ export interface ActivityLog {
   machineryIds: string[];
   inputIds: string[];
   laborIds: string[];
+  consumedReceptionId?: string;
+  consumedQuantity?: number;
 }
 
 export interface SowingProject {
@@ -101,6 +103,15 @@ export interface DispatchRecord {
   providerName?: string;
 }
 
+export interface Silo {
+  id: string;
+  name: string;
+  capacity: number;
+  currentLevel: number;
+  cropId: string;
+  averageBrix: number;
+}
+
 export interface Barrel {
   id: string;
   code: string;
@@ -131,6 +142,7 @@ export interface MaterialReception {
   qualityValues: { [parameterId: string]: any };
   healthScore: number;
   status: QualityCategory;
+  usedQuantity?: number;
 }
 
 export interface Lot {

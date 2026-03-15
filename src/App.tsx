@@ -3,57 +3,61 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { 
-  Plus, Minus, Beaker, ShieldCheck, Clock, ChevronRight, Save, Leaf, 
+  Plus, Minus, Beaker, ShieldCheck, Clock, ChevronRight, ChevronLeft, Save, Leaf, 
   Map, LayoutGrid, MapPin, Layers, Info, Home, User, Settings, 
   Activity, Trash2, CheckCircle2, XCircle, ListFilter, Briefcase, Factory, Users, Search, Phone, CreditCard,
   Droplets, Sprout, Truck, Box, Sun, Moon, FlaskConical, ClipboardCheck
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { SiembraControlView } from './components/SiembraControlView';
+import { FarmManagementView } from './components/FarmManagementView';
+import { LotManagementView } from './components/LotManagementView';
+import { QualityManagementView } from './components/QualityManagementView';
+import { SiloManagementView } from './components/SiloManagementView';
 import { 
   Crop, INITIAL_CROPS, DynamicParameter, Lot, INITIAL_LOTS, 
   SoilType, LotStatus, Farm, INITIAL_FARMS, UnitSystem, 
   UNITS_MASTER, ParameterType, ParameterCategory, LotAnalysis,
   QualityCategory, MaterialReception, Contact, INITIAL_CONTACTS,
-  Chemical, INITIAL_CHEMICALS, CureRecord, SowingRecord, Barrel, DispatchRecord, BarrelStatus, SowingProject
+  Chemical, INITIAL_CHEMICALS, CureRecord, SowingRecord, Barrel, DispatchRecord, BarrelStatus, SowingProject, Silo, ActivityLog
 } from './types';
 
 // --- Reusable Components ---
 
 const HomeDashboardView = ({ onNavigate }: { onNavigate: (tab: string) => void, key?: React.Key }) => {
   const modules = [
-    { id: 'maestros', label: 'MAESTROS', icon: Briefcase, color: 'bg-blue-600', description: 'Configuración base y contactos' },
-    { id: 'campo', label: 'CAMPO', icon: Map, color: 'bg-emerald-700', description: 'Cura, Siembra y Lotes' },
-    { id: 'planta', label: 'PLANTA', icon: Factory, color: 'bg-slate-600', description: 'Recepción y Despacho' },
-    { id: 'calidad', label: 'CALIDAD', icon: ShieldCheck, color: 'bg-amber-500', description: 'Microbiología y Barriles' },
+    { id: 'maestros', label: 'MAESTROS', icon: Briefcase, color: 'text-slate-800 bg-slate-100', description: 'Configuración base y contactos' },
+    { id: 'campo', label: 'CAMPO', icon: Map, color: 'text-[#10B981] bg-emerald-100', description: 'Cura, Siembra y Lotes' },
+    { id: 'planta', label: 'PLANTA', icon: Factory, color: 'text-[#0052CC] bg-blue-100', description: 'Recepción y Despacho' },
+    { id: 'calidad', label: 'CALIDAD', icon: ShieldCheck, color: 'text-amber-600 bg-amber-100', description: 'Microbiología y Barriles' },
   ];
 
   return (
     <motion.div 
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="grid grid-cols-1 md:grid-cols-2 gap-8"
+      className="grid grid-cols-1 md:grid-cols-2 gap-10"
     >
       {modules.map((m) => (
         <button
           key={m.id}
           onClick={() => onNavigate(m.id)}
-          className={`${m.color} rounded-[3rem] p-12 flex flex-col justify-between text-white text-left transition-all hover:scale-[1.02] active:scale-[0.98] shadow-2xl group relative overflow-hidden`}
+          className="bg-white border border-black/5 rounded-[3.5rem] shadow-xl shadow-black/5 p-12 flex flex-col justify-between text-left transition-all hover:-translate-y-2 hover:shadow-2xl group relative overflow-hidden"
         >
-          <div className="absolute top-0 right-0 p-12 opacity-10 group-hover:scale-110 transition-transform">
-            <m.icon size={240} />
+          <div className="absolute top-0 right-0 p-12 opacity-[0.03] group-hover:scale-110 transition-transform text-black">
+            <m.icon size={280} />
           </div>
           <div className="z-10">
-            <div className="p-4 bg-white/20 rounded-2xl w-fit mb-6">
-              <m.icon size={32} />
+            <div className={`p-5 rounded-2xl w-fit mb-8 shadow-inner ${m.color}`}>
+              <m.icon size={36} />
             </div>
-            <h2 className="text-5xl font-black tracking-tighter mb-4">{m.label}</h2>
-            <p className="text-white/70 font-medium text-lg">{m.description}</p>
+            <h2 className="text-6xl font-black tracking-tighter mb-4 text-black group-hover:text-[#0052CC] transition-colors">{m.label}</h2>
+            <p className="text-black/60 font-black uppercase text-xs tracking-widest">{m.description}</p>
           </div>
-          <div className="z-10 flex items-center gap-2 font-bold text-sm uppercase tracking-widest">
-            Acceder Módulo <ChevronRight size={18} />
+          <div className="z-10 flex items-center gap-3 font-black text-sm uppercase tracking-widest text-[#0052CC] mt-12 group-hover:gap-5 transition-all">
+            Acceder Módulo <ChevronRight size={24} />
           </div>
         </button>
       ))}
@@ -75,12 +79,27 @@ const ContactManagementView = ({
 }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingContact, setEditingContact] = useState<Contact | null>(null);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 6;
+
   const [contactForm, setContactForm] = useState<Partial<Contact>>({
     name: '',
     role: 'Administrador',
     phone: '',
     externalId: ''
   });
+
+  const filteredContacts = useMemo(() => {
+    return contacts.filter(c => 
+      c.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      c.externalId.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      c.role.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+  }, [contacts, searchTerm]);
+
+  const totalPages = Math.ceil(filteredContacts.length / itemsPerPage);
+  const paginatedContacts = filteredContacts.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 
   const openModal = (contact: Contact | null = null) => {
     setEditingContact(contact);
@@ -95,85 +114,174 @@ const ContactManagementView = ({
 
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex flex-col gap-8">
-      <div className="flex justify-between items-center">
-        <h2 className="text-3xl font-bold tracking-tight">Maestro de Contactos</h2>
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 bg-white p-8 rounded-[3rem] shadow-xl shadow-black/5 border border-black/5">
+        <div className="flex items-center gap-6">
+          <div className="w-16 h-16 bg-blue-100 text-[#0052CC] rounded-2xl flex items-center justify-center shadow-inner">
+            <Users size={32} />
+          </div>
+          <div>
+            <h2 className="text-3xl font-black tracking-tight uppercase">Maestro de Contactos</h2>
+            <p className="text-black/40 font-black uppercase text-[10px] tracking-widest mt-1">Gestión de Personal y Proveedores</p>
+          </div>
+        </div>
         <button 
           onClick={() => openModal()}
-          className="flex items-center gap-2 px-8 py-4 bg-black text-white rounded-2xl font-bold shadow-xl hover:scale-105 transition-transform"
+          className="w-full md:w-auto flex items-center justify-center gap-3 px-10 py-5 bg-[#0052CC] text-white rounded-2xl font-black shadow-xl shadow-blue-200 hover:scale-[1.02] active:scale-[0.98] transition-all uppercase text-xs tracking-widest"
         >
           <Plus size={20} /> Nuevo Contacto
         </button>
       </div>
 
-      <Carousel>
-        {contacts.map(contact => (
-          <BentoCard key={contact.id} title={contact.name} icon={Users}>
-            <div className="flex flex-col gap-4">
-              <div className="flex items-center gap-3">
-                <div className="px-3 py-1 bg-blue-50 text-[#0052CC] text-[10px] font-black uppercase rounded-full">
+      <div className="bg-white p-6 rounded-[2.5rem] shadow-xl shadow-black/5 border border-black/5">
+        <div className="flex flex-col md:flex-row gap-4 items-center justify-between mb-8">
+          <div className="relative w-full md:w-96">
+            <Search className="absolute left-6 top-1/2 -translate-y-1/2 text-black/20" size={20} />
+            <input
+              type="text"
+              placeholder="BUSCAR CONTACTO..."
+              value={searchTerm}
+              onChange={(e) => { setSearchTerm(e.target.value); setCurrentPage(1); }}
+              className="w-full h-14 pl-16 pr-6 bg-black/5 rounded-2xl font-black text-xs tracking-widest outline-none focus:ring-2 focus:ring-[#0052CC] transition-all"
+            />
+          </div>
+          
+          <div className="flex items-center gap-4 bg-black/5 p-2 rounded-2xl">
+            <button 
+              onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+              disabled={currentPage === 1}
+              className="p-3 hover:bg-white rounded-xl transition-all disabled:opacity-20"
+            >
+              <ChevronLeft size={20} />
+            </button>
+            <span className="text-[10px] font-black tracking-widest px-4">
+              {currentPage} DE {totalPages || 1}
+            </span>
+            <button 
+              onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+              disabled={currentPage === totalPages || totalPages === 0}
+              className="p-3 hover:bg-white rounded-xl transition-all disabled:opacity-20"
+            >
+              <ChevronRight size={20} />
+            </button>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {paginatedContacts.map(contact => (
+            <div 
+              key={contact.id} 
+              className="bg-white border border-black/5 rounded-[2rem] p-8 flex flex-col gap-6 hover:shadow-xl hover:shadow-black/5 transition-all group"
+            >
+              <div className="flex justify-between items-start">
+                <div className="w-14 h-14 bg-black/5 rounded-2xl flex items-center justify-center text-black/40 group-hover:bg-blue-50 group-hover:text-[#0052CC] transition-all">
+                  <Users size={24} />
+                </div>
+                <div className={`px-3 py-1 rounded-lg text-[10px] font-black tracking-widest ${
+                  contact.role === 'Administrador' ? 'bg-purple-50 text-purple-600' : 
+                  contact.role === 'Operador' ? 'bg-emerald-50 text-[#10B981]' : 'bg-blue-50 text-[#0052CC]'
+                }`}>
                   {contact.role}
                 </div>
               </div>
-              <div className="flex items-center gap-3 text-black/60">
-                <Phone size={16} />
-                <span className="font-bold">{contact.phone}</span>
+
+              <div>
+                <h3 className="text-xl font-black tracking-tight text-black mb-1">{contact.name}</h3>
+                <p className="text-[10px] font-black text-black/30 uppercase tracking-widest">ID: {contact.externalId}</p>
               </div>
-              <div className="flex items-center gap-3 text-black/60">
-                <CreditCard size={16} />
-                <span className="font-bold">ID: {contact.externalId}</span>
+
+              <div className="flex flex-col gap-3">
+                <div className="flex items-center gap-3 text-black/60">
+                  <Phone size={16} className="text-[#0052CC]" />
+                  <span className="font-black text-sm">{contact.phone}</span>
+                </div>
               </div>
-              <div className="pt-4 border-t border-black/5 flex justify-between items-center">
+
+              <div className="pt-6 border-t border-black/5 flex justify-between items-center">
                 <button 
                   onClick={() => openModal(contact)}
-                  className="px-4 py-2 bg-black/5 rounded-xl font-bold text-sm"
+                  className="px-6 py-3 bg-black/5 hover:bg-black text-black hover:text-white rounded-xl font-black text-[10px] tracking-widest transition-all"
                 >
-                  Editar
+                  EDITAR
                 </button>
                 <button 
-                  onClick={() => onDeleteContact(contact.id)}
-                  className="p-2 text-black/10 hover:text-red-500 transition-colors"
+                  onClick={() => { if(confirm('¿Eliminar contacto?')) onDeleteContact(contact.id); }}
+                  className="p-3 text-black/10 hover:text-red-500 transition-colors"
                 >
                   <Trash2 size={18} />
                 </button>
               </div>
             </div>
-          </BentoCard>
-        ))}
-      </Carousel>
+          ))}
+          {paginatedContacts.length === 0 && (
+            <div className="col-span-full py-20 text-center opacity-20 font-black text-2xl uppercase tracking-widest">
+              No se encontraron contactos
+            </div>
+          )}
+        </div>
+      </div>
 
       <AnimatePresence>
         {isModalOpen && (
           <div className="fixed inset-0 z-50 flex items-center justify-center p-6">
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setIsModalOpen(false)} className="absolute inset-0 bg-black/40 backdrop-blur-sm" />
-            <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.9, opacity: 0 }} className="relative bg-white w-full max-w-xl rounded-[3rem] shadow-2xl p-10 flex flex-col gap-8">
-              <h3 className="text-3xl font-bold tracking-tight">{editingContact ? 'Editar Contacto' : 'Registrar Contacto'}</h3>
-              <div className="flex flex-col gap-6">
-                <div className="flex flex-col gap-2">
-                  <span className="text-xs font-bold text-black/40 uppercase tracking-widest">Nombre Completo</span>
-                  <input type="text" value={contactForm.name} onChange={e => setContactForm(prev => ({ ...prev, name: e.target.value }))} className="h-16 px-6 bg-black/5 rounded-2xl font-bold" />
+            <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.9, opacity: 0 }} className="relative bg-white w-full max-w-xl rounded-[3rem] shadow-2xl overflow-hidden">
+              <div className="p-10 border-b border-black/5 flex justify-between items-center">
+                <h3 className="text-3xl font-black tracking-tight uppercase">{editingContact ? 'Editar Contacto' : 'Registrar Contacto'}</h3>
+                <button onClick={() => setIsModalOpen(false)} className="p-4 bg-black/5 rounded-2xl hover:bg-black/10 transition-all">
+                  <Plus className="rotate-45" size={24} />
+                </button>
+              </div>
+              
+              <div className="p-10 flex flex-col gap-8">
+                <div className="flex flex-col gap-3">
+                  <span className="text-[10px] font-black text-black/40 uppercase tracking-widest">Nombre Completo</span>
+                  <input 
+                    type="text" 
+                    value={contactForm.name} 
+                    onChange={e => setContactForm(prev => ({ ...prev, name: e.target.value }))} 
+                    className="h-16 px-6 bg-black/5 rounded-2xl font-black text-lg outline-none focus:ring-2 focus:ring-[#0052CC] transition-all" 
+                  />
                 </div>
-                <div className="flex flex-col gap-2">
-                  <span className="text-xs font-bold text-black/40 uppercase tracking-widest">Cargo / Rol</span>
-                  <select 
-                    value={contactForm.role} 
-                    onChange={e => setContactForm(prev => ({ ...prev, role: e.target.value as any }))}
-                    className="h-16 px-6 bg-black/5 rounded-2xl font-bold appearance-none"
-                  >
-                    <option value="Administrador">Administrador</option>
-                    <option value="Operador">Operador</option>
-                    <option value="Proveedor">Proveedor</option>
-                  </select>
-                </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="flex flex-col gap-2">
-                    <span className="text-xs font-bold text-black/40 uppercase tracking-widest">Teléfono</span>
-                    <input type="text" value={contactForm.phone} onChange={e => setContactForm(prev => ({ ...prev, phone: e.target.value }))} className="h-16 px-6 bg-black/5 rounded-2xl font-bold" />
+                
+                <div className="flex flex-col gap-3">
+                  <span className="text-[10px] font-black text-black/40 uppercase tracking-widest">Cargo / Rol</span>
+                  <div className="relative">
+                    <select 
+                      value={contactForm.role} 
+                      onChange={e => setContactForm(prev => ({ ...prev, role: e.target.value as any }))}
+                      className="w-full h-16 px-6 bg-black/5 rounded-2xl font-black text-lg appearance-none outline-none focus:ring-2 focus:ring-[#0052CC] transition-all"
+                    >
+                      <option value="Administrador">Administrador</option>
+                      <option value="Operador">Operador</option>
+                      <option value="Proveedor">Proveedor</option>
+                    </select>
+                    <div className="absolute right-6 top-1/2 -translate-y-1/2 pointer-events-none opacity-40">
+                      <ChevronRight className="rotate-90" size={20} />
+                    </div>
                   </div>
-                  <div className="flex flex-col gap-2">
-                    <span className="text-xs font-bold text-black/40 uppercase tracking-widest">ID / Cédula</span>
-                    <input type="text" value={contactForm.externalId} onChange={e => setContactForm(prev => ({ ...prev, externalId: e.target.value }))} className="h-16 px-6 bg-black/5 rounded-2xl font-bold" />
+                </div>
+                
+                <div className="grid grid-cols-2 gap-6">
+                  <div className="flex flex-col gap-3">
+                    <span className="text-[10px] font-black text-black/40 uppercase tracking-widest">Teléfono</span>
+                    <input 
+                      type="text" 
+                      value={contactForm.phone} 
+                      onChange={e => setContactForm(prev => ({ ...prev, phone: e.target.value }))} 
+                      className="h-16 px-6 bg-black/5 rounded-2xl font-black text-lg outline-none focus:ring-2 focus:ring-[#0052CC] transition-all" 
+                    />
+                  </div>
+                  <div className="flex flex-col gap-3">
+                    <span className="text-[10px] font-black text-black/40 uppercase tracking-widest">ID / Cédula</span>
+                    <input 
+                      type="text" 
+                      value={contactForm.externalId} 
+                      onChange={e => setContactForm(prev => ({ ...prev, externalId: e.target.value }))} 
+                      className="h-16 px-6 bg-black/5 rounded-2xl font-black text-lg outline-none focus:ring-2 focus:ring-[#0052CC] transition-all" 
+                    />
                   </div>
                 </div>
+                
                 <button 
                   onClick={() => { 
                     if (editingContact) {
@@ -183,7 +291,7 @@ const ContactManagementView = ({
                     }
                     setIsModalOpen(false); 
                   }}
-                  className="h-20 bg-black text-white font-bold rounded-3xl shadow-xl mt-4"
+                  className="h-20 bg-[#0052CC] text-white font-black rounded-3xl shadow-xl shadow-blue-200 mt-4 text-xl uppercase tracking-widest hover:scale-[1.02] active:scale-[0.98] transition-all"
                 >
                   {editingContact ? 'Guardar Cambios' : 'Guardar Contacto'}
                 </button>
@@ -331,215 +439,7 @@ const StatusBadge = ({ status }: { status: LotStatus }) => {
 
 // --- Views ---
 
-const FarmManagementView = ({ 
-  farms, 
-  contacts,
-  onAddFarm, 
-  onDeleteFarm 
-}: { 
-  farms: Farm[], 
-  contacts: Contact[],
-  onAddFarm: (farm: Partial<Farm>) => void, 
-  onDeleteFarm: (id: string) => void,
-  key?: React.Key
-}) => {
-  const [isAdding, setIsAdding] = useState(false);
-  const [newFarm, setNewFarm] = useState<Partial<Farm>>({
-    name: '',
-    location: '',
-    adminId: '',
-    totalHectares: 0,
-    unitSystem: 'METRICO'
-  });
 
-  const handleGetLocation = () => {
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          setNewFarm(prev => ({
-            ...prev,
-            location: `${position.coords.latitude.toFixed(4)}, ${position.coords.longitude.toFixed(4)}`,
-            coordinates: { lat: position.coords.latitude, lng: position.coords.longitude }
-          }));
-        },
-        (error) => {
-          console.error("Error getting location:", error);
-          alert("No se pudo obtener la ubicación automáticamente.");
-        }
-      );
-    }
-  };
-
-  return (
-    <motion.div 
-      initial={{ opacity: 0, scale: 0.95 }}
-      animate={{ opacity: 1, scale: 1 }}
-      className="flex flex-col gap-8"
-    >
-      <div className="flex justify-between items-center">
-        <h2 className="text-3xl font-bold tracking-tight">Gestión de Fincas</h2>
-        <button 
-          onClick={() => setIsAdding(true)}
-          className="flex items-center gap-2 px-8 py-4 bg-black text-white rounded-2xl font-bold shadow-xl hover:scale-105 transition-transform"
-        >
-          <Plus size={20} /> Registrar Finca
-        </button>
-      </div>
-
-      <Carousel>
-        {farms.map(farm => {
-          const admin = contacts.find(c => c.id === farm.adminId);
-          return (
-            <BentoCard key={farm.id} title={farm.name} icon={Home} className="relative group">
-              <div className="flex flex-col gap-6">
-                <div className="flex items-start gap-4">
-                  <div className="p-3 bg-black/5 rounded-xl text-black/40">
-                    <MapPin size={20} />
-                  </div>
-                  <div>
-                    <span className="text-[10px] uppercase font-bold text-black/40 block">Ubicación</span>
-                    <span className="font-bold">{farm.location}</span>
-                  </div>
-                </div>
-
-                <div className="flex items-start gap-4">
-                  <div className="p-3 bg-black/5 rounded-xl text-black/40">
-                    <User size={20} />
-                  </div>
-                  <div>
-                    <span className="text-[10px] uppercase font-bold text-black/40 block">Administrador</span>
-                    <span className="font-bold">{admin?.name || 'Sin asignar'}</span>
-                  </div>
-                </div>
-
-                <div className="flex items-start gap-4">
-                  <div className="p-3 bg-black/5 rounded-xl text-black/40">
-                    <Layers size={20} />
-                  </div>
-                  <div>
-                    <span className="text-[10px] uppercase font-bold text-black/40 block">Área Total</span>
-                    <span className="font-bold">{farm.totalHectares} Ha</span>
-                  </div>
-                </div>
-
-                <div className="flex items-center justify-between pt-6 border-t border-black/5">
-                  <div className="flex items-center gap-2">
-                    <Settings size={16} className="text-black/30" />
-                    <span className="text-xs font-bold text-black/40 uppercase tracking-widest">Sistema: {farm.unitSystem}</span>
-                  </div>
-                  <button 
-                    onClick={() => onDeleteFarm(farm.id)}
-                    className="p-2 text-black/10 hover:text-red-500 transition-colors"
-                  >
-                    <Trash2 size={18} />
-                  </button>
-                </div>
-              </div>
-            </BentoCard>
-          );
-        })}
-      </Carousel>
-
-      {/* Add Farm Modal */}
-      <AnimatePresence>
-        {isAdding && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-6">
-            <motion.div 
-              initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-              onClick={() => setIsAdding(false)}
-              className="absolute inset-0 bg-black/40 backdrop-blur-sm"
-            />
-            <motion.div 
-              initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.9, opacity: 0 }}
-              className="relative bg-white w-full max-w-2xl rounded-[3rem] shadow-2xl overflow-hidden"
-            >
-              <div className="p-10 border-b border-black/5 flex justify-between items-center">
-                <h3 className="text-3xl font-bold tracking-tight">Nueva Finca</h3>
-                <button onClick={() => setIsAdding(false)} className="p-4 bg-black/5 rounded-2xl"><Plus className="rotate-45" /></button>
-              </div>
-              <div className="p-10 flex flex-col gap-8">
-                <div className="grid grid-cols-2 gap-6">
-                  <div className="flex flex-col gap-2">
-                    <span className="text-xs font-bold text-black/40 uppercase tracking-widest">Nombre de la Finca</span>
-                    <input 
-                      type="text" 
-                      value={newFarm.name}
-                      onChange={e => setNewFarm(prev => ({ ...prev, name: e.target.value }))}
-                      className="h-16 px-6 bg-black/5 rounded-2xl font-bold focus:outline-none focus:ring-4 focus:ring-blue-100"
-                    />
-                  </div>
-                  <div className="flex flex-col gap-2">
-                    <span className="text-xs font-bold text-black/40 uppercase tracking-widest">Hectáreas Totales</span>
-                    <input 
-                      type="number" 
-                      value={newFarm.totalHectares}
-                      onChange={e => setNewFarm(prev => ({ ...prev, totalHectares: Number(e.target.value) }))}
-                      className="h-16 px-6 bg-black/5 rounded-2xl font-bold focus:outline-none focus:ring-4 focus:ring-blue-100"
-                    />
-                  </div>
-                </div>
-                <div className="flex flex-col gap-2">
-                  <span className="text-xs font-bold text-black/40 uppercase tracking-widest">Ubicación</span>
-                  <div className="flex gap-2">
-                    <input 
-                      type="text" 
-                      placeholder="Ej: Yaracuy, Venezuela"
-                      value={newFarm.location}
-                      onChange={e => setNewFarm(prev => ({ ...prev, location: e.target.value }))}
-                      className="flex-1 h-16 px-6 bg-black/5 rounded-2xl font-bold focus:outline-none focus:ring-4 focus:ring-blue-100"
-                    />
-                    <button 
-                      onClick={handleGetLocation}
-                      className="px-6 bg-black text-white rounded-2xl flex items-center justify-center"
-                      title="Obtener ubicación actual"
-                    >
-                      <MapPin size={24} />
-                    </button>
-                  </div>
-                </div>
-                <div className="grid grid-cols-2 gap-6">
-                  <div className="flex flex-col gap-2">
-                    <span className="text-xs font-bold text-black/40 uppercase tracking-widest">Administrador</span>
-                    <select 
-                      value={newFarm.adminId}
-                      onChange={e => setNewFarm(prev => ({ ...prev, adminId: e.target.value }))}
-                      className="h-16 px-6 bg-black/5 rounded-2xl font-bold focus:outline-none focus:ring-4 focus:ring-blue-100 appearance-none"
-                    >
-                      <option value="">Seleccionar...</option>
-                      {contacts.filter(c => c.role === 'Administrador').map(c => (
-                        <option key={c.id} value={c.id}>{c.name}</option>
-                      ))}
-                    </select>
-                  </div>
-                  <div className="flex flex-col gap-2">
-                    <span className="text-xs font-bold text-black/40 uppercase tracking-widest">Sistema de Unidades</span>
-                    <div className="flex bg-black/5 p-1 rounded-2xl h-16">
-                      {(['METRICO', 'IMPERIAL'] as UnitSystem[]).map(u => (
-                        <button
-                          key={u}
-                          onClick={() => setNewFarm(prev => ({ ...prev, unitSystem: u }))}
-                          className={`flex-1 rounded-xl font-bold transition-all ${newFarm.unitSystem === u ? 'bg-white shadow-sm text-[#0052CC]' : 'text-black/40'}`}
-                        >
-                          {u}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-                <button 
-                  onClick={() => { onAddFarm(newFarm); setIsAdding(false); }}
-                  className="h-20 bg-[#0052CC] text-white font-bold rounded-3xl shadow-xl shadow-blue-200 mt-4"
-                >
-                  Confirmar Registro
-                </button>
-              </div>
-            </motion.div>
-          </div>
-        )}
-      </AnimatePresence>
-    </motion.div>
-  );
-};
 
 const CropMasterView = ({ 
   crops, 
@@ -721,23 +621,23 @@ const CropMasterView = ({
               <div className="p-10 flex flex-col gap-10">
                 <div className="grid grid-cols-2 gap-8">
                   <div className="flex flex-col gap-2">
-                    <span className="text-xs font-bold text-black/40 uppercase tracking-widest">Nombre del Análisis</span>
+                    <span className="text-[10px] font-black text-black/40 uppercase tracking-widest">Nombre del Análisis</span>
                     <input 
                       type="text" 
                       placeholder="Ej: Grados Brix"
                       value={newParam.name}
                       onChange={e => setNewParam(prev => ({ ...prev, name: e.target.value }))}
-                      className="h-16 px-6 bg-black/5 rounded-2xl font-bold focus:outline-none focus:ring-4 focus:ring-blue-100"
+                      className="h-16 px-6 bg-black/5 rounded-2xl font-black focus:outline-none focus:ring-4 focus:ring-blue-100"
                     />
                   </div>
                   <div className="flex flex-col gap-2">
-                    <span className="text-xs font-bold text-black/40 uppercase tracking-widest">Categoría</span>
+                    <span className="text-[10px] font-black text-black/40 uppercase tracking-widest">Categoría</span>
                     <div className="flex bg-black/5 p-1 rounded-2xl h-16">
                       {(['FISICO_QUIMICO', 'MICROBIOLOGICO'] as ParameterCategory[]).map(c => (
                         <button
                           key={c}
                           onClick={() => setNewParam(prev => ({ ...prev, category: c }))}
-                          className={`flex-1 rounded-xl font-bold text-[10px] transition-all ${newParam.category === c ? 'bg-white shadow-sm text-[#0052CC]' : 'text-black/40'}`}
+                          className={`flex-1 rounded-xl font-black text-[10px] transition-all ${newParam.category === c ? 'bg-white shadow-sm text-[#0052CC]' : 'text-black/40'}`}
                         >
                           {c.replace('_', ' ')}
                         </button>
@@ -748,13 +648,13 @@ const CropMasterView = ({
 
                 <div className="grid grid-cols-2 gap-8">
                   <div className="flex flex-col gap-2">
-                    <span className="text-xs font-bold text-black/40 uppercase tracking-widest">Tipo de Valor</span>
+                    <span className="text-[10px] font-black text-black/40 uppercase tracking-widest">Tipo de Valor</span>
                     <div className="grid grid-cols-3 gap-2">
                       {(['NUMERIC', 'BOOLEAN', 'SELECTION'] as ParameterType[]).map(t => (
                         <button
                           key={t}
                           onClick={() => setNewParam(prev => ({ ...prev, type: t }))}
-                          className={`h-12 rounded-xl font-bold text-[10px] border transition-all ${newParam.type === t ? 'bg-black text-white border-black' : 'bg-white text-black/40 border-black/10'}`}
+                          className={`h-12 rounded-xl font-black text-[10px] border transition-all ${newParam.type === t ? 'bg-black text-white border-black' : 'bg-white text-black/40 border-black/10'}`}
                         >
                           {t}
                         </button>
@@ -762,13 +662,13 @@ const CropMasterView = ({
                     </div>
                   </div>
                   <div className="flex flex-col gap-2">
-                    <span className="text-xs font-bold text-black/40 uppercase tracking-widest">Unidad de Medida</span>
+                    <span className="text-[10px] font-black text-black/40 uppercase tracking-widest">Unidad de Medida</span>
                     <div className="flex gap-2 overflow-x-auto no-scrollbar pb-2">
                       {UNITS_MASTER.map(u => (
                         <button
                           key={u}
                           onClick={() => setNewParam(prev => ({ ...prev, unit: u }))}
-                          className={`px-4 py-2 rounded-xl font-bold text-xs border whitespace-nowrap transition-all ${newParam.unit === u ? 'bg-[#0052CC] text-white border-[#0052CC]' : 'bg-white text-black/40 border-black/10'}`}
+                          className={`px-4 py-2 rounded-xl font-black text-xs border whitespace-nowrap transition-all ${newParam.unit === u ? 'bg-[#0052CC] text-white border-[#0052CC]' : 'bg-white text-black/40 border-black/10'}`}
                         >
                           {u}
                         </button>
@@ -927,6 +827,10 @@ const MaterialReceptionView = ({
   key?: React.Key
 }) => {
   const [isAdding, setIsAdding] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 6;
+
   const [newReception, setNewReception] = useState<Partial<MaterialReception>>({
     provider: '',
     cropId: crops[0]?.id || '',
@@ -936,6 +840,17 @@ const MaterialReceptionView = ({
     averageWeight: 5.0,
     qualityValues: {}
   });
+
+  const filteredReceptions = useMemo(() => {
+    return receptions.filter(r => 
+      r.provider.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      crops.find(c => c.id === r.cropId)?.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      lots.find(l => l.id === r.lotId)?.lotCode.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+  }, [receptions, searchTerm, crops, lots]);
+
+  const totalPages = Math.ceil(filteredReceptions.length / itemsPerPage) || 1;
+  const paginatedReceptions = filteredReceptions.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 
   const selectedCrop = crops.find(c => c.id === newReception.cropId);
   const filteredLots = lots.filter(l => l.cropId === newReception.cropId && (!newReception.farmId || l.farmId === newReception.farmId));
@@ -1005,61 +920,115 @@ const MaterialReceptionView = ({
 
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex flex-col gap-8">
-      <div className="flex justify-between items-center">
-        <h2 className="text-3xl font-bold tracking-tight">Recepción de Material</h2>
-        <button 
-          onClick={() => setIsAdding(true)} 
-          className="h-16 px-10 bg-black text-white rounded-2xl font-black shadow-xl active:scale-95 transition-transform flex items-center gap-3"
-        >
-          <Plus size={24} /> Registrar Entrada
-        </button>
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 bg-white p-8 rounded-[3rem] shadow-xl shadow-black/5 border border-black/5">
+        <div className="flex items-center gap-6">
+          <div className="w-16 h-16 bg-blue-100 text-[#0052CC] rounded-2xl flex items-center justify-center shadow-inner">
+            <Layers size={32} />
+          </div>
+          <div>
+            <h2 className="text-3xl font-black tracking-tight uppercase">Recepción de Material</h2>
+            <div className="flex items-center gap-2 mt-1">
+              <span className="text-black/40 font-bold uppercase text-[10px] tracking-widest">Página</span>
+              <span className="text-[#0052CC] font-black text-xs">{currentPage} de {totalPages}</span>
+            </div>
+          </div>
+        </div>
+        <div className="flex items-center gap-4 w-full md:w-auto">
+          <div className="relative flex-1 md:w-64">
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-black/40" size={20} />
+            <input 
+              type="text" 
+              placeholder="Buscar recepción..." 
+              value={searchTerm}
+              onChange={(e) => { setSearchTerm(e.target.value); setCurrentPage(1); }}
+              className="w-full h-14 pl-12 pr-4 bg-black/5 rounded-2xl border-none focus:ring-2 focus:ring-[#0052CC] font-bold outline-none transition-all"
+            />
+          </div>
+          <div className="flex gap-2">
+            <button 
+              onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+              disabled={currentPage === 1}
+              className="w-14 h-14 rounded-2xl bg-black/5 flex items-center justify-center disabled:opacity-30 hover:bg-black/10 transition-colors shadow-sm"
+            >
+              <ChevronLeft size={24} />
+            </button>
+            <button 
+              onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+              disabled={currentPage === totalPages}
+              className="w-14 h-14 rounded-2xl bg-black/5 flex items-center justify-center disabled:opacity-30 hover:bg-black/10 transition-colors shadow-sm"
+            >
+              <ChevronRight size={24} />
+            </button>
+          </div>
+          <button
+            onClick={() => setIsAdding(true)}
+            className="flex items-center justify-center gap-2 h-14 px-6 bg-[#0052CC] text-white rounded-2xl font-black shadow-lg shadow-blue-200 hover:scale-105 active:scale-95 transition-all whitespace-nowrap"
+          >
+            <Plus size={20} /> <span className="hidden md:inline">Registrar Entrada</span>
+          </button>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-        {receptions.map(rec => {
-          const crop = crops.find(c => c.id === rec.cropId);
-          const lot = lots.find(l => l.id === rec.lotId);
-          return (
-            <BentoCard key={rec.id} title={rec.provider} icon={Layers} className="relative">
-              <div className="absolute top-8 right-8">
-                <span className={`px-4 py-2 rounded-xl text-xs font-black tracking-widest border ${
-                  rec.status === 'Bueno' ? 'bg-emerald-100 text-emerald-700 border-emerald-200' : 
-                  rec.status === 'Regular' ? 'bg-amber-100 text-amber-700 border-amber-200' : 
-                  'bg-red-100 text-red-700 border-red-200'
-                }`}>
-                  {rec.status.toUpperCase()}
-                </span>
-              </div>
-              <div className="flex flex-col gap-6">
-                <div className="flex items-center gap-2 text-black/40 text-xs font-bold uppercase tracking-widest">
-                  <Clock size={14} /> {new Date(rec.date).toLocaleDateString()} • {lot?.lotCode}
+        {paginatedReceptions.length === 0 ? (
+          <div className="col-span-full text-center py-20 opacity-50 font-bold">No se encontraron recepciones</div>
+        ) : (
+          paginatedReceptions.map(rec => {
+            const crop = crops.find(c => c.id === rec.cropId);
+            const lot = lots.find(l => l.id === rec.lotId);
+            return (
+              <button
+                key={rec.id}
+                className="p-8 rounded-[2rem] text-left transition-all flex flex-col gap-6 bg-white border border-black/5 hover:scale-[1.02] active:scale-[0.98] shadow-xl group relative"
+              >
+                <div className="absolute top-8 right-8">
+                  <span className={`px-4 py-2 rounded-xl text-[10px] font-black tracking-widest border ${
+                    rec.status === 'Bueno' ? 'bg-emerald-100 text-[#10B981] border-emerald-200' : 
+                    rec.status === 'Regular' ? 'bg-amber-100 text-amber-700 border-amber-200' : 
+                    'bg-red-100 text-red-700 border-red-200'
+                  }`}>
+                    {rec.status.toUpperCase()}
+                  </span>
                 </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="bg-black/5 p-4 rounded-2xl">
-                    <span className="text-[10px] uppercase font-bold text-black/40 block mb-1">Bultos</span>
-                    <span className="text-xl font-black">{rec.bundleCount}</span>
+                <div className="flex flex-col gap-6">
+                  <div className="flex items-center gap-4">
+                    <div className="p-4 rounded-2xl bg-black/5 text-[#0052CC]">
+                      <Layers size={32} />
+                    </div>
+                    <div>
+                      <h4 className="font-black text-2xl tracking-tight">{rec.provider}</h4>
+                      <div className="flex items-center gap-2 text-black/40 text-[10px] font-black uppercase tracking-widest">
+                        <Clock size={12} /> {new Date(rec.date).toLocaleDateString()} • {lot?.lotCode}
+                      </div>
+                    </div>
                   </div>
-                  <div className="bg-black/5 p-4 rounded-2xl">
-                    <span className="text-[10px] uppercase font-bold text-black/40 block mb-1">Peso Prom.</span>
-                    <span className="text-xl font-black">{rec.averageWeight} Kg</span>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="bg-black/5 p-4 rounded-2xl">
+                      <span className="text-[10px] uppercase font-black text-black/40 block mb-1">Bultos</span>
+                      <span className="text-xl font-black">{rec.bundleCount}</span>
+                    </div>
+                    <div className="bg-black/5 p-4 rounded-2xl">
+                      <span className="text-[10px] uppercase font-black text-black/40 block mb-1">Peso Prom.</span>
+                      <span className="text-xl font-black">{rec.averageWeight} Kg</span>
+                    </div>
+                  </div>
+                  <div className="flex items-center justify-between bg-black/5 p-5 rounded-2xl">
+                    <div className="flex items-center gap-3">
+                      <span className="text-3xl">{crop?.icon}</span>
+                      <span className="font-black">{crop?.name}</span>
+                    </div>
+                    <div className="text-right">
+                      <span className="text-[10px] uppercase font-black text-black/40 block">Health Score</span>
+                      <span className={`text-2xl font-black ${rec.healthScore >= 80 ? 'text-[#10B981]' : rec.healthScore >= 50 ? 'text-amber-500' : 'text-red-500'}`}>
+                        {rec.healthScore}%
+                      </span>
+                    </div>
                   </div>
                 </div>
-                <div className="flex items-center justify-between bg-black/5 p-5 rounded-2xl">
-                  <div className="flex items-center gap-3">
-                    <span className="text-3xl">{crop?.icon}</span>
-                    <span className="font-black">{crop?.name}</span>
-                  </div>
-                  <div className="text-right">
-                    <span className="text-[10px] uppercase font-bold text-black/40 block">Health Score</span>
-                    <span className={`text-2xl font-black ${rec.healthScore >= 80 ? 'text-emerald-500' : rec.healthScore >= 50 ? 'text-amber-500' : 'text-red-500'}`}>
-                      {rec.healthScore}%
-                    </span>
-                  </div>
-                </div>
-              </div>
-            </BentoCard>
-          );
-        })}
+              </button>
+            );
+          })
+        )}
       </div>
 
       <AnimatePresence>
@@ -1077,24 +1046,24 @@ const MaterialReceptionView = ({
                   {/* Left Column: Basic Info */}
                   <div className="flex flex-col gap-8">
                     <div className="flex flex-col gap-2">
-                      <span className="text-xs font-bold text-black/40 uppercase tracking-widest">Proveedor</span>
+                      <span className="text-[10px] font-black text-black/40 uppercase tracking-widest">Proveedor</span>
                       <input 
                         type="text" 
                         value={newReception.provider}
                         onChange={e => setNewReception(prev => ({ ...prev, provider: e.target.value }))}
-                        className="h-16 px-6 bg-black/5 rounded-2xl font-bold text-xl"
+                        className="h-16 px-6 bg-black/5 rounded-2xl font-black text-xl"
                         placeholder="Nombre del Proveedor"
                       />
                     </div>
 
                     <div className="flex flex-col gap-2">
-                      <span className="text-xs font-bold text-black/40 uppercase tracking-widest">Finca de Recepción</span>
+                      <span className="text-[10px] font-black text-black/40 uppercase tracking-widest">Finca de Recepción</span>
                       <div className="grid grid-cols-2 gap-2">
                         {farms.map(f => (
                           <button
                             key={f.id}
                             onClick={() => setNewReception(prev => ({ ...prev, farmId: f.id, lotId: '' }))}
-                            className={`h-14 px-4 rounded-xl font-bold border transition-all text-sm flex items-center justify-between ${newReception.farmId === f.id ? 'bg-[#0052CC] text-white border-[#0052CC]' : 'bg-white border-black/10 text-black/40'}`}
+                            className={`h-14 px-4 rounded-xl font-black border transition-all text-xs flex items-center justify-between ${newReception.farmId === f.id ? 'bg-[#0052CC] text-white border-[#0052CC]' : 'bg-white border-black/10 text-black/40'}`}
                           >
                             {f.name}
                             {newReception.farmId === f.id && <CheckCircle2 size={16} />}
@@ -1104,13 +1073,13 @@ const MaterialReceptionView = ({
                     </div>
 
                     <div className="flex flex-col gap-2">
-                      <span className="text-xs font-bold text-black/40 uppercase tracking-widest">Rubro</span>
+                      <span className="text-[10px] font-black text-black/40 uppercase tracking-widest">Rubro</span>
                       <div className="flex gap-2 overflow-x-auto no-scrollbar pb-2">
                         {crops.map(c => (
                           <button
                             key={c.id}
                             onClick={() => setNewReception(prev => ({ ...prev, cropId: c.id, lotId: '' }))}
-                            className={`px-6 py-4 rounded-2xl font-bold border transition-all flex items-center gap-2 ${newReception.cropId === c.id ? 'bg-black text-white border-black' : 'bg-white text-black/40 border-black/10'}`}
+                            className={`px-6 py-4 rounded-2xl font-black border transition-all flex items-center gap-2 ${newReception.cropId === c.id ? 'bg-black text-white border-black' : 'bg-white text-black/40 border-black/10'}`}
                           >
                             <span>{c.icon}</span> {c.name}
                           </button>
@@ -1119,13 +1088,13 @@ const MaterialReceptionView = ({
                     </div>
 
                     <div className="flex flex-col gap-2">
-                      <span className="text-xs font-bold text-black/40 uppercase tracking-widest">Lote de Destino</span>
+                      <span className="text-[10px] font-black text-black/40 uppercase tracking-widest">Lote de Destino</span>
                       <div className="grid grid-cols-2 gap-2">
                         {filteredLots.map(l => (
                           <button
                             key={l.id}
                             onClick={() => setNewReception(prev => ({ ...prev, lotId: l.id }))}
-                            className={`h-14 px-4 rounded-xl font-bold border transition-all text-xs flex items-center justify-between ${newReception.lotId === l.id ? 'bg-[#0052CC] text-white border-[#0052CC]' : 'bg-white border-black/10 text-black/40'}`}
+                            className={`h-14 px-4 rounded-xl font-black border transition-all text-[10px] flex items-center justify-between ${newReception.lotId === l.id ? 'bg-[#0052CC] text-white border-[#0052CC]' : 'bg-white border-black/10 text-black/40'}`}
                           >
                             {l.lotCode}
                             {newReception.lotId === l.id && <CheckCircle2 size={16} />}
@@ -1156,7 +1125,7 @@ const MaterialReceptionView = ({
                   {/* Right Column: Dynamic Quality Parameters */}
                   <div className="flex flex-col gap-6">
                     <div className="flex justify-between items-center">
-                      <span className="text-xs font-bold text-black/40 uppercase tracking-widest">Control de Calidad en Tiempo Real</span>
+                      <span className="text-[10px] font-black text-black/40 uppercase tracking-widest">Control de Calidad en Tiempo Real</span>
                       <div className="flex items-center gap-2">
                         <span className="text-[10px] font-black uppercase text-black/30">Score:</span>
                         <span className="text-xl font-black text-[#0052CC]">{calculateHealthScore(newReception.qualityValues || {})}%</span>
@@ -1174,7 +1143,7 @@ const MaterialReceptionView = ({
                         return (
                           <div key={param.id} className={`p-6 rounded-3xl border-2 transition-all ${isGood ? 'bg-emerald-50 border-emerald-100' : 'bg-red-50 border-red-100'}`}>
                             <div className="flex justify-between items-center mb-4">
-                              <span className="font-bold text-black">{param.name}</span>
+                              <span className="font-black text-black uppercase text-xs tracking-tight">{param.name}</span>
                               {isGood ? <CheckCircle2 className="text-emerald-500" size={20} /> : <XCircle className="text-red-500" size={20} />}
                             </div>
 
@@ -1188,7 +1157,7 @@ const MaterialReceptionView = ({
                                   max={1000}
                                   step={0.1}
                                 />
-                                <div className="flex justify-between text-[10px] font-bold text-black/30">
+                                <div className="flex justify-between text-[10px] font-black text-black/30 uppercase tracking-widest">
                                   <span>Rango: {param.min} - {param.max}</span>
                                 </div>
                               </div>
@@ -1200,7 +1169,7 @@ const MaterialReceptionView = ({
                                   <button
                                     key={v.toString()}
                                     onClick={() => setNewReception(prev => ({ ...prev, qualityValues: { ...prev.qualityValues, [param.id]: v } }))}
-                                    className={`flex-1 rounded-xl font-bold text-xs transition-all ${val === v ? 'bg-black text-white shadow-lg' : 'text-black/40'}`}
+                                    className={`flex-1 rounded-xl font-black text-xs tracking-widest transition-all ${val === v ? 'bg-black text-white shadow-lg' : 'text-black/40'}`}
                                   >
                                     {v ? 'SI' : 'NO'}
                                   </button>
@@ -1214,7 +1183,7 @@ const MaterialReceptionView = ({
                                   <button
                                     key={opt}
                                     onClick={() => setNewReception(prev => ({ ...prev, qualityValues: { ...prev.qualityValues, [param.id]: opt } }))}
-                                    className={`px-4 py-2 rounded-xl font-bold text-xs border transition-all ${val === opt ? 'bg-black text-white border-black shadow-md' : 'bg-white text-black/40 border-black/10'}`}
+                                    className={`px-4 py-2 rounded-xl font-black text-[10px] uppercase tracking-widest border transition-all ${val === opt ? 'bg-black text-white border-black shadow-md' : 'bg-white text-black/40 border-black/10'}`}
                                   >
                                     {opt}
                                   </button>
@@ -1248,236 +1217,133 @@ const MaterialReceptionView = ({
 const DispatchManagementView = ({ 
   dispatches, 
   lots, 
-  farms 
+  farms,
+  onReceiveDispatch
 }: { 
   dispatches: DispatchRecord[], 
   lots: Lot[], 
   farms: Farm[],
+  onReceiveDispatch: (dispatchId: string) => void,
   key?: React.Key
 }) => {
+  const [searchTerm, setSearchTerm] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 6;
+
+  const filteredDispatches = useMemo(() => {
+    return dispatches.filter(d => 
+      d.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      lots.find(l => l.id === d.lotId)?.lotCode.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      farms.find(f => f.id === d.originFarmId)?.name.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+  }, [dispatches, searchTerm, lots, farms]);
+
+  const totalPages = Math.ceil(filteredDispatches.length / itemsPerPage) || 1;
+  const paginatedDispatches = filteredDispatches.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+
   return (
     <div className="flex flex-col gap-8">
-      <div className="flex justify-between items-center">
-        <div>
-          <h2 className="text-4xl font-black tracking-tighter uppercase">Despachos a Planta</h2>
-          <p className="text-black/40 font-mono text-sm">LOGÍSTICA Y TRAZABILIDAD DE SALIDA</p>
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 bg-white p-8 rounded-[3rem] shadow-xl shadow-black/5 border border-black/5">
+        <div className="flex items-center gap-6">
+          <div className="w-16 h-16 bg-blue-100 text-[#0052CC] rounded-2xl flex items-center justify-center shadow-inner">
+            <Truck size={32} />
+          </div>
+          <div>
+            <h2 className="text-3xl font-black tracking-tight uppercase">Despachos a Planta</h2>
+            <div className="flex items-center gap-2 mt-1">
+              <span className="text-black/40 font-bold uppercase text-[10px] tracking-widest">Página</span>
+              <span className="text-[#0052CC] font-black text-xs">{currentPage} de {totalPages}</span>
+            </div>
+          </div>
+        </div>
+        <div className="flex items-center gap-4 w-full md:w-auto">
+          <div className="relative flex-1 md:w-64">
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-black/40" size={20} />
+            <input 
+              type="text" 
+              placeholder="Buscar despacho..." 
+              value={searchTerm}
+              onChange={(e) => { setSearchTerm(e.target.value); setCurrentPage(1); }}
+              className="w-full h-14 pl-12 pr-4 bg-black/5 rounded-2xl border-none focus:ring-2 focus:ring-[#0052CC] font-bold outline-none transition-all"
+            />
+          </div>
+          <div className="flex gap-2">
+            <button 
+              onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+              disabled={currentPage === 1}
+              className="w-14 h-14 rounded-2xl bg-black/5 flex items-center justify-center disabled:opacity-30 hover:bg-black/10 transition-colors shadow-sm"
+            >
+              <ChevronLeft size={24} />
+            </button>
+            <button 
+              onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+              disabled={currentPage === totalPages}
+              className="w-14 h-14 rounded-2xl bg-black/5 flex items-center justify-center disabled:opacity-30 hover:bg-black/10 transition-colors shadow-sm"
+            >
+              <ChevronRight size={24} />
+            </button>
+          </div>
         </div>
       </div>
 
       <div className="grid grid-cols-1 gap-4">
-        {dispatches.length === 0 ? (
+        {paginatedDispatches.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-20 bg-white rounded-[3rem] border border-black/5 text-black/20">
             <Truck size={64} strokeWidth={1} className="mb-4" />
             <p className="font-bold">No hay despachos registrados.</p>
           </div>
         ) : (
-          dispatches.map(dispatch => {
+          paginatedDispatches.map(dispatch => {
             const lot = lots.find(l => l.id === dispatch.lotId);
             const farm = farms.find(f => f.id === dispatch.originFarmId);
             return (
-              <div key={dispatch.id} className="bg-white p-8 rounded-[2rem] border border-black/5 flex justify-between items-center industrial-btn">
+              <div key={dispatch.id} className="bg-white p-8 rounded-[2rem] border border-black/5 flex flex-col md:flex-row justify-between items-start md:items-center gap-6 shadow-xl hover:scale-[1.01] transition-all">
                 <div className="flex items-center gap-8">
-                  <div className="p-5 bg-black text-white rounded-2xl">
+                  <div className="p-5 bg-[#0052CC] text-white rounded-2xl shadow-lg">
                     <Truck size={24} />
                   </div>
                   <div>
                     <div className="flex items-center gap-2 mb-1">
-                      <span className="font-mono font-black text-xl">{dispatch.id.split('-')[1]}</span>
-                      <span className={`px-2 py-0.5 rounded text-[8px] font-black tracking-widest ${dispatch.type === 'INTERNO' ? 'bg-blue-100 text-blue-600' : 'bg-amber-100 text-amber-600'}`}>
+                      <span className="font-black text-2xl tracking-tight">{dispatch.id.split('-')[1]}</span>
+                      <span className={`px-3 py-1 rounded-lg text-[10px] font-black tracking-widest ${dispatch.type === 'INTERNO' ? 'bg-blue-100 text-[#0052CC]' : 'bg-amber-100 text-amber-600'}`}>
                         {dispatch.type}
                       </span>
                     </div>
-                    <p className="text-xs font-bold text-black/40 uppercase tracking-widest">
+                    <p className="text-xs font-black text-black/40 uppercase tracking-widest">
                       {farm?.name || 'Proveedor Externo'} • {lot?.lotCode || 'N/A'}
                     </p>
                   </div>
                 </div>
 
-                <div className="flex gap-12 items-center">
+                <div className="flex flex-wrap gap-8 md:gap-12 items-center w-full md:w-auto justify-between md:justify-end">
                   <div className="text-right">
-                    <span className="text-[10px] font-black text-black/30 uppercase tracking-widest block">Cantidad</span>
+                    <span className="text-[10px] font-black text-black/40 uppercase tracking-widest block">Cantidad</span>
                     <span className="text-2xl font-black">{dispatch.quantity} Kg</span>
                   </div>
                   <div className="text-right">
-                    <span className="text-[10px] font-black text-black/30 uppercase tracking-widest block">Fecha</span>
-                    <span className="text-sm font-bold">{new Date(dispatch.date).toLocaleDateString()}</span>
+                    <span className="text-[10px] font-black text-black/40 uppercase tracking-widest block">Fecha</span>
+                    <span className="text-sm font-black">{new Date(dispatch.date).toLocaleDateString()}</span>
                   </div>
-                  <div className={`px-4 py-2 rounded-xl text-[10px] font-black border ${
-                    dispatch.status === 'RECIBIDO' ? 'bg-emerald-50 border-emerald-200 text-emerald-600' : 'bg-blue-50 border-blue-200 text-blue-600'
-                  }`}>
-                    {dispatch.status}
+                  <div className="flex items-center gap-4">
+                    <div className={`px-4 py-2 rounded-xl text-[10px] font-black border ${
+                      dispatch.status === 'RECIBIDO' ? 'bg-emerald-50 border-emerald-200 text-[#10B981]' : 'bg-blue-50 border-blue-200 text-[#0052CC]'
+                    }`}>
+                      {dispatch.status}
+                    </div>
+                    {dispatch.status === 'PENDIENTE' && (
+                      <button 
+                        onClick={() => onReceiveDispatch(dispatch.id)}
+                        className="h-12 px-6 bg-black text-white rounded-xl font-black text-xs hover:scale-105 active:scale-95 transition-all shadow-lg"
+                      >
+                        RECIBIR
+                      </button>
+                    )}
                   </div>
                 </div>
               </div>
             );
           })
         )}
-      </div>
-    </div>
-  );
-};
-const QualityManagementView = ({ 
-  barrels, 
-  crops, 
-  lots,
-  onUpdateBarrel
-}: { 
-  barrels: Barrel[], 
-  crops: Crop[], 
-  lots: Lot[],
-  onUpdateBarrel: (barrel: Barrel) => void,
-  key?: React.Key
-}) => {
-  const [selectedBarrelId, setSelectedBarrelId] = useState<string | null>(null);
-  const selectedBarrel = barrels.find(b => b.id === selectedBarrelId);
-  const selectedCrop = crops.find(c => c.id === selectedBarrel?.cropId);
-
-  const handleStatusChange = (status: BarrelStatus) => {
-    if (selectedBarrel) {
-      onUpdateBarrel({ ...selectedBarrel, status });
-    }
-  };
-
-  const handleValueChange = (paramId: string, value: any) => {
-    if (selectedBarrel) {
-      onUpdateBarrel({
-        ...selectedBarrel,
-        analysisValues: { ...selectedBarrel.analysisValues, [paramId]: value }
-      });
-    }
-  };
-
-  return (
-    <div className="flex flex-col gap-8 h-full">
-      <div className="flex justify-between items-center">
-        <div>
-          <h2 className="text-4xl font-black tracking-tighter">CUARENTENA DE BARRILES</h2>
-          <p className="text-black/40 font-mono text-sm">SISTEMA DE CONTROL MICROBIOLÓGICO</p>
-        </div>
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 flex-1 overflow-hidden">
-        {/* Barrel List */}
-        <div className="lg:col-span-5 flex flex-col gap-4 overflow-y-auto no-scrollbar pr-2">
-          {barrels.map(barrel => (
-            <button
-              key={barrel.id}
-              onClick={() => setSelectedBarrelId(barrel.id)}
-              className={`p-6 rounded-3xl border-2 transition-all text-left flex justify-between items-center industrial-btn ${
-                selectedBarrelId === barrel.id 
-                  ? 'bg-white border-[#0052CC] shadow-xl ring-4 ring-blue-50' 
-                  : 'bg-white border-black/5 hover:border-black/20'
-              }`}
-            >
-              <div className="flex items-center gap-4">
-                <div className={`p-4 rounded-2xl ${
-                  barrel.status === 'LIBERADO' ? 'bg-emerald-100 text-emerald-600' :
-                  barrel.status === 'RECHAZADO' ? 'bg-red-100 text-red-600' :
-                  barrel.status === 'EN ANÁLISIS' ? 'bg-blue-100 text-blue-600' :
-                  'bg-slate-100 text-slate-600'
-                }`}>
-                  <Box size={24} />
-                </div>
-                <div>
-                  <h4 className="font-mono font-bold text-xl">{barrel.code}</h4>
-                  <p className="text-xs font-bold text-black/40 uppercase tracking-widest">
-                    {crops.find(c => c.id === barrel.cropId)?.name} • {new Date(barrel.date).toLocaleDateString()}
-                  </p>
-                </div>
-              </div>
-              <span className={`px-3 py-1 rounded-lg text-[10px] font-black tracking-widest border ${
-                barrel.status === 'LIBERADO' ? 'bg-emerald-50 border-emerald-200 text-emerald-600' :
-                barrel.status === 'RECHAZADO' ? 'bg-red-50 border-red-200 text-red-600' :
-                barrel.status === 'EN ANÁLISIS' ? 'bg-blue-50 border-blue-200 text-blue-600' :
-                'bg-slate-50 border-slate-200 text-slate-600'
-              }`}>
-                {barrel.status}
-              </span>
-            </button>
-          ))}
-        </div>
-
-        {/* Barrel Details & Analysis */}
-        <div className="lg:col-span-7 bg-white rounded-[3rem] border border-black/10 shadow-2xl overflow-hidden flex flex-col">
-          {selectedBarrel ? (
-            <>
-              <div className="p-10 border-b border-black/5 bg-slate-50/50 flex justify-between items-center">
-                <div>
-                  <span className="text-[10px] font-black text-[#0052CC] uppercase tracking-[0.3em] mb-2 block">Detalles del Activo</span>
-                  <h3 className="text-3xl font-black font-mono">{selectedBarrel.code}</h3>
-                </div>
-                <div className="flex gap-2">
-                  {(['EN ESPERA', 'EN ANÁLISIS', 'LIBERADO', 'RECHAZADO'] as BarrelStatus[]).map(s => (
-                    <button
-                      key={s}
-                      onClick={() => handleStatusChange(s)}
-                      className={`px-4 py-2 rounded-xl text-[10px] font-black transition-all border ${
-                        selectedBarrel.status === s 
-                          ? 'bg-black text-white border-black shadow-lg' 
-                          : 'bg-white text-black/40 border-black/5 hover:border-black/20'
-                      }`}
-                    >
-                      {s}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              <div className="p-10 flex-1 overflow-y-auto no-scrollbar">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                  {selectedCrop?.parameters.filter(p => p.category === 'MICROBIOLOGICO').map(param => (
-                    <div key={param.id} className="p-6 bg-black/5 rounded-[2rem] border border-black/5 flex flex-col gap-4">
-                      <div className="flex justify-between items-center">
-                        <span className="text-xs font-bold text-black/40 uppercase tracking-widest">{param.name}</span>
-                        <span className="text-[10px] font-black px-2 py-1 bg-white rounded-lg border border-black/5">{param.unit}</span>
-                      </div>
-                      
-                      {param.type === 'NUMERIC' && (
-                        <Stepper 
-                          label="Resultado"
-                          value={selectedBarrel.analysisValues[param.id] || 0}
-                          onChange={v => handleValueChange(param.id, v)}
-                          min={0}
-                          max={1000}
-                          step={0.1}
-                        />
-                      )}
-
-                      {param.type === 'BOOLEAN' && (
-                        <div className="flex bg-white p-1 rounded-2xl h-16 border border-black/5">
-                          {[true, false].map(v => (
-                            <button
-                              key={v.toString()}
-                              onClick={() => handleValueChange(param.id, v)}
-                              className={`flex-1 rounded-xl font-bold transition-all ${selectedBarrel.analysisValues[param.id] === v ? 'bg-black text-white shadow-lg' : 'text-black/40'}`}
-                            >
-                              {v ? 'POSITIVO' : 'NEGATIVO'}
-                            </button>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                  ))}
-                </div>
-                
-                {selectedCrop?.parameters.filter(p => p.category === 'MICROBIOLOGICO').length === 0 && (
-                  <div className="flex flex-col items-center justify-center py-20 text-black/20">
-                    <FlaskConical size={64} strokeWidth={1} className="mb-4" />
-                    <p className="font-bold">No hay parámetros microbiológicos definidos para este rubro.</p>
-                  </div>
-                )}
-              </div>
-            </>
-          ) : (
-            <div className="flex-1 flex flex-col items-center justify-center p-20 text-center">
-              <div className="w-24 h-24 bg-black/5 rounded-full flex items-center justify-center mb-6 text-black/20">
-                <Search size={48} />
-              </div>
-              <h3 className="text-2xl font-bold mb-2">Seleccione un Barril</h3>
-              <p className="text-black/40 max-w-xs">Elija un barril de la lista para ver su trazabilidad y registrar análisis de laboratorio.</p>
-            </div>
-          )}
-        </div>
       </div>
     </div>
   );
@@ -1507,66 +1373,87 @@ const CureManagementView = ({
 
   return (
     <div className="flex flex-col gap-8">
-      <div className="flex justify-between items-center">
-        <div>
-          <h2 className="text-4xl font-black tracking-tighter uppercase">Tratamiento de Semilla (Cura)</h2>
-          <p className="text-black/40 font-mono text-sm">REGISTRO DE APLICACIÓN FITOSANITARIA</p>
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 bg-white p-8 rounded-[3rem] shadow-xl shadow-black/5 border border-black/5">
+        <div className="flex items-center gap-6">
+          <div className="w-16 h-16 bg-blue-100 text-[#0052CC] rounded-2xl flex items-center justify-center shadow-inner">
+            <Droplets size={32} />
+          </div>
+          <div>
+            <h2 className="text-3xl font-black tracking-tight uppercase">Tratamiento de Semilla (Cura)</h2>
+            <p className="text-black/40 font-black uppercase text-[10px] tracking-widest mt-1">Registro de Aplicación Fitosanitaria</p>
+          </div>
         </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
         <div className="lg:col-span-4 flex flex-col gap-6">
-          <BentoCard title="Selección de Lote" icon={Map}>
+          <div className="bg-white p-8 rounded-[3rem] shadow-xl shadow-black/5 border border-black/5">
+            <div className="flex items-center gap-4 mb-8">
+              <div className="w-12 h-12 bg-black/5 rounded-2xl flex items-center justify-center text-[#0052CC]">
+                <Map size={24} />
+              </div>
+              <h3 className="text-xl font-black uppercase tracking-tight">Selección de Lote</h3>
+            </div>
             <div className="flex flex-col gap-4">
               {lots.filter(l => l.status === 'VACÍO' || l.status === 'PREPARACIÓN').map(lot => (
                 <button
                   key={lot.id}
                   onClick={() => setSelectedLotId(lot.id)}
-                  className={`p-6 rounded-2xl border-2 transition-all text-left industrial-btn ${
-                    selectedLotId === lot.id ? 'bg-white border-[#0052CC] shadow-lg' : 'bg-black/5 border-transparent'
+                  className={`p-6 rounded-2xl border-2 transition-all text-left flex flex-col gap-2 ${
+                    selectedLotId === lot.id ? 'bg-white border-[#0052CC] shadow-lg scale-[1.02]' : 'bg-black/5 border-transparent opacity-60 hover:opacity-100'
                   }`}
                 >
-                  <span className="font-mono font-bold text-lg">{lot.lotCode}</span>
+                  <span className={`font-black text-xl ${selectedLotId === lot.id ? 'text-[#0052CC]' : 'text-black'}`}>{lot.lotCode}</span>
                   <span className="block text-[10px] font-black text-black/40 uppercase tracking-widest">{lot.soilType} • {lot.area} Ha</span>
                 </button>
               ))}
+              {lots.filter(l => l.status === 'VACÍO' || l.status === 'PREPARACIÓN').length === 0 && (
+                <div className="text-center py-10 opacity-30 font-bold">No hay lotes disponibles</div>
+              )}
             </div>
-          </BentoCard>
+          </div>
         </div>
 
         <div className="lg:col-span-8 flex flex-col gap-6">
-          <BentoCard title="Detalles del Tratamiento" icon={Droplets}>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              <div className="flex flex-col gap-6">
-                <div className="flex flex-col gap-2">
-                  <span className="text-xs font-bold text-black/40 uppercase tracking-widest">Producto Químico</span>
-                  <div className="grid grid-cols-1 gap-2">
+          <div className="bg-white p-10 rounded-[3rem] shadow-xl shadow-black/5 border border-black/5">
+            <div className="flex items-center gap-4 mb-10">
+              <div className="w-12 h-12 bg-black/5 rounded-2xl flex items-center justify-center text-[#0052CC]">
+                <Droplets size={24} />
+              </div>
+              <h3 className="text-xl font-black uppercase tracking-tight">Detalles del Tratamiento</h3>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
+              <div className="flex flex-col gap-8">
+                <div className="flex flex-col gap-3">
+                  <span className="text-xs font-black text-black/40 uppercase tracking-widest">Producto Químico</span>
+                  <div className="grid grid-cols-1 gap-3">
                     {chemicals.map(c => (
                       <button
                         key={c.id}
                         onClick={() => setNewCure(prev => ({ ...prev, chemicalId: c.id }))}
-                        className={`h-16 px-6 rounded-2xl font-bold border-2 transition-all text-left flex justify-between items-center ${
-                          newCure.chemicalId === c.id ? 'bg-white border-[#0052CC] text-[#0052CC]' : 'bg-black/5 border-transparent text-black/40'
+                        className={`h-16 px-6 rounded-2xl font-black border-2 transition-all text-left flex justify-between items-center ${
+                          newCure.chemicalId === c.id ? 'bg-white border-[#0052CC] text-[#0052CC] shadow-md' : 'bg-black/5 border-transparent text-black/40 hover:bg-black/10'
                         }`}
                       >
                         {c.name}
-                        <span className="text-[10px] opacity-50">{c.type}</span>
+                        <span className="text-[10px] font-black uppercase tracking-widest opacity-50">{c.type}</span>
                       </button>
                     ))}
                   </div>
                 </div>
-                <div className="flex flex-col gap-2">
-                  <span className="text-xs font-bold text-black/40 uppercase tracking-widest">Fecha de Aplicación</span>
+                <div className="flex flex-col gap-3">
+                  <span className="text-xs font-black text-black/40 uppercase tracking-widest">Fecha de Aplicación</span>
                   <input 
                     type="date" 
                     value={newCure.date}
                     onChange={e => setNewCure(prev => ({ ...prev, date: e.target.value }))}
-                    className="h-16 px-6 bg-black/5 rounded-2xl font-bold text-xl"
+                    className="h-16 px-6 bg-black/5 rounded-2xl font-black text-xl outline-none focus:ring-2 focus:ring-[#0052CC] transition-all"
                   />
                 </div>
               </div>
 
-              <div className="flex flex-col gap-8">
+              <div className="flex flex-col gap-10">
                 <Stepper 
                   label={`Dosis (${selectedChemical?.unit || 'ml/L'})`}
                   value={newCure.dosage || 0}
@@ -1576,565 +1463,47 @@ const CureManagementView = ({
                   step={0.1}
                 />
                 
-                <div className="flex flex-col gap-2">
-                  <span className="text-xs font-bold text-black/40 uppercase tracking-widest">Responsable de Aplicación</span>
-                  <select 
-                    value={newCure.responsibleId}
-                    onChange={e => setNewCure(prev => ({ ...prev, responsibleId: e.target.value }))}
-                    className="h-16 px-6 bg-black/5 rounded-2xl font-bold appearance-none"
-                  >
-                    {contacts.filter(c => c.role === 'Operador' || c.role === 'Administrador').map(c => (
-                      <option key={c.id} value={c.id}>{c.name}</option>
-                    ))}
-                  </select>
-                </div>
-
-                <button 
-                  onClick={() => {
-                    if (!selectedLotId) return alert('Seleccione un lote');
-                    onAddCureRecord({ ...newCure, lotId: selectedLotId });
-                  }}
-                  className="h-20 bg-black text-white font-black rounded-3xl shadow-2xl industrial-btn mt-auto"
-                >
-                  REGISTRAR CURA
-                </button>
-              </div>
-            </div>
-          </BentoCard>
-        </div>
-      </div>
-    </div>
-  );
-};
-
-const SowingManagementView = ({ 
-  lots, 
-  contacts,
-  onAddSowingRecord,
-  onGenerateDispatch
-}: { 
-  lots: Lot[], 
-  contacts: Contact[],
-  onAddSowingRecord: (record: Partial<SowingRecord>) => void,
-  onGenerateDispatch: (lotId: string, quantity: number) => void,
-  key?: React.Key
-}) => {
-  const [selectedLotId, setSelectedLotId] = useState<string>('');
-  const [newSowing, setNewSowing] = useState<Partial<SowingRecord>>({
-    density: 35000,
-    responsibleId: contacts[0]?.id || '',
-    date: new Date().toISOString().split('T')[0]
-  });
-  const [dispatchQty, setDispatchQty] = useState(1000);
-
-  const selectedLot = lots.find(l => l.id === selectedLotId);
-
-  return (
-    <div className="flex flex-col gap-8">
-      <div className="flex justify-between items-center">
-        <div>
-          <h2 className="text-4xl font-black tracking-tighter uppercase">Registro de Siembra</h2>
-          <p className="text-black/40 font-mono text-sm">CONTROL DE DENSIDAD Y TRAZABILIDAD</p>
-        </div>
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 flex-1">
-        <div className="lg:col-span-4 flex flex-col gap-6">
-          <BentoCard title="Lotes Listos" icon={Sprout}>
-            <div className="flex flex-col gap-4">
-              {lots.filter(l => l.status === 'EN_CURA' || l.status === 'PREPARACIÓN').map(lot => (
-                <button
-                  key={lot.id}
-                  onClick={() => setSelectedLotId(lot.id)}
-                  className={`p-6 rounded-2xl border-2 transition-all text-left industrial-btn ${
-                    selectedLotId === lot.id ? 'bg-white border-[#0052CC] shadow-lg' : 'bg-black/5 border-transparent'
-                  }`}
-                >
-                  <span className="font-mono font-bold text-lg">{lot.lotCode}</span>
-                  <span className="block text-[10px] font-black text-black/40 uppercase tracking-widest">{lot.soilType} • {lot.area} Ha</span>
-                </button>
-              ))}
-            </div>
-          </BentoCard>
-        </div>
-
-        <div className="lg:col-span-8 grid grid-cols-1 md:grid-cols-2 gap-8">
-          <div className="flex flex-col gap-6">
-            <BentoCard title="Parámetros de Siembra" icon={ClipboardCheck}>
-              <div className="flex flex-col gap-8">
-                <div className="flex flex-col gap-2">
-                  <span className="text-xs font-bold text-black/40 uppercase tracking-widest">Fecha de Siembra</span>
-                  <input 
-                    type="date" 
-                    value={newSowing.date}
-                    onChange={e => setNewSowing(prev => ({ ...prev, date: e.target.value }))}
-                    className="h-16 px-6 bg-black/5 rounded-2xl font-bold text-xl"
-                  />
-                </div>
-                
-                <Stepper 
-                  label="Densidad (Plantas/Ha)"
-                  value={newSowing.density || 0}
-                  onChange={v => setNewSowing(prev => ({ ...prev, density: v }))}
-                  min={1000}
-                  max={100000}
-                  step={500}
-                />
-
-                <div className="flex flex-col gap-2">
-                  <span className="text-xs font-bold text-black/40 uppercase tracking-widest">Responsable</span>
-                  <select 
-                    value={newSowing.responsibleId}
-                    onChange={e => setNewSowing(prev => ({ ...prev, responsibleId: e.target.value }))}
-                    className="h-16 px-6 bg-black/5 rounded-2xl font-bold appearance-none"
-                  >
-                    {contacts.filter(c => c.role === 'Operador' || c.role === 'Administrador').map(c => (
-                      <option key={c.id} value={c.id}>{c.name}</option>
-                    ))}
-                  </select>
-                </div>
-
-                <button 
-                  onClick={() => {
-                    if (!selectedLotId) return alert('Seleccione un lote');
-                    onAddSowingRecord({ ...newSowing, lotId: selectedLotId });
-                  }}
-                  className="h-20 bg-emerald-600 text-white font-black rounded-3xl shadow-2xl industrial-btn"
-                >
-                  REGISTRAR SIEMBRA
-                </button>
-              </div>
-            </BentoCard>
-          </div>
-
-          <div className="flex flex-col gap-6">
-            <BentoCard title="Despacho a Planta" icon={Truck} className="bg-slate-50">
-              <div className="flex flex-col gap-8">
-                <p className="text-sm font-medium text-black/60">Genera un despacho directo a planta heredando toda la trazabilidad del lote.</p>
-                
-                <Stepper 
-                  label="Cantidad a Despachar (Kg)"
-                  value={dispatchQty}
-                  onChange={setDispatchQty}
-                  min={100}
-                  max={50000}
-                  step={100}
-                />
-
-                <div className="p-6 bg-white rounded-2xl border border-black/5 flex flex-col gap-2">
-                  <span className="text-[10px] font-black text-black/30 uppercase tracking-widest">Resumen de Trazabilidad</span>
-                  <div className="flex justify-between items-center">
-                    <span className="font-bold text-sm">Lote:</span>
-                    <span className="font-mono text-sm">{selectedLot?.lotCode || '---'}</span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="font-bold text-sm">Estado:</span>
-                    <span className="text-xs font-black">{selectedLot?.status || '---'}</span>
-                  </div>
-                </div>
-
-                <button 
-                  disabled={!selectedLot || selectedLot.status !== 'SEMBRADO'}
-                  onClick={() => onGenerateDispatch(selectedLotId, dispatchQty)}
-                  className={`h-20 font-black rounded-3xl shadow-2xl industrial-btn transition-all ${
-                    selectedLot?.status === 'SEMBRADO' ? 'bg-black text-white' : 'bg-black/10 text-black/30 cursor-not-allowed'
-                  }`}
-                >
-                  GENERAR DESPACHO
-                </button>
-              </div>
-            </BentoCard>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-};
-
-const LotManagementView = ({ 
-  lots, 
-  crops, 
-  farms,
-  onAddLot,
-  onDeleteLot,
-  onAddAnalysis
-}: { 
-  lots: Lot[], 
-  crops: Crop[], 
-  farms: Farm[],
-  onAddLot: (lot: Partial<Lot>) => void,
-  onDeleteLot: (id: string) => void,
-  onAddAnalysis: (lotId: string, analysis: LotAnalysis) => void,
-  key?: React.Key
-}) => {
-  const [analyzingLotId, setAnalyzingLotId] = useState<string | null>(null);
-  const [viewingHistoryLotId, setViewingHistoryLotId] = useState<string | null>(null);
-  const [isAdding, setIsAdding] = useState(false);
-  const [newLot, setNewLot] = useState<Partial<Lot>>({
-    lotCode: '',
-    area: 10,
-    soilType: 'Arcilloso',
-    cropId: crops[0].id,
-    farmId: '', // Start empty to force selection
-    status: 'VACÍO'
-  });
-
-  const analyzingLot = lots.find(l => l.id === analyzingLotId);
-  const analyzingCrop = crops.find(c => c.id === analyzingLot?.cropId);
-  const [analysisValues, setAnalysisValues] = useState<{ [key: string]: any }>({});
-
-  const historyLot = lots.find(l => l.id === viewingHistoryLotId);
-
-  const selectedFarm = farms.find(f => f.id === newLot.farmId);
-  const occupiedArea = lots.filter(l => l.farmId === newLot.farmId).reduce((acc, l) => acc + l.area, 0);
-  const availableArea = selectedFarm ? selectedFarm.totalHectares - occupiedArea : 0;
-  const isAreaValid = (newLot.area || 0) <= availableArea;
-
-  const handleStartAnalysis = (lot: Lot) => {
-    setAnalyzingLotId(lot.id);
-    const initialValues: any = {};
-    const crop = crops.find(c => c.id === lot.cropId);
-    crop?.parameters.forEach(p => {
-      if (p.type === 'NUMERIC') initialValues[p.id] = (p.min! + p.max!) / 2;
-      if (p.type === 'BOOLEAN') initialValues[p.id] = true;
-      if (p.type === 'SELECTION') initialValues[p.id] = p.options?.[0] || '';
-    });
-    setAnalysisValues(initialValues);
-  };
-
-  const submitAnalysis = () => {
-    if (!analyzingLotId) return;
-    
-    // Simple status logic: if any numeric value is out of range, it's RECHAZADO
-    let status: 'APROBADO' | 'RECHAZADO' = 'APROBADO';
-    analyzingCrop?.parameters.forEach(p => {
-      if (p.type === 'NUMERIC') {
-        const val = analysisValues[p.id];
-        if (val < p.min! || val > p.max!) status = 'RECHAZADO';
-      }
-    });
-
-    const analysis = {
-      id: `an-${Date.now()}`,
-      lotId: analyzingLotId,
-      date: new Date().toISOString(),
-      values: analysisValues,
-      status
-    };
-
-    onAddAnalysis(analyzingLotId, analysis);
-    setAnalyzingLotId(null);
-  };
-
-  const handleGetLocation = () => {
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          setNewLot(prev => ({
-            ...prev,
-            location: { lat: position.coords.latitude, lng: position.coords.longitude }
-          }));
-        },
-        (error) => {
-          console.error("Error getting location:", error);
-          alert("No se pudo obtener la ubicación automáticamente.");
-        }
-      );
-    }
-  };
-
-  const handleCreateLot = () => {
-    if (!newLot.farmId) {
-      alert("Debe seleccionar una finca para el nuevo lote.");
-      return;
-    }
-    onAddLot(newLot);
-    setIsAdding(false);
-    setNewLot({
-      lotCode: '',
-      area: 10,
-      soilType: 'Arcilloso',
-      cropId: crops[0].id,
-      farmId: '',
-      status: 'VACÍO'
-    });
-  };
-
-  return (
-    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex flex-col gap-8">
-      <div className="flex justify-between items-center">
-        <h2 className="text-3xl font-bold tracking-tight">Inventario de Lotes</h2>
-        <button onClick={() => setIsAdding(true)} className="flex items-center gap-2 px-8 py-4 bg-[#0052CC] text-white rounded-2xl font-bold shadow-xl shadow-blue-200">
-          <Plus size={20} /> Nuevo Lote
-        </button>
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-        {lots.map(lot => {
-          const crop = crops.find(c => c.id === lot.cropId);
-          const farm = farms.find(f => f.id === lot.farmId);
-          return (
-            <BentoCard key={lot.id} title={lot.lotCode} icon={Map} className="relative overflow-hidden">
-              <div className="absolute top-8 right-8"><StatusBadge status={lot.status} /></div>
-              <div className="flex flex-col gap-6">
-                <div className="flex items-center gap-2 text-black/40 text-xs font-bold uppercase tracking-widest">
-                  <Home size={14} /> {farm?.name}
-                </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="bg-black/5 p-4 rounded-2xl">
-                    <span className="text-[10px] uppercase font-bold text-black/40 block mb-1">Área</span>
-                    <span className="text-xl font-black">{lot.area} Ha</span>
-                  </div>
-                  <div className="bg-black/5 p-4 rounded-2xl">
-                    <span className="text-[10px] uppercase font-bold text-black/40 block mb-1">Suelo</span>
-                    <span className="text-xl font-black">{lot.soilType}</span>
-                  </div>
-                </div>
-                <div className="flex items-center justify-between bg-blue-50/50 p-5 rounded-2xl border border-blue-100">
-                  <div className="flex items-center gap-3">
-                    <span className="text-3xl">{crop?.icon}</span>
-                    <div>
-                      <span className="text-[10px] uppercase font-bold text-blue-400 block">Cultivo</span>
-                      <span className="font-black text-blue-900">{crop?.name}</span>
-                    </div>
-                  </div>
-                  <div className="text-right">
-                    <span className="text-[10px] uppercase font-bold text-blue-400 block">Análisis</span>
-                    <span className="text-xs font-bold text-blue-900">{crop?.parameters.length} Parámetros</span>
-                  </div>
-                </div>
-                  <button 
-                    onClick={() => handleStartAnalysis(lot)}
-                    className="flex-1 h-12 bg-black text-white rounded-xl font-bold flex items-center justify-center gap-2 shadow-lg active:scale-95 transition-transform"
-                  >
-                    <Beaker size={16} /> Analizar
-                  </button>
-                </div>
-                <div className="flex items-center justify-between pt-4 border-t border-black/5">
-                  <button 
-                    onClick={() => onDeleteLot(lot.id)}
-                    className="p-2 text-black/10 hover:text-red-500 transition-colors"
-                  >
-                    <Trash2 size={18} />
-                  </button>
-                  <button 
-                    onClick={() => setViewingHistoryLotId(lot.id)}
-                    className="text-[#0052CC] font-bold text-xs flex items-center gap-1"
-                  >
-                    Historial <ChevronRight size={14} />
-                  </button>
-                </div>
-            </BentoCard>
-          );
-        })}
-      </div>
-
-      {/* Analysis Entry Modal */}
-      <AnimatePresence>
-        {analyzingLotId && analyzingLot && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-6">
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setAnalyzingLotId(null)} className="absolute inset-0 bg-black/40 backdrop-blur-sm" />
-            <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.9, opacity: 0 }} className="relative bg-white w-full max-w-4xl rounded-[3rem] shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
-              <div className="p-10 border-b border-black/5 flex justify-between items-center bg-white sticky top-0 z-10">
-                <div>
-                  <h3 className="text-3xl font-bold tracking-tight">Nuevo Análisis</h3>
-                  <p className="text-black/40 font-bold uppercase text-xs tracking-widest mt-1">Lote: {analyzingLot.lotCode} • {analyzingCrop?.name}</p>
-                </div>
-                <button onClick={() => setAnalyzingLotId(null)} className="p-4 bg-black/5 rounded-2xl"><Plus className="rotate-45" /></button>
-              </div>
-              
-              <div className="p-10 flex flex-col gap-10 overflow-y-auto">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-                  {analyzingCrop?.parameters.map(param => (
-                    <div key={param.id} className="flex flex-col gap-4 p-6 bg-black/5 rounded-3xl border border-black/5">
-                      <div className="flex justify-between items-center">
-                        <span className="text-xs font-bold text-black/40 uppercase tracking-widest">{param.name}</span>
-                        <span className="text-[10px] font-black px-2 py-1 bg-white rounded-lg border border-black/5">{param.category.replace('_', ' ')}</span>
-                      </div>
-
-                      {param.type === 'NUMERIC' && (
-                        <Stepper 
-                          label={`Valor (${param.unit})`}
-                          value={analysisValues[param.id]}
-                          onChange={v => setAnalysisValues(prev => ({ ...prev, [param.id]: v }))}
-                          min={0}
-                          max={1000}
-                          step={0.1}
-                        />
-                      )}
-
-                      {param.type === 'BOOLEAN' && (
-                        <div className="flex bg-white p-1 rounded-2xl h-16 border border-black/5">
-                          {[true, false].map(v => (
-                            <button
-                              key={v.toString()}
-                              onClick={() => setAnalysisValues(prev => ({ ...prev, [param.id]: v }))}
-                              className={`flex-1 rounded-xl font-bold transition-all ${analysisValues[param.id] === v ? 'bg-black text-white shadow-lg' : 'text-black/40'}`}
-                            >
-                              {v ? 'SI' : 'NO'}
-                            </button>
-                          ))}
-                        </div>
-                      )}
-
-                      {param.type === 'SELECTION' && (
-                        <div className="flex flex-wrap gap-2">
-                          {param.options?.map(opt => (
-                            <button
-                              key={opt}
-                              onClick={() => setAnalysisValues(prev => ({ ...prev, [param.id]: opt }))}
-                              className={`px-4 py-2 rounded-xl font-bold text-sm border transition-all ${analysisValues[param.id] === opt ? 'bg-[#0052CC] text-white border-[#0052CC] shadow-md' : 'bg-white text-black/40 border-black/10'}`}
-                            >
-                              {opt}
-                            </button>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              <div className="p-10 border-t border-black/5 bg-white sticky bottom-0">
-                <button 
-                  onClick={submitAnalysis}
-                  className="w-full h-20 bg-[#0052CC] text-white font-bold rounded-3xl shadow-xl shadow-blue-200 text-xl active:scale-95 transition-transform"
-                >
-                  Registrar Análisis de Campo
-                </button>
-              </div>
-            </motion.div>
-          </div>
-        )}
-      </AnimatePresence>
-
-      {/* History Modal */}
-      <AnimatePresence>
-        {viewingHistoryLotId && historyLot && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-6">
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setViewingHistoryLotId(null)} className="absolute inset-0 bg-black/40 backdrop-blur-sm" />
-            <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.9, opacity: 0 }} className="relative bg-white w-full max-w-4xl rounded-[3rem] shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
-              <div className="p-10 border-b border-black/5 flex justify-between items-center bg-white">
-                <div>
-                  <h3 className="text-3xl font-bold tracking-tight">Historial de Análisis</h3>
-                  <p className="text-black/40 font-bold uppercase text-xs tracking-widest mt-1">Lote: {historyLot.lotCode}</p>
-                </div>
-                <button onClick={() => setViewingHistoryLotId(null)} className="p-4 bg-black/5 rounded-2xl"><Plus className="rotate-45" /></button>
-              </div>
-              
-              <div className="p-10 overflow-y-auto">
-                {(!historyLot.analyses || historyLot.analyses.length === 0) ? (
-                  <div className="text-center py-20">
-                    <div className="w-20 h-20 bg-black/5 rounded-full flex items-center justify-center mx-auto mb-6 text-black/20">
-                      <ListFilter size={40} />
-                    </div>
-                    <p className="text-black/40 font-bold">No hay análisis registrados para este lote.</p>
-                  </div>
-                ) : (
-                  <div className="flex flex-col gap-6">
-                    {historyLot.analyses.map(analysis => (
-                      <div key={analysis.id} className="p-8 bg-black/5 rounded-[2rem] border border-black/5 flex flex-col gap-6">
-                        <div className="flex justify-between items-center">
-                          <div className="flex items-center gap-4">
-                            <div className="p-3 bg-white rounded-2xl shadow-sm">
-                              <Clock size={20} className="text-black/40" />
-                            </div>
-                            <div>
-                              <span className="text-lg font-black">{new Date(analysis.date).toLocaleDateString()}</span>
-                              <span className="text-[10px] block font-bold text-black/30 uppercase tracking-widest">{new Date(analysis.date).toLocaleTimeString()}</span>
-                            </div>
-                          </div>
-                          <span className={`px-4 py-2 rounded-xl text-xs font-black tracking-widest border ${
-                            analysis.status === 'APROBADO' ? 'bg-emerald-100 text-emerald-700 border-emerald-200' : 'bg-red-100 text-red-700 border-red-200'
-                          }`}>
-                            {analysis.status}
-                          </span>
-                        </div>
-                        
-                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                          {Object.entries(analysis.values).map(([paramId, value]) => {
-                            const param = crops.flatMap(c => c.parameters).find(p => p.id === paramId);
-                            return (
-                              <div key={paramId} className="bg-white p-4 rounded-2xl shadow-sm border border-black/5">
-                                <span className="text-[10px] uppercase font-bold text-black/30 block mb-1 truncate">{param?.name}</span>
-                                <span className="text-lg font-black">{value.toString()} <span className="text-[10px] font-normal text-black/30">{param?.unit}</span></span>
-                              </div>
-                            );
-                          })}
-                        </div>
-                      </div>
-                    )).reverse()}
-                  </div>
-                )}
-              </div>
-            </motion.div>
-          </div>
-        )}
-      </AnimatePresence>
-
-      <AnimatePresence>
-        {isAdding && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-6">
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setIsAdding(false)} className="absolute inset-0 bg-black/40 backdrop-blur-sm" />
-            <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.9, opacity: 0 }} className="relative bg-white w-full max-w-4xl rounded-[3rem] shadow-2xl overflow-hidden">
-              <div className="p-10 border-b border-black/5 flex justify-between items-center">
-                <h3 className="text-3xl font-bold tracking-tight">Configurar Lote</h3>
-                <button onClick={() => setIsAdding(false)} className="p-4 bg-black/5 rounded-2xl"><Plus className="rotate-45" /></button>
-              </div>
-              <div className="p-10 flex flex-col gap-10 overflow-y-auto max-h-[70vh]">
-                <div className="grid grid-cols-2 gap-10">
-                  <div className="flex flex-col gap-2">
-                    <span className="text-xs font-bold text-black/40 uppercase tracking-widest">Finca Destino</span>
-                    <div className="grid grid-cols-1 gap-2">
-                      {farms.map(f => (
-                        <button
-                          key={f.id}
-                          onClick={() => setNewLot(prev => ({ ...prev, farmId: f.id }))}
-                          className={`h-16 px-6 rounded-2xl font-bold border transition-all text-left flex items-center justify-between ${newLot.farmId === f.id ? 'bg-blue-50 border-[#0052CC] text-[#0052CC]' : 'bg-white border-black/10 text-black/40'}`}
-                        >
-                          {f.name}
-                          {newLot.farmId === f.id && <CheckCircle2 size={20} />}
-                        </button>
+                <div className="flex flex-col gap-3">
+                  <span className="text-xs font-black text-black/40 uppercase tracking-widest">Responsable de Aplicación</span>
+                  <div className="relative">
+                    <select 
+                      value={newCure.responsibleId}
+                      onChange={e => setNewCure(prev => ({ ...prev, responsibleId: e.target.value }))}
+                      className="w-full h-16 px-6 bg-black/5 rounded-2xl font-black appearance-none outline-none focus:ring-2 focus:ring-[#0052CC] transition-all"
+                    >
+                      {contacts.filter(c => c.role === 'Operador' || c.role === 'Administrador').map(c => (
+                        <option key={c.id} value={c.id}>{c.name}</option>
                       ))}
-                    </div>
-                  </div>
-                  <div className="flex flex-col gap-6">
-                    <div className="flex flex-col gap-2">
-                      <span className="text-xs font-bold text-black/40 uppercase tracking-widest">Código Lote</span>
-                      <input type="text" value={newLot.lotCode} onChange={e => setNewLot(prev => ({ ...prev, lotCode: e.target.value }))} className="h-16 px-6 bg-black/5 rounded-2xl font-bold" />
-                    </div>
-                    <div className="flex flex-col gap-2">
-                      <div className="flex justify-between items-center">
-                        <span className="text-xs font-bold text-black/40 uppercase tracking-widest">Área (Ha)</span>
-                        {selectedFarm && (
-                          <span className={`text-[10px] font-black px-2 py-1 rounded-lg ${isAreaValid ? 'bg-emerald-50 text-emerald-600' : 'bg-red-50 text-red-600'}`}>
-                            Disponible: {availableArea.toFixed(2)} Ha
-                          </span>
-                        )}
-                      </div>
-                      <Stepper label="" value={newLot.area || 0} onChange={v => setNewLot(prev => ({ ...prev, area: v }))} step={0.5} />
+                    </select>
+                    <div className="absolute right-6 top-1/2 -translate-y-1/2 pointer-events-none opacity-40">
+                      <ChevronRight className="rotate-90" size={20} />
                     </div>
                   </div>
                 </div>
-                    <div className="flex flex-col gap-2">
-                      <span className="text-xs font-bold text-black/40 uppercase tracking-widest">Coordenadas</span>
-                      <button 
-                        onClick={handleGetLocation}
-                        className={`h-16 px-6 rounded-2xl font-bold border flex items-center justify-center gap-3 transition-all ${newLot.location ? 'bg-emerald-50 border-emerald-200 text-emerald-600' : 'bg-black/5 border-transparent text-black/40'}`}
-                      >
-                        <MapPin size={20} />
-                        {newLot.location ? `${newLot.location.lat.toFixed(4)}, ${newLot.location.lng.toFixed(4)}` : 'Obtener GPS'}
-                      </button>
-                    </div>
-                    <button onClick={handleCreateLot} className="h-20 bg-[#0052CC] text-white font-bold rounded-3xl shadow-xl shadow-blue-200">Crear Lote</button>
+
+                <button
+                  onClick={() => {
+                    if (!selectedLotId) {
+                      alert("Seleccione un lote primero");
+                      return;
+                    }
+                    onAddCureRecord({ ...newCure, lotId: selectedLotId });
+                    alert("Tratamiento registrado con éxito");
+                  }}
+                  className="w-full h-20 bg-[#0052CC] text-white rounded-3xl font-black text-xl shadow-xl shadow-blue-200 hover:scale-[1.02] active:scale-[0.98] transition-all mt-4"
+                >
+                  Registrar Cura
+                </button>
               </div>
-            </motion.div>
+            </div>
           </div>
-        )}
-      </AnimatePresence>
-    </motion.div>
+        </div>
+      </div>
+    </div>
   );
 };
+
+
 
 // --- Main Application ---
 
@@ -2162,7 +1531,38 @@ export default function App() {
     const saved = localStorage.getItem('dusa_receptions');
     return saved ? JSON.parse(saved) : [];
   });
-  const [sowingProjects, setSowingProjects] = useState<SowingProject[]>([]);
+  const [sowingProjects, setSowingProjects] = useState<SowingProject[]>(() => {
+    const saved = localStorage.getItem('dusa_projects');
+    if (saved) return JSON.parse(saved);
+    return [
+      {
+        id: 'proj-1',
+        name: 'Siembra Invierno 2025',
+        lotIds: ['lot-1'],
+        status: 'FINALIZADA',
+        startDate: '2025-06-01',
+        endDate: '2025-12-01',
+        activityLogs: [
+          { id: 'log-1', date: '2025-06-01', description: 'Preparación de terreno', machineryIds: [], inputIds: [], laborIds: [] },
+          { id: 'log-2', date: '2025-06-15', description: 'Siembra inicial', machineryIds: [], inputIds: [], laborIds: [] },
+          { id: 'log-3', date: '2025-08-10', description: 'Aplicación de fertilizante', machineryIds: [], inputIds: [], laborIds: [] },
+          { id: 'log-4', date: '2025-11-20', description: 'Cosecha', machineryIds: [], inputIds: [], laborIds: [] }
+        ]
+      },
+      {
+        id: 'proj-2',
+        name: 'Siembra Primavera 2026',
+        lotIds: ['lot-1'],
+        status: 'CRECIMIENTO',
+        startDate: '2026-02-01',
+        activityLogs: [
+          { id: 'log-5', date: '2026-02-01', description: 'Arado profundo', machineryIds: [], inputIds: [], laborIds: [] },
+          { id: 'log-6', date: '2026-02-15', description: 'Siembra', machineryIds: [], inputIds: [], laborIds: [] },
+          { id: 'log-7', date: '2026-03-01', description: 'Control de maleza', machineryIds: [], inputIds: [], laborIds: [] }
+        ]
+      }
+    ];
+  });
 
   const handleAddProject = (projectData: Omit<SowingProject, 'id' | 'activityLogs'>) => {
     const newProject: SowingProject = {
@@ -2173,9 +1573,58 @@ export default function App() {
     setSowingProjects(prev => [...prev, newProject]);
   };
 
+  const handleAddActivity = (projectId: string, activity: Omit<ActivityLog, 'id'>, consumedReceptionId?: string, consumedQuantity?: number) => {
+    const newActivity: ActivityLog = {
+      ...activity,
+      id: `act-${Date.now()}`
+    };
+
+    setSowingProjects(prev => prev.map(p => {
+      if (p.id === projectId) {
+        return { ...p, activityLogs: [...p.activityLogs, newActivity] };
+      }
+      return p;
+    }));
+
+    if (consumedReceptionId && consumedQuantity) {
+      setReceptions(prev => prev.map(r => {
+        if (r.id === consumedReceptionId) {
+          return { ...r, usedQuantity: (r.usedQuantity || 0) + consumedQuantity };
+        }
+        return r;
+      }));
+    }
+  };
+
   const [chemicals] = useState<Chemical[]>(INITIAL_CHEMICALS);
-  const [barrels, setBarrels] = useState<Barrel[]>([]);
-  const [dispatches, setDispatches] = useState<DispatchRecord[]>([]);
+  const [barrels, setBarrels] = useState<Barrel[]>(() => {
+    const saved = localStorage.getItem('dusa_barrels');
+    if (saved) return JSON.parse(saved);
+    return Array.from({ length: 5 }).map((_, i) => ({
+      id: `barrel-${i + 1}`,
+      code: `BRL-2026-${(i + 1).toString().padStart(3, '0')}`,
+      cropId: 'pina',
+      status: 'EN CUARENTENA' as BarrelStatus,
+      analysisValues: {},
+      date: new Date().toISOString()
+    }));
+  });
+  const [dispatches, setDispatches] = useState<DispatchRecord[]>(() => {
+    const saved = localStorage.getItem('dusa_dispatches');
+    if (saved) return JSON.parse(saved);
+    return [
+      { id: 'disp-1', lotId: 'lot-1', date: '2026-03-14', quantity: 5000, status: 'PENDIENTE', type: 'INTERNO' },
+      { id: 'disp-2', lotId: 'lot-1', date: '2026-03-15', quantity: 4500, status: 'PENDIENTE', type: 'INTERNO' }
+    ];
+  });
+  const [silos, setSilos] = useState<Silo[]>(() => {
+    const saved = localStorage.getItem('dusa_silos');
+    if (saved) return JSON.parse(saved);
+    return [
+      { id: 'silo-1', name: 'Silo A', capacity: 50000, currentLevel: 15000, cropId: 'pina', averageBrix: 13.5 },
+      { id: 'silo-2', name: 'Silo B', capacity: 50000, currentLevel: 0, cropId: 'naranja', averageBrix: 0 }
+    ];
+  });
   const [theme, setTheme] = useState<'solar' | 'plant'>('solar');
 
   useEffect(() => {
@@ -2355,6 +1804,39 @@ export default function App() {
     setBarrels(prev => prev.map(b => b.id === updatedBarrel.id ? updatedBarrel : b));
   };
 
+  const handleReceiveDispatch = (dispatchId: string) => {
+    const dispatch = dispatches.find(d => d.id === dispatchId);
+    if (!dispatch) return;
+
+    const lot = lots.find(l => l.id === dispatch.lotId);
+    if (!lot) return;
+
+    // Find a compatible silo
+    const compatibleSilo = silos.find(s => s.cropId === lot.cropId && (s.capacity - s.currentLevel) >= dispatch.quantity);
+    
+    if (!compatibleSilo) {
+      alert('No hay silos disponibles con capacidad suficiente para este rubro.');
+      return;
+    }
+
+    // Update dispatch status
+    setDispatches(prev => prev.map(d => d.id === dispatchId ? { ...d, status: 'RECIBIDO' } : d));
+
+    // Update silo level and brix (simulated brix for now)
+    setSilos(prev => prev.map(s => {
+      if (s.id === compatibleSilo.id) {
+        const newLevel = s.currentLevel + dispatch.quantity;
+        // Simple weighted average for Brix (assuming incoming has ~12 Brix)
+        const incomingBrix = 12.0;
+        const newBrix = ((s.currentLevel * s.averageBrix) + (dispatch.quantity * incomingBrix)) / newLevel;
+        return { ...s, currentLevel: newLevel, averageBrix: newBrix };
+      }
+      return s;
+    }));
+
+    alert(`Despacho recibido y asignado al ${compatibleSilo.name}`);
+  };
+
   const handleSave = () => {
     setIsSaving(true);
     setTimeout(() => {
@@ -2389,14 +1871,14 @@ export default function App() {
                   <button onClick={() => setActiveTab('fincas')} className={`px-6 py-2.5 rounded-xl font-bold text-sm transition-all ${activeTab === 'fincas' ? 'bg-white shadow-md text-[#0052CC]' : 'text-black/30'}`}>Fincas</button>
                   <button onClick={() => setActiveTab('lots')} className={`px-6 py-2.5 rounded-xl font-bold text-sm transition-all ${activeTab === 'lots' ? 'bg-white shadow-md text-[#0052CC]' : 'text-black/30'}`}>Lotes</button>
                   <button onClick={() => setActiveTab('cura')} className={`px-6 py-2.5 rounded-xl font-bold text-sm transition-all ${activeTab === 'cura' ? 'bg-white shadow-md text-[#0052CC]' : 'text-black/30'}`}>Cura</button>
-                  <button onClick={() => setActiveTab('siembra')} className={`px-6 py-2.5 rounded-xl font-bold text-sm transition-all ${activeTab === 'siembra' ? 'bg-white shadow-md text-[#0052CC]' : 'text-black/30'}`}>Siembra</button>
-                  <button onClick={() => setActiveTab('control-siembra')} className={`px-6 py-2.5 rounded-xl font-bold text-sm transition-all ${activeTab === 'control-siembra' ? 'bg-white shadow-md text-[#0052CC]' : 'text-black/30'}`}>Control Siembra</button>
+                  <button onClick={() => setActiveTab('control-siembra')} className={`px-6 py-2.5 rounded-xl font-bold text-sm transition-all ${activeTab === 'control-siembra' ? 'bg-white shadow-md text-[#0052CC]' : 'text-black/30'}`}>Proyectos</button>
                 </>
               )}
               {currentModule === 'planta' && (
                 <>
                   <button onClick={() => setActiveTab('recepcion')} className={`px-6 py-2.5 rounded-xl font-bold text-sm transition-all ${activeTab === 'recepcion' ? 'bg-white shadow-md text-[#0052CC]' : 'text-black/30'}`}>Recepción</button>
                   <button onClick={() => setActiveTab('despacho')} className={`px-6 py-2.5 rounded-xl font-bold text-sm transition-all ${activeTab === 'despacho' ? 'bg-white shadow-md text-[#0052CC]' : 'text-black/30'}`}>Despacho</button>
+                  <button onClick={() => setActiveTab('silos')} className={`px-6 py-2.5 rounded-xl font-bold text-sm transition-all ${activeTab === 'silos' ? 'bg-white shadow-md text-[#0052CC]' : 'text-black/30'}`}>Silos</button>
                 </>
               )}
               {currentModule === 'calidad' && (
@@ -2490,21 +1972,17 @@ export default function App() {
                 onAddCureRecord={handleAddCureRecord}
               />
             )}
-            {currentModule === 'campo' && activeTab === 'siembra' && (
-              <SowingManagementView 
-                key="siembra"
-                lots={lots}
-                contacts={contacts}
-                onAddSowingRecord={handleAddSowingRecord}
-                onGenerateDispatch={handleGenerateDispatch}
-              />
-            )}
             {currentModule === 'campo' && activeTab === 'control-siembra' && (
               <SiembraControlView 
                 key="control-siembra"
                 sowingProjects={sowingProjects}
                 lots={lots}
+                receptions={receptions}
+                contacts={contacts}
                 onAddProject={handleAddProject}
+                onAddActivity={handleAddActivity}
+                onAddSowingRecord={handleAddSowingRecord}
+                onGenerateDispatch={handleGenerateDispatch}
               />
             )}
             {currentModule === 'planta' && activeTab === 'recepcion' && (
@@ -2523,6 +2001,14 @@ export default function App() {
                 dispatches={dispatches}
                 lots={lots}
                 farms={farms}
+                onReceiveDispatch={handleReceiveDispatch}
+              />
+            )}
+            {currentModule === 'planta' && activeTab === 'silos' && (
+              <SiloManagementView 
+                key="silos"
+                silos={silos}
+                crops={crops}
               />
             )}
             {currentModule === 'calidad' && activeTab === 'analisis' && (

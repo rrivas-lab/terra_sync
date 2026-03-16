@@ -1,16 +1,28 @@
 import React, { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Box, FlaskConical, Search, Plus, ArrowLeft, CheckCircle2, XCircle, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Box, FlaskConical, Search, Plus, ArrowLeft, CheckCircle2, XCircle, ChevronLeft, ChevronRight, Calendar } from 'lucide-react';
 import { Barrel, Crop, Lot, BarrelStatus } from '../types';
 
 // Let's just copy Stepper here to avoid circular dependencies if it's not exported properly.
 const Stepper = ({ value, onChange, min = 0, max = 100, step = 1, label }: any) => (
   <div className="flex flex-col gap-2">
-    <span className="text-[10px] font-black text-white/20 uppercase tracking-widest">{label}</span>
-    <div className="flex items-center gap-4 bg-white/5 p-2 rounded-2xl border border-white/10">
-      <button onClick={() => onChange(Math.max(min, value - step))} className="w-12 h-12 bg-white/10 text-white rounded-xl flex items-center justify-center font-black hover:bg-white/20 transition-all">-</button>
-      <div className="flex-1 text-center font-black text-xl text-white">{typeof value === 'number' ? value.toFixed(step < 1 ? 1 : 0) : value}</div>
-      <button onClick={() => onChange(Math.min(max, value + step))} className="w-12 h-12 bg-[#3B82F6] rounded-xl flex items-center justify-center font-black shadow-lg shadow-blue-500/20 text-white hover:scale-105 active:scale-95 transition-all">+</button>
+    <span className="text-[10px] font-black text-white uppercase tracking-widest">{label}</span>
+    <div className="flex items-center gap-4 bg-black p-2 rounded-2xl border-2 border-white/20">
+      <button 
+        onClick={() => onChange(Math.max(min, value - step))} 
+        className="w-12 h-12 bg-white/10 text-white rounded-xl flex items-center justify-center font-black hover:bg-white/20 transition-all border border-white/20"
+      >
+        -
+      </button>
+      <div className="flex-1 text-center font-black text-2xl text-white">
+        {typeof value === 'number' ? value.toFixed(step < 1 ? 1 : 0) : value}
+      </div>
+      <button 
+        onClick={() => onChange(Math.min(max, value + step))} 
+        className="w-12 h-12 bg-[#3B82F6] rounded-xl flex items-center justify-center font-black shadow-[0_0_15px_rgba(59,130,246,0.5)] text-white hover:scale-105 active:scale-95 transition-all border-2 border-white/30"
+      >
+        +
+      </button>
     </div>
   </div>
 );
@@ -20,29 +32,39 @@ const Countdown = ({ date }: { date: string }) => {
 
   React.useEffect(() => {
     const target = new Date(date).getTime() + (72 * 60 * 60 * 1000);
-    const interval = setInterval(() => {
+    const update = () => {
       const now = new Date().getTime();
       const diff = target - now;
       if (diff <= 0) {
         setTimeLeft(0);
-        clearInterval(interval);
       } else {
         setTimeLeft(diff);
       }
-    }, 1000);
+    };
+    update();
+    const interval = setInterval(update, 1000);
     return () => clearInterval(interval);
   }, [date]);
 
-  if (timeLeft <= 0) return null;
+  if (timeLeft <= 0) {
+    return (
+      <div className="flex items-center gap-3 px-6 py-3 bg-black border-2 border-[#10B981] rounded-2xl shadow-[0_0_20px_rgba(16,185,129,0.2)]">
+        <div className="w-3 h-3 bg-[#10B981] rounded-full shadow-[0_0_15px_#10B981]" />
+        <span className="text-xs font-black text-[#10B981] uppercase tracking-widest">
+          Candado Liberado
+        </span>
+      </div>
+    );
+  }
 
   const hours = Math.floor(timeLeft / (1000 * 60 * 60));
   const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
   const seconds = Math.floor((timeLeft % (1000 * 60)) / 1000);
 
   return (
-    <div className="flex items-center gap-2 px-4 py-2 bg-amber-500/10 border border-amber-500/20 rounded-xl">
-      <div className="w-2 h-2 bg-amber-500 rounded-full animate-pulse shadow-[0_0_10px_#F59E0B]" />
-      <span className="text-[10px] font-black text-amber-500 uppercase tracking-widest">
+    <div className="flex items-center gap-3 px-6 py-3 bg-black border-2 border-amber-500 rounded-2xl shadow-[0_0_20px_rgba(245,158,11,0.2)]">
+      <div className="w-3 h-3 bg-amber-500 rounded-full animate-pulse shadow-[0_0_15px_#F59E0B]" />
+      <span className="text-xs font-black text-amber-500 uppercase tracking-widest">
         Bloqueo de Seguridad: {hours}h {minutes}m {seconds}s
       </span>
     </div>
@@ -80,10 +102,20 @@ export const QualityManagementView = ({
   const selectedBarrel = barrels.find(b => b.id === selectedBarrelId);
   const selectedCrop = crops.find(c => c.id === selectedBarrel?.cropId);
 
-  const isLocked = useMemo(() => {
-    if (!selectedBarrel) return false;
+  const [isLocked, setIsLocked] = useState(false);
+
+  React.useEffect(() => {
+    if (!selectedBarrel) {
+      setIsLocked(false);
+      return;
+    }
     const target = new Date(selectedBarrel.date).getTime() + (72 * 60 * 60 * 1000);
-    return new Date().getTime() < target;
+    const checkLock = () => {
+      setIsLocked(new Date().getTime() < target);
+    };
+    checkLock();
+    const interval = setInterval(checkLock, 1000);
+    return () => clearInterval(interval);
   }, [selectedBarrel]);
 
   const handleStatusChange = (status: BarrelStatus) => {
@@ -113,79 +145,94 @@ export const QualityManagementView = ({
             exit={{ opacity: 0, x: -20 }}
             className="flex flex-col gap-8"
           >
-            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 bg-white/5 p-8 rounded-[3rem] border border-white/10 backdrop-blur-md">
+            <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-8 bg-black p-10 rounded-[2rem] border-2 border-white/20 shadow-[0_0_30px_rgba(255,255,255,0.05)]">
               <div className="flex items-center gap-6">
-                <div className="w-16 h-16 bg-amber-500 text-black rounded-2xl flex items-center justify-center shadow-2xl shadow-amber-500/20">
-                  <Box size={32} />
+                <div className="w-20 h-20 bg-amber-500 text-black rounded-3xl flex items-center justify-center shadow-[0_0_20px_rgba(245,158,11,0.4)]">
+                  <Box size={40} />
                 </div>
                 <div>
-                  <h2 className="text-3xl font-black tracking-tight uppercase">Control de Barriles</h2>
-                  <div className="flex items-center gap-2 mt-1">
-                    <span className="text-white/20 font-bold uppercase text-[10px] tracking-widest">Página</span>
-                    <span className="text-[#F59E0B] font-black text-xs">{currentPage} de {totalPages}</span>
+                  <h2 className="text-4xl font-black tracking-tighter uppercase leading-none text-white">Control de Barriles</h2>
+                  <div className="flex items-center gap-3 mt-3">
+                    <span className="text-white/40 font-black uppercase text-[10px] tracking-widest">Página</span>
+                    <span className="text-amber-500 font-black text-xs uppercase tracking-widest">{currentPage} de {totalPages}</span>
                   </div>
                 </div>
               </div>
-              <div className="flex items-center gap-4 w-full md:w-auto">
-                <div className="relative flex-1 md:w-64">
-                  <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-white/20" size={20} />
+              <div className="flex flex-col sm:flex-row items-center gap-6 w-full lg:w-auto">
+                <div className="relative w-full sm:w-80">
+                  <Search className="absolute left-6 top-1/2 -translate-y-1/2 text-white/40" size={24} />
                   <input 
                     type="text" 
-                    placeholder="Buscar barril..." 
+                    placeholder="BUSCAR BARRIL..." 
                     value={searchTerm}
                     onChange={(e) => { setSearchTerm(e.target.value); setCurrentPage(1); }}
-                    className="w-full h-14 pl-12 pr-4 bg-white/5 rounded-2xl border border-white/10 focus:border-[#F59E0B] font-bold outline-none transition-all text-white"
+                    className="industrial-input w-full h-16 pl-16 pr-6 bg-black rounded-2xl border-2 border-white/20 focus:border-amber-500 font-black text-white outline-none transition-all uppercase text-xs tracking-widest"
                   />
                 </div>
-                <div className="flex gap-2">
+                <div className="flex gap-3">
                   <button 
                     onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
                     disabled={currentPage === 1}
-                    className="w-14 h-14 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center disabled:opacity-30 hover:bg-white/10 transition-colors shadow-sm"
+                    className="w-16 h-16 rounded-2xl bg-black border-2 border-white/20 flex items-center justify-center disabled:opacity-10 hover:bg-white/10 transition-colors text-white"
                   >
-                    <ChevronLeft size={24} />
+                    <ChevronLeft size={28} />
                   </button>
                   <button 
                     onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
                     disabled={currentPage === totalPages}
-                    className="w-14 h-14 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center disabled:opacity-30 hover:bg-white/10 transition-colors shadow-sm"
+                    className="w-16 h-16 rounded-2xl bg-black border-2 border-white/20 flex items-center justify-center disabled:opacity-10 hover:bg-white/10 transition-colors text-white"
                   >
-                    <ChevronRight size={24} />
+                    <ChevronRight size={28} />
                   </button>
                 </div>
               </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {paginatedBarrels.map(barrel => (
-                <button
-                  key={barrel.id}
-                  onClick={() => setSelectedBarrelId(barrel.id)}
-                  className={`p-8 rounded-[2rem] border transition-all text-left flex flex-col gap-6 bg-[#F59E0B] text-black border-transparent hover:scale-[1.02] active:scale-[0.98] shadow-2xl shadow-amber-500/10 group relative overflow-hidden`}
-                >
-                  <div className="absolute top-0 right-0 p-8 opacity-10 group-hover:scale-110 transition-transform">
-                    <Box size={120} />
-                  </div>
-                  <div className="flex justify-between items-start w-full z-10">
-                    <div className="p-4 rounded-2xl bg-black/10 text-black">
-                      <Box size={32} />
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+              {paginatedBarrels.map(barrel => {
+                const statusColors = {
+                  'EN ESPERA': 'border-amber-500 text-amber-500 shadow-amber-500/10',
+                  'EN ANÁLISIS': 'border-blue-500 text-blue-500 shadow-blue-500/10',
+                  'LIBERADO': 'border-emerald-500 text-emerald-500 shadow-emerald-500/10',
+                  'RECHAZADO': 'border-red-500 text-red-500 shadow-red-500/10'
+                };
+                const colorClass = statusColors[barrel.status as keyof typeof statusColors] || 'border-white/20 text-white';
+
+                return (
+                  <button
+                    key={barrel.id}
+                    onClick={() => setSelectedBarrelId(barrel.id)}
+                    className={`p-10 rounded-[3rem] border-2 transition-all text-left flex flex-col gap-8 bg-black ${colorClass.split(' ')[0]} hover:scale-[1.02] active:scale-[0.98] shadow-[0_0_40px_rgba(0,0,0,0.5)] group relative overflow-hidden h-[360px]`}
+                  >
+                    <div className="absolute top-0 right-0 p-10 opacity-5 group-hover:scale-110 transition-transform text-white">
+                      <Box size={160} />
                     </div>
-                    <span className={`px-3 py-1 rounded-lg text-[10px] font-black tracking-widest bg-black/10 text-black`}>
-                      {barrel.status}
-                    </span>
-                  </div>
-                  <div className="z-10 mt-auto">
-                    <h4 className="font-black text-3xl mb-1 tracking-tight">{barrel.code}</h4>
-                    <p className="text-xs font-black text-black/60 uppercase tracking-widest">
-                      {crops.find(c => c.id === barrel.cropId)?.name} • {new Date(barrel.date).toLocaleDateString()}
-                    </p>
-                  </div>
-                </button>
-              ))}
+                    <div className="flex justify-between items-start w-full z-10">
+                      <div className={`p-5 rounded-2xl bg-white/5 border-2 ${colorClass.split(' ')[0]} flex items-center justify-center transition-all group-hover:bg-white/10`}>
+                        <Box size={32} />
+                      </div>
+                      <span className={`px-4 py-1.5 rounded-lg text-[10px] font-black tracking-widest border-2 uppercase ${colorClass}`}>
+                        {barrel.status}
+                      </span>
+                    </div>
+                    <div className="z-10 mt-auto">
+                      <h4 className="font-black text-4xl mb-2 tracking-tighter text-white leading-none uppercase">{barrel.code}</h4>
+                      <div className="flex flex-col gap-2">
+                        <p className="text-[10px] font-black text-white/40 uppercase tracking-widest flex items-center gap-2">
+                          <FlaskConical size={14} /> {crops.find(c => c.id === barrel.cropId)?.name}
+                        </p>
+                        <p className="text-[10px] font-black text-white/40 uppercase tracking-widest flex items-center gap-2">
+                          <Calendar size={14} /> {new Date(barrel.date).toLocaleDateString()}
+                        </p>
+                      </div>
+                    </div>
+                  </button>
+                );
+              })}
               {paginatedBarrels.length === 0 && (
-                <div className="col-span-full py-20 flex flex-col items-center justify-center text-black/20">
-                  <Box size={64} className="mb-4" />
-                  <p className="font-bold text-xl">No se encontraron barriles</p>
+                <div className="col-span-full bg-black border-2 border-dashed border-white/10 rounded-[3rem] py-32 text-center flex flex-col items-center justify-center text-white/20">
+                  <Box size={80} className="mb-6 opacity-10" />
+                  <p className="font-black text-xl uppercase tracking-[0.3em]">No se encontraron barriles</p>
                 </div>
               )}
             </div>
@@ -198,52 +245,75 @@ export const QualityManagementView = ({
             exit={{ opacity: 0, x: 20 }}
             className="flex flex-col gap-8 h-full"
           >
-            <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-8 bg-white/5 p-8 rounded-[3rem] border border-white/10 backdrop-blur-md">
-              <div className="flex items-center gap-6">
+            <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-10 bg-black p-10 rounded-[2rem] border-2 border-white/20 shadow-[0_0_30px_rgba(255,255,255,0.05)]">
+              <div className="flex items-center gap-8">
                 <button 
                   onClick={() => setSelectedBarrelId(null)}
-                  className="w-16 h-16 bg-white/5 text-white rounded-2xl flex items-center justify-center hover:bg-white/10 transition-colors border border-white/10"
+                  className="w-20 h-20 bg-black text-white rounded-3xl flex items-center justify-center hover:bg-white/10 transition-all border-2 border-white/20 active:scale-90"
                 >
-                  <ArrowLeft size={32} />
+                  <ArrowLeft size={40} />
                 </button>
                 <div>
-                  <h2 className="text-3xl font-black tracking-tight uppercase">{selectedBarrel?.code}</h2>
-                  <p className="text-white/20 font-black uppercase text-[10px] tracking-widest mt-1">Detalles del Activo</p>
+                  <h2 className="text-5xl font-black tracking-tighter uppercase leading-none text-white">{selectedBarrel?.code}</h2>
+                  <div className="flex items-center gap-3 mt-3">
+                    <span className="text-white/40 font-black uppercase text-[10px] tracking-widest">Activo Crítico</span>
+                    <span className="w-2 h-2 bg-amber-500 rounded-full animate-pulse" />
+                  </div>
                 </div>
               </div>
-              <div className="flex flex-col items-end gap-3">
+              <div className="flex flex-col items-end gap-6 w-full lg:w-auto">
                 {selectedBarrel && <Countdown date={selectedBarrel.date} />}
-                <div className="flex gap-2">
-                  {(['EN ESPERA', 'EN ANÁLISIS', 'LIBERADO', 'RECHAZADO'] as BarrelStatus[]).map(s => (
-                    <button
-                      key={s}
-                      onClick={() => handleStatusChange(s)}
-                      disabled={s === 'LIBERADO' && isLocked}
-                      className={`px-6 py-3 rounded-xl text-xs font-black transition-all border ${
-                        selectedBarrel?.status === s 
-                          ? 'bg-[#F59E0B] text-black border-transparent shadow-lg shadow-amber-500/20' 
-                          : 'bg-white/5 text-white/40 border-white/10 hover:border-white/20 disabled:opacity-20 disabled:cursor-not-allowed'
-                      }`}
-                    >
-                      {s}
-                    </button>
-                  ))}
+                <div className="flex flex-wrap justify-end gap-3">
+                  {(['EN ESPERA', 'EN ANÁLISIS', 'LIBERADO', 'RECHAZADO'] as BarrelStatus[]).map(s => {
+                    const isActive = selectedBarrel?.status === s;
+                    const isRelease = s === 'LIBERADO';
+                    const releaseDisabled = isRelease && isLocked;
+
+                    const statusStyles = {
+                      'EN ESPERA': 'border-amber-500/50 text-amber-500 hover:bg-amber-500/10',
+                      'EN ANÁLISIS': 'border-blue-500/50 text-blue-500 hover:bg-blue-500/10',
+                      'LIBERADO': 'border-emerald-500/50 text-emerald-500 hover:bg-emerald-500/10',
+                      'RECHAZADO': 'border-red-500/50 text-red-500 hover:bg-red-500/10'
+                    };
+
+                    return (
+                      <button
+                        key={s}
+                        onClick={() => handleStatusChange(s)}
+                        disabled={releaseDisabled}
+                        className={`px-8 py-4 rounded-2xl text-[10px] font-black transition-all border-2 uppercase tracking-widest ${
+                          isActive 
+                            ? 'bg-white text-black border-white shadow-[0_0_30px_rgba(255,255,255,0.3)] scale-105' 
+                            : releaseDisabled
+                              ? 'bg-black text-white/5 border-white/5 cursor-not-allowed opacity-30'
+                              : `bg-black ${statusStyles[s]}`
+                        }`}
+                      >
+                        {s}
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
             </div>
 
-            <div className="bg-white/5 rounded-[3rem] border border-white/10 p-10 flex-1 overflow-y-auto backdrop-blur-md">
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div className="bg-black rounded-[3rem] border-2 border-white/20 p-12 flex-1 overflow-y-auto shadow-[0_0_40px_rgba(0,0,0,0.5)]">
+              <div className="flex items-center gap-4 mb-10">
+                <FlaskConical className="text-amber-500" size={32} />
+                <h3 className="text-2xl font-black uppercase tracking-tighter text-white">Análisis Microbiológico</h3>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
                 {selectedCrop?.parameters.filter(p => p.category === 'MICROBIOLOGICO').map(param => (
-                  <div key={param.id} className="p-8 bg-white/5 rounded-[2rem] border border-white/10 flex flex-col gap-6 hover:bg-white/[0.07] transition-colors">
+                  <div key={param.id} className="p-10 bg-black rounded-[2rem] border-2 border-white/10 flex flex-col gap-8 hover:border-white/30 transition-all group">
                     <div className="flex justify-between items-center">
-                      <span className="text-[10px] font-black text-white/40 uppercase tracking-widest">{param.name}</span>
-                      <span className="text-[10px] font-black px-3 py-1.5 bg-white/10 rounded-lg border border-white/10 text-white/60">{param.unit}</span>
+                      <span className="text-[10px] font-black text-white/60 uppercase tracking-[0.2em] group-hover:text-white transition-colors">{param.name}</span>
+                      <span className="text-[10px] font-black px-4 py-2 bg-white/5 rounded-xl border border-white/20 text-white/40 uppercase tracking-widest">{param.unit}</span>
                     </div>
                     
                     {param.type === 'NUMERIC' && (
                       <Stepper 
-                        label="Resultado"
+                        label="Resultado de Laboratorio"
                         value={selectedBarrel?.analysisValues[param.id] || 0}
                         onChange={(v: number) => handleValueChange(param.id, v)}
                         min={0}
@@ -253,16 +323,23 @@ export const QualityManagementView = ({
                     )}
 
                     {param.type === 'BOOLEAN' && (
-                      <div className="flex bg-white/5 p-2 rounded-2xl h-20 border border-white/10">
-                        {[true, false].map(v => (
-                          <button
-                            key={v.toString()}
-                            onClick={() => handleValueChange(param.id, v)}
-                            className={`flex-1 rounded-xl font-bold transition-all ${selectedBarrel?.analysisValues[param.id] === v ? 'bg-[#3B82F6] text-white shadow-lg shadow-blue-500/20' : 'text-white/20 hover:bg-white/5'}`}
-                          >
-                            {v ? 'POSITIVO' : 'NEGATIVO'}
-                          </button>
-                        ))}
+                      <div className="flex flex-col gap-3">
+                        <span className="text-[10px] font-black text-white uppercase tracking-widest">Presencia / Ausencia</span>
+                        <div className="flex bg-black p-2 rounded-2xl h-24 border-2 border-white/20">
+                          {[true, false].map(v => (
+                            <button
+                              key={v.toString()}
+                              onClick={() => handleValueChange(param.id, v)}
+                              className={`flex-1 rounded-xl font-black transition-all border-2 uppercase text-xs tracking-widest ${
+                                selectedBarrel?.analysisValues[param.id] === v 
+                                  ? 'bg-[#3B82F6] text-white border-white/30 shadow-[0_0_20px_rgba(59,130,246,0.4)]' 
+                                  : 'text-white/20 border-transparent hover:bg-white/5'
+                              }`}
+                            >
+                              {v ? 'POSITIVO' : 'NEGATIVO'}
+                            </button>
+                          ))}
+                        </div>
                       </div>
                     )}
                   </div>
@@ -270,9 +347,9 @@ export const QualityManagementView = ({
               </div>
               
               {selectedCrop?.parameters.filter(p => p.category === 'MICROBIOLOGICO').length === 0 && (
-                <div className="flex flex-col items-center justify-center py-32 text-white/10">
-                  <FlaskConical size={80} strokeWidth={1} className="mb-6" />
-                  <p className="font-bold text-2xl uppercase tracking-tighter">No hay parámetros microbiológicos definidos</p>
+                <div className="flex flex-col items-center justify-center py-40 text-white/5">
+                  <FlaskConical size={120} strokeWidth={1} className="mb-8 opacity-10" />
+                  <p className="font-black text-2xl uppercase tracking-[0.4em]">Sin Parámetros Críticos</p>
                 </div>
               )}
             </div>

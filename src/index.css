@@ -16,8 +16,9 @@
 }
 
 body {
-  background-color: var(--bg);
-  color: var(--text);
+  background-color: #000000;
+  color: #FFFFFF;
+  font-size: 18px;
   @apply antialiased overflow-hidden h-screen w-screen;
 }
 
@@ -34,7 +35,7 @@ body {
 }
 
 .industrial-input {
-  @apply h-16 px-6 bg-white/5 border border-white/10 rounded-2xl font-black text-xl text-white focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all placeholder:text-white/20;
+  @apply h-16 px-6 bg-black border-2 border-white/20 rounded-2xl font-black text-xl text-white focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all placeholder:text-white/40;
 }
 
 .no-scrollbar::-webkit-scrollbar {

@@ -84,17 +84,17 @@ export const FarmManagementView = ({
 
     return (
       <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="flex flex-col gap-8 min-h-[80vh]">
-        <div className="flex justify-between items-center bg-white/5 p-8 rounded-[3rem] border border-white/10 backdrop-blur-md">
+        <div className="flex justify-between items-center bg-black p-8 rounded-[3rem] border-2 border-white/10">
           <div className="flex items-center gap-6">
             <button 
               onClick={() => { setSelectedFarmId(null); setIsAdding(false); setEditFarm({}); }}
-              className="w-16 h-16 bg-white/5 text-white/60 rounded-2xl flex items-center justify-center hover:bg-white/10 transition-colors"
+              className="w-16 h-16 bg-white/5 text-white rounded-2xl flex items-center justify-center hover:bg-white/10 transition-colors border-2 border-white/10"
             >
               <ArrowLeft size={32} />
             </button>
             <div>
-              <h2 className="text-3xl font-black tracking-tighter uppercase">{isEditing ? selectedFarm.name : 'Nueva Finca'}</h2>
-              <p className="text-white/20 font-black uppercase text-[10px] tracking-[0.2em] mt-1">Configuración de Activo</p>
+              <h2 className="text-4xl font-black tracking-tighter uppercase text-white">{isEditing ? selectedFarm.name : 'Nueva Finca'}</h2>
+              <p className="text-white/40 font-black uppercase text-[10px] tracking-widest mt-2">Configuración de Activo</p>
             </div>
           </div>
 
@@ -111,67 +111,67 @@ export const FarmManagementView = ({
                   setEditFarm({});
                 }
               }}
-              className="flex items-center gap-3 px-10 py-5 bg-[#3B82F6] text-white rounded-2xl font-black text-xs uppercase tracking-widest hover:scale-105 transition-all shadow-xl shadow-blue-500/20"
+              className="flex items-center gap-3 px-10 py-5 bg-[#3B82F6] text-white rounded-2xl font-black text-xs uppercase tracking-widest hover:scale-105 transition-all shadow-[0_0_20px_rgba(59,130,246,0.4)]"
             >
               <Save size={20} /> Guardar Cambios
             </button>
           )}
         </div>
 
-        <div className="bg-white/5 rounded-[3rem] border border-white/10 p-10 flex flex-col gap-10 backdrop-blur-md">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-            <div className="flex flex-col gap-3">
-              <label className="text-[10px] font-black text-white/20 uppercase tracking-[0.2em]">Nombre de la Finca</label>
+        <div className="bg-black rounded-[3rem] border-2 border-white/10 p-12 flex flex-col gap-12">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
+            <div className="flex flex-col gap-4">
+              <label className="text-[10px] font-black text-white/40 uppercase tracking-widest">Nombre de la Finca</label>
               <input 
                 type="text" 
                 value={farmData.name || ''} 
                 onChange={e => setFarmData({ ...farmData, name: e.target.value })} 
-                className="w-full h-20 px-8 bg-white/5 rounded-3xl border border-white/10 focus:border-[#3B82F6] focus:ring-4 focus:ring-[#3B82F6]/10 font-black text-xl outline-none transition-all text-white placeholder:text-white/10" 
-                placeholder="Ej. Hacienda El Sol"
+                className="industrial-input w-full h-20 px-8 bg-black rounded-2xl border-2 border-white/20 focus:border-[#3B82F6] font-black text-2xl outline-none transition-all text-white placeholder:text-white/10 uppercase" 
+                placeholder="EJ. HACIENDA EL SOL"
               />
             </div>
-            <div className="flex flex-col gap-3">
-              <label className="text-[10px] font-black text-white/20 uppercase tracking-[0.2em]">Ubicación GPS</label>
-              <div className="flex gap-3">
+            <div className="flex flex-col gap-4">
+              <label className="text-[10px] font-black text-white/40 uppercase tracking-widest">Ubicación GPS</label>
+              <div className="flex gap-4">
                 <input 
                   type="text" 
                   value={farmData.location || ''} 
                   onChange={e => setFarmData({ ...farmData, location: e.target.value })} 
-                  className="flex-1 h-20 px-8 bg-white/5 rounded-3xl border border-white/10 focus:border-[#3B82F6] focus:ring-4 focus:ring-[#3B82F6]/10 font-black text-xl outline-none transition-all text-white placeholder:text-white/10" 
-                  placeholder="Coordenadas o Dirección"
+                  className="industrial-input flex-1 h-20 px-8 bg-black rounded-2xl border-2 border-white/20 focus:border-[#3B82F6] font-black text-2xl outline-none transition-all text-white placeholder:text-white/10 uppercase" 
+                  placeholder="COORDENADAS O DIRECCIÓN"
                 />
-                <button onClick={handleGetLocation} className="w-20 h-20 bg-white/5 rounded-3xl border border-white/10 hover:bg-white/10 transition-colors flex items-center justify-center text-[#3B82F6]">
+                <button onClick={handleGetLocation} className="w-20 h-20 bg-white/5 rounded-2xl border-2 border-white/10 hover:bg-white/10 transition-colors flex items-center justify-center text-[#3B82F6]">
                   <MapPin size={32} />
                 </button>
               </div>
             </div>
-            <div className="flex flex-col gap-3">
-              <label className="text-[10px] font-black text-white/20 uppercase tracking-[0.2em]">Administrador Responsable</label>
+            <div className="flex flex-col gap-4">
+              <label className="text-[10px] font-black text-white/40 uppercase tracking-widest">Administrador Responsable</label>
               <select 
                 value={farmData.adminId || ''} 
                 onChange={e => setFarmData({ ...farmData, adminId: e.target.value })} 
-                className="w-full h-20 px-8 bg-white/5 rounded-3xl border border-white/10 focus:border-[#3B82F6] focus:ring-4 focus:ring-[#3B82F6]/10 font-black text-xl outline-none transition-all text-white appearance-none"
+                className="industrial-input w-full h-20 px-8 bg-black rounded-2xl border-2 border-white/20 focus:border-[#3B82F6] font-black text-xl outline-none transition-all text-white appearance-none uppercase"
               >
-                <option value="" className="bg-zinc-900">Seleccione un administrador</option>
+                <option value="" className="bg-black">SELECCIONE UN ADMINISTRADOR</option>
                 {contacts.filter(c => c.role === 'Administrador').map(c => (
-                  <option key={c.id} value={c.id} className="bg-zinc-900">{c.name}</option>
+                  <option key={c.id} value={c.id} className="bg-black uppercase">{c.name}</option>
                 ))}
               </select>
             </div>
-            <div className="flex flex-col gap-3">
-              <label className="text-[10px] font-black text-white/20 uppercase tracking-[0.2em]">Superficie Total (Ha)</label>
+            <div className="flex flex-col gap-4">
+              <label className="text-[10px] font-black text-white/40 uppercase tracking-widest">Superficie Total (Ha)</label>
               <input 
                 type="number" 
                 value={farmData.totalHectares || ''} 
                 onChange={e => setFarmData({ ...farmData, totalHectares: parseFloat(e.target.value) || 0 })} 
-                className="w-full h-20 px-8 bg-white/5 rounded-3xl border border-white/10 focus:border-[#3B82F6] focus:ring-4 focus:ring-[#3B82F6]/10 font-black text-xl outline-none transition-all text-white placeholder:text-white/10" 
+                className="industrial-input w-full h-20 px-8 bg-black rounded-2xl border-2 border-white/20 focus:border-[#3B82F6] font-black text-2xl outline-none transition-all text-white placeholder:text-white/10 uppercase" 
                 placeholder="0.00"
               />
             </div>
           </div>
 
           {isEditing && (
-            <div className="flex justify-start mt-10 pt-10 border-t border-white/5">
+            <div className="flex justify-start mt-10 pt-10 border-t-2 border-white/10">
               <button 
                 onClick={() => {
                   if (confirm('¿Está seguro de eliminar esta finca?')) {
@@ -179,7 +179,7 @@ export const FarmManagementView = ({
                     setSelectedFarmId(null);
                   }
                 }}
-                className="px-10 py-5 bg-red-500/10 text-red-500 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-red-500 hover:text-white transition-all"
+                className="px-10 py-5 bg-red-500/10 text-red-500 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-red-500 hover:text-white transition-all border-2 border-red-500/20 hover:border-red-500"
               >
                 Eliminar Activo
               </button>
@@ -192,18 +192,18 @@ export const FarmManagementView = ({
 
   return (
     <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="flex flex-col gap-8">
-      <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-8 bg-zinc-900 p-10 rounded-[3rem] border border-white/5">
+      <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-8 bg-black p-10 rounded-[3rem] border-2 border-white/10">
         <div className="flex items-center gap-8">
-          <div className="w-20 h-20 bg-[#10B981] text-black rounded-3xl flex items-center justify-center shadow-2xl shadow-[#10B981]/20">
+          <div className="w-20 h-20 bg-[#10B981] text-black rounded-3xl flex items-center justify-center shadow-[0_0_30px_rgba(16,185,129,0.3)]">
             <Home size={40} />
           </div>
           <div>
-            <h2 className="text-4xl font-black tracking-tighter uppercase leading-none">Gestión de Fincas</h2>
+            <h2 className="text-4xl font-black tracking-tighter uppercase leading-none text-white">Gestión de Fincas</h2>
             <div className="flex items-center gap-3 mt-3">
-              <span className="px-3 py-1 bg-white/5 rounded-lg text-[10px] font-black uppercase tracking-widest text-white/40">
+              <span className="px-3 py-1 bg-white/10 rounded-lg text-[10px] font-black uppercase tracking-widest text-white/60">
                 Página {currentPage} de {totalPages}
               </span>
-              <span className="w-1.5 h-1.5 bg-white/10 rounded-full" />
+              <span className="w-1.5 h-1.5 bg-white/20 rounded-full" />
               <span className="text-[10px] font-black uppercase tracking-widest text-[#10B981]">
                 {filteredFarms.length} Activos Registrados
               </span>
@@ -213,34 +213,34 @@ export const FarmManagementView = ({
         
         <div className="flex flex-col sm:flex-row items-center gap-4 w-full lg:w-auto">
           <div className="relative w-full sm:w-80">
-            <Search className="absolute left-6 top-1/2 -translate-y-1/2 text-white/20" size={24} />
+            <Search className="absolute left-6 top-1/2 -translate-y-1/2 text-white/40" size={24} />
             <input 
               type="text" 
               placeholder="BUSCAR FINCA..." 
               value={searchTerm}
               onChange={(e) => { setSearchTerm(e.target.value); setCurrentPage(1); }}
-              className="w-full h-16 pl-16 pr-6 bg-white/5 rounded-2xl border border-white/10 focus:border-[#10B981] font-black text-sm uppercase tracking-widest outline-none transition-all text-white"
+              className="industrial-input w-full h-16 pl-16 pr-6 bg-black rounded-2xl border-2 border-white/20 focus:border-[#10B981] font-black text-sm uppercase tracking-widest outline-none transition-all text-white placeholder:text-white/20"
             />
           </div>
           <div className="flex gap-3">
             <button 
               onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
               disabled={currentPage === 1}
-              className="w-16 h-16 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center disabled:opacity-10 hover:bg-white/10 transition-colors"
+              className="w-16 h-16 rounded-2xl bg-white/5 border-2 border-white/10 flex items-center justify-center disabled:opacity-10 hover:bg-white/10 transition-colors text-white"
             >
               <ChevronLeft size={28} />
             </button>
             <button 
               onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
               disabled={currentPage === totalPages}
-              className="w-16 h-16 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center disabled:opacity-10 hover:bg-white/10 transition-colors"
+              className="w-16 h-16 rounded-2xl bg-white/5 border-2 border-white/10 flex items-center justify-center disabled:opacity-10 hover:bg-white/10 transition-colors text-white"
             >
               <ChevronRight size={28} />
             </button>
           </div>
           <button
             onClick={() => setIsAdding(true)}
-            className="w-full sm:w-auto flex items-center justify-center gap-3 h-16 px-10 bg-[#10B981] text-black rounded-2xl font-black text-xs uppercase tracking-widest hover:scale-105 active:scale-95 transition-all shadow-xl shadow-[#10B981]/20"
+            className="w-full sm:w-auto flex items-center justify-center gap-3 h-16 px-10 bg-[#10B981] text-black rounded-2xl font-black text-xs uppercase tracking-widest hover:scale-105 active:scale-95 transition-all shadow-[0_0_20px_rgba(16,185,129,0.4)]"
           >
             <Plus size={24} /> Nueva Finca
           </button>
@@ -249,8 +249,8 @@ export const FarmManagementView = ({
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         {paginatedFarms.length === 0 ? (
-          <div className="col-span-full text-center py-32 bg-zinc-900 rounded-[3rem] border border-white/5 border-dashed">
-            <p className="text-white/20 font-black uppercase tracking-[0.3em]">No se encontraron activos</p>
+          <div className="col-span-full text-center py-32 bg-black rounded-[3rem] border-2 border-white/10 border-dashed">
+            <p className="text-white/40 font-black uppercase tracking-[0.3em]">No se encontraron activos</p>
           </div>
         ) : (
           paginatedFarms.map(farm => {
@@ -259,7 +259,7 @@ export const FarmManagementView = ({
               <button
                 key={farm.id}
                 onClick={() => setSelectedFarmId(farm.id)}
-                className="p-10 rounded-[3rem] text-left transition-all flex flex-col gap-6 bg-[#10B981] text-black hover:-translate-y-2 active:scale-95 shadow-2xl shadow-[#10B981]/10 group relative overflow-hidden h-[320px]"
+                className="p-10 rounded-[3rem] text-left transition-all flex flex-col gap-6 bg-[#10B981] text-black hover:-translate-y-2 active:scale-95 shadow-[0_0_30px_rgba(16,185,129,0.2)] group relative overflow-hidden h-[320px]"
               >
                 <div className="absolute top-0 right-0 p-10 opacity-10 group-hover:scale-110 transition-transform">
                   <Home size={120} />
@@ -281,7 +281,7 @@ export const FarmManagementView = ({
                       <MapPin size={12} /> {farm.location}
                     </div>
                     <div className="px-3 py-1.5 bg-black/5 rounded-lg text-[10px] font-black uppercase tracking-widest flex items-center gap-2">
-                      <User size={12} /> {admin?.name || 'Sin asignar'}
+                      <User size={12} /> {admin?.name || 'SIN ASIGNAR'}
                     </div>
                   </div>
                 </div>

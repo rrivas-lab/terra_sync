@@ -8,7 +8,7 @@ import {
   Plus, Minus, Beaker, ShieldCheck, Clock, ChevronRight, ChevronLeft, Save, Leaf, 
   Map, LayoutGrid, MapPin, Layers, Info, Home, User, Settings, 
   Activity, Trash2, CheckCircle2, XCircle, ListFilter, Briefcase, Factory, Users, Search, Phone, CreditCard,
-  Droplets, Sprout, Truck, Box, Sun, Moon, FlaskConical, ClipboardCheck, ArrowLeft
+  Droplets, Sprout, Truck, Box, Sun, Moon, FlaskConical, ClipboardCheck, ArrowLeft, Target, Calendar
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { SiembraControlView } from './components/SiembraControlView';
@@ -28,10 +28,10 @@ import {
 
 const HomeDashboardView = ({ onNavigate }: { onNavigate: (tab: string) => void, key?: React.Key }) => {
   const modules = [
-    { id: 'maestros', label: 'MAESTROS', icon: Briefcase, color: 'bg-zinc-900 text-white', description: 'Configuración base y contactos' },
-    { id: 'campo', label: 'CAMPO', icon: Map, color: 'bg-[#10B981] text-black', description: 'Cura, Siembra y Lotes' },
-    { id: 'planta', label: 'PLANTA', icon: Factory, color: 'bg-[#3B82F6] text-white', description: 'Recepción y Despacho' },
-    { id: 'calidad', label: 'CALIDAD', icon: ShieldCheck, color: 'bg-[#F59E0B] text-black', description: 'Microbiología y Barriles' },
+    { id: 'maestros', label: 'MAESTROS', icon: Briefcase, color: 'bg-black text-white border-2 border-white/10', description: 'Configuración base y contactos' },
+    { id: 'campo', label: 'CAMPO', icon: Map, color: 'bg-[#10B981] text-black shadow-[0_0_30px_rgba(16,185,129,0.3)]', description: 'Cura, Siembra y Lotes' },
+    { id: 'planta', label: 'PLANTA', icon: Factory, color: 'bg-[#3B82F6] text-white shadow-[0_0_30px_rgba(59,130,246,0.3)]', description: 'Recepción y Despacho' },
+    { id: 'calidad', label: 'CALIDAD', icon: ShieldCheck, color: 'bg-[#F59E0B] text-black shadow-[0_0_30px_rgba(245,158,11,0.3)]', description: 'Microbiología y Barriles' },
   ];
 
   return (
@@ -44,7 +44,7 @@ const HomeDashboardView = ({ onNavigate }: { onNavigate: (tab: string) => void, 
         <button
           key={m.id}
           onClick={() => onNavigate(m.id)}
-          className={`${m.color} rounded-[3rem] shadow-2xl p-10 flex flex-col justify-between text-left transition-all hover:-translate-y-2 hover:shadow-white/5 group relative overflow-hidden h-[400px]`}
+          className={`${m.color} rounded-[3rem] p-10 flex flex-col justify-between text-left transition-all hover:-translate-y-2 group relative overflow-hidden h-[400px]`}
         >
           <div className="absolute top-0 right-0 p-8 opacity-10 group-hover:scale-110 transition-transform">
             <m.icon size={200} />
@@ -113,107 +113,109 @@ const ContactManagementView = ({
   };
 
   return (
-    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex flex-col gap-8">
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 bg-white p-8 rounded-[3rem] shadow-xl shadow-black/5 border border-black/5">
+    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex flex-col gap-10">
+      <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-8 bg-black p-10 rounded-[2rem] border-2 border-white/20 shadow-[0_0_30px_rgba(255,255,255,0.05)]">
         <div className="flex items-center gap-6">
-          <div className="w-16 h-16 bg-blue-100 text-[#0052CC] rounded-2xl flex items-center justify-center shadow-inner">
-            <Users size={32} />
+          <div className="w-20 h-20 bg-[#3B82F6] text-black rounded-3xl flex items-center justify-center shadow-[0_0_20px_rgba(59,130,246,0.4)]">
+            <Users size={40} />
           </div>
           <div>
-            <h2 className="text-3xl font-black tracking-tight uppercase">Maestro de Contactos</h2>
-            <p className="text-black/40 font-black uppercase text-[10px] tracking-widest mt-1">Gestión de Personal y Proveedores</p>
+            <h2 className="text-4xl font-black tracking-tighter uppercase leading-none text-white">Maestro de Contactos</h2>
+            <p className="text-white/40 font-black uppercase text-[10px] tracking-widest mt-3">Gestión de Personal y Proveedores</p>
           </div>
         </div>
         <button 
           onClick={() => openModal()}
-          className="w-full md:w-auto flex items-center justify-center gap-3 px-10 py-5 bg-[#0052CC] text-white rounded-2xl font-black shadow-xl shadow-blue-200 hover:scale-[1.02] active:scale-[0.98] transition-all uppercase text-xs tracking-widest"
+          className="w-full lg:w-auto flex items-center justify-center gap-3 h-16 px-10 bg-[#3B82F6] text-white rounded-2xl font-black uppercase tracking-widest text-xs shadow-[0_0_20px_rgba(59,130,246,0.4)] hover:scale-105 active:scale-95 transition-all whitespace-nowrap border-2 border-white/20"
         >
-          <Plus size={20} /> Nuevo Contacto
+          <Plus size={24} /> <span>Nuevo Contacto</span>
         </button>
       </div>
 
-      <div className="bg-white p-6 rounded-[2.5rem] shadow-xl shadow-black/5 border border-black/5">
-        <div className="flex flex-col md:flex-row gap-4 items-center justify-between mb-8">
-          <div className="relative w-full md:w-96">
-            <Search className="absolute left-6 top-1/2 -translate-y-1/2 text-black/20" size={20} />
+      <div className="bg-black p-10 rounded-[2rem] border-2 border-white/20 shadow-[0_0_30px_rgba(255,255,255,0.05)]">
+        <div className="flex flex-col lg:flex-row gap-8 items-center justify-between mb-10">
+          <div className="relative w-full lg:w-96">
+            <Search className="absolute left-6 top-1/2 -translate-y-1/2 text-white/40" size={24} />
             <input
               type="text"
               placeholder="BUSCAR CONTACTO..."
               value={searchTerm}
               onChange={(e) => { setSearchTerm(e.target.value); setCurrentPage(1); }}
-              className="w-full h-14 pl-16 pr-6 bg-black/5 rounded-2xl font-black text-xs tracking-widest outline-none focus:ring-2 focus:ring-[#0052CC] transition-all"
+              className="industrial-input w-full h-16 pl-16 pr-6 bg-black rounded-2xl border-2 border-white/20 focus:border-[#3B82F6] font-black text-white outline-none transition-all uppercase text-xs tracking-widest"
             />
           </div>
           
-          <div className="flex items-center gap-4 bg-black/5 p-2 rounded-2xl">
+          <div className="flex items-center gap-4 bg-white/5 p-2 rounded-2xl border border-white/10">
             <button 
               onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
               disabled={currentPage === 1}
-              className="p-3 hover:bg-white rounded-xl transition-all disabled:opacity-20"
+              className="w-12 h-12 flex items-center justify-center hover:bg-white/10 rounded-xl transition-all disabled:opacity-10 text-white"
             >
-              <ChevronLeft size={20} />
+              <ChevronLeft size={24} />
             </button>
-            <span className="text-[10px] font-black tracking-widest px-4">
+            <span className="text-xs font-black tracking-widest px-4 text-white">
               {currentPage} DE {totalPages || 1}
             </span>
             <button 
               onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
               disabled={currentPage === totalPages || totalPages === 0}
-              className="p-3 hover:bg-white rounded-xl transition-all disabled:opacity-20"
+              className="w-12 h-12 flex items-center justify-center hover:bg-white/10 rounded-xl transition-all disabled:opacity-10 text-white"
             >
-              <ChevronRight size={20} />
+              <ChevronRight size={24} />
             </button>
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
           {paginatedContacts.map(contact => (
             <div 
               key={contact.id} 
-              className="bg-white border border-black/5 rounded-[2rem] p-8 flex flex-col gap-6 hover:shadow-xl hover:shadow-black/5 transition-all group"
+              className="bg-black border-2 border-white/20 rounded-[2rem] p-8 flex flex-col gap-8 hover:border-[#3B82F6] transition-all group shadow-[0_0_30px_rgba(255,255,255,0.02)]"
             >
               <div className="flex justify-between items-start">
-                <div className="w-14 h-14 bg-black/5 rounded-2xl flex items-center justify-center text-black/40 group-hover:bg-blue-50 group-hover:text-[#0052CC] transition-all">
-                  <Users size={24} />
+                <div className="w-16 h-16 bg-white/5 rounded-2xl flex items-center justify-center text-white/40 group-hover:bg-[#3B82F6]/20 group-hover:text-[#3B82F6] transition-all border border-white/10">
+                  <Users size={32} />
                 </div>
-                <div className={`px-3 py-1 rounded-lg text-[10px] font-black tracking-widest ${
-                  contact.role === 'Administrador' ? 'bg-purple-50 text-purple-600' : 
-                  contact.role === 'Operador' ? 'bg-emerald-50 text-[#10B981]' : 'bg-blue-50 text-[#0052CC]'
+                <div className={`px-4 py-2 rounded-xl text-[10px] font-black tracking-widest border ${
+                  contact.role === 'Administrador' ? 'bg-purple-500/10 text-purple-400 border-purple-500/30' : 
+                  contact.role === 'Operador' ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30' : 'bg-blue-500/10 text-blue-400 border-blue-500/30'
                 }`}>
-                  {contact.role}
+                  {contact.role.toUpperCase()}
                 </div>
               </div>
 
               <div>
-                <h3 className="text-xl font-black tracking-tight text-black mb-1">{contact.name}</h3>
-                <p className="text-[10px] font-black text-black/30 uppercase tracking-widest">ID: {contact.externalId}</p>
+                <h3 className="text-2xl font-black tracking-tighter text-white mb-2 uppercase">{contact.name}</h3>
+                <p className="text-[10px] font-black text-white/30 uppercase tracking-widest">ID: {contact.externalId}</p>
               </div>
 
-              <div className="flex flex-col gap-3">
-                <div className="flex items-center gap-3 text-black/60">
-                  <Phone size={16} className="text-[#0052CC]" />
-                  <span className="font-black text-sm">{contact.phone}</span>
+              <div className="flex flex-col gap-4">
+                <div className="flex items-center gap-4 text-white/60">
+                  <div className="w-10 h-10 bg-white/5 rounded-xl flex items-center justify-center text-[#3B82F6]">
+                    <Phone size={20} />
+                  </div>
+                  <span className="font-black text-lg tracking-tight">{contact.phone}</span>
                 </div>
               </div>
 
-              <div className="pt-6 border-t border-black/5 flex justify-between items-center">
+              <div className="pt-8 border-t border-white/10 flex justify-between items-center gap-4">
                 <button 
                   onClick={() => openModal(contact)}
-                  className="px-6 py-3 bg-black/5 hover:bg-black text-black hover:text-white rounded-xl font-black text-[10px] tracking-widest transition-all"
+                  className="flex-1 h-14 bg-white/5 hover:bg-white text-white hover:text-black rounded-xl font-black text-xs tracking-widest transition-all uppercase border border-white/10"
                 >
-                  EDITAR
+                  Editar
                 </button>
                 <button 
                   onClick={() => { if(confirm('¿Eliminar contacto?')) onDeleteContact(contact.id); }}
-                  className="p-3 text-black/10 hover:text-red-500 transition-colors"
+                  className="w-14 h-14 flex items-center justify-center text-white/20 hover:text-red-500 hover:bg-red-500/10 rounded-xl transition-all border border-white/10"
                 >
-                  <Trash2 size={18} />
+                  <Trash2 size={24} />
                 </button>
               </div>
             </div>
           ))}
           {paginatedContacts.length === 0 && (
-            <div className="col-span-full py-20 text-center opacity-20 font-black text-2xl uppercase tracking-widest">
+            <div className="col-span-full py-32 text-center text-white/10 font-black text-4xl uppercase tracking-tighter">
               No se encontraron contactos
             </div>
           )}
@@ -223,61 +225,60 @@ const ContactManagementView = ({
       <AnimatePresence>
         {isModalOpen && (
           <div className="fixed inset-0 z-50 flex items-center justify-center p-6">
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setIsModalOpen(false)} className="absolute inset-0 bg-black/40 backdrop-blur-sm" />
-            <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.9, opacity: 0 }} className="relative bg-white w-full max-w-xl rounded-[3rem] shadow-2xl overflow-hidden">
-              <div className="p-10 border-b border-black/5 flex justify-between items-center">
-                <h3 className="text-3xl font-black tracking-tight uppercase">{editingContact ? 'Editar Contacto' : 'Registrar Contacto'}</h3>
-                <button onClick={() => setIsModalOpen(false)} className="p-4 bg-black/5 rounded-2xl hover:bg-black/10 transition-all">
-                  <Plus className="rotate-45" size={24} />
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setIsModalOpen(false)} className="absolute inset-0 bg-black/80 backdrop-blur-md" />
+            <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.9, opacity: 0 }} className="relative bg-black w-full max-w-2xl rounded-[3rem] border-2 border-white/20 shadow-[0_0_50px_rgba(0,0,0,0.5)] overflow-hidden">
+              <div className="p-10 border-b border-white/10 flex justify-between items-center bg-white/5">
+                <h3 className="text-3xl font-black tracking-tighter uppercase text-white">{editingContact ? 'Editar Contacto' : 'Registrar Contacto'}</h3>
+                <button onClick={() => setIsModalOpen(false)} className="w-14 h-14 flex items-center justify-center bg-white/10 rounded-2xl hover:bg-white/20 transition-all text-white">
+                  <Plus className="rotate-45" size={32} />
                 </button>
               </div>
               
-              <div className="p-10 flex flex-col gap-8">
-                <div className="flex flex-col gap-3">
-                  <span className="text-[10px] font-black text-black/40 uppercase tracking-widest">Nombre Completo</span>
+              <div className="p-10 flex flex-col gap-10">
+                <div className="flex flex-col gap-4">
+                  <span className="text-xs font-black text-white/40 uppercase tracking-widest">Nombre Completo</span>
                   <input 
                     type="text" 
                     value={contactForm.name} 
                     onChange={e => setContactForm(prev => ({ ...prev, name: e.target.value }))} 
-                    className="h-16 px-6 bg-black/5 rounded-2xl font-black text-lg outline-none focus:ring-2 focus:ring-[#0052CC] transition-all" 
+                    className="industrial-input h-20 px-8 bg-black rounded-2xl border-2 border-white/20 focus:border-[#3B82F6] font-black text-2xl text-white outline-none transition-all uppercase" 
                   />
                 </div>
                 
-                <div className="flex flex-col gap-3">
-                  <span className="text-[10px] font-black text-black/40 uppercase tracking-widest">Cargo / Rol</span>
+                <div className="flex flex-col gap-4">
+                  <span className="text-xs font-black text-white/40 uppercase tracking-widest">Cargo / Rol</span>
                   <div className="relative">
                     <select 
                       value={contactForm.role} 
                       onChange={e => setContactForm(prev => ({ ...prev, role: e.target.value as any }))}
-                      className="w-full h-16 px-6 bg-black/5 rounded-2xl font-black text-lg appearance-none outline-none focus:ring-2 focus:ring-[#0052CC] transition-all"
+                      className="industrial-input w-full h-20 px-8 bg-black rounded-2xl border-2 border-white/20 focus:border-[#3B82F6] font-black text-xl text-white outline-none transition-all appearance-none uppercase"
                     >
-                      <option value="Administrador">Administrador</option>
-                      <option value="Operador">Operador</option>
-                      <option value="Proveedor">Proveedor</option>
+                      <option value="Administrador">ADMINISTRADOR</option>
+                      <option value="Operador">OPERADOR</option>
+                      <option value="Agrónomo">AGRÓNOMO</option>
+                      <option value="Logística">LOGÍSTICA</option>
                     </select>
-                    <div className="absolute right-6 top-1/2 -translate-y-1/2 pointer-events-none opacity-40">
-                      <ChevronRight className="rotate-90" size={20} />
-                    </div>
+                    <ChevronRight className="absolute right-8 top-1/2 -translate-y-1/2 rotate-90 text-white/40 pointer-events-none" size={24} />
                   </div>
                 </div>
                 
-                <div className="grid grid-cols-2 gap-6">
-                  <div className="flex flex-col gap-3">
-                    <span className="text-[10px] font-black text-black/40 uppercase tracking-widest">Teléfono</span>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                  <div className="flex flex-col gap-4">
+                    <span className="text-xs font-black text-white/40 uppercase tracking-widest">Teléfono</span>
                     <input 
                       type="text" 
                       value={contactForm.phone} 
                       onChange={e => setContactForm(prev => ({ ...prev, phone: e.target.value }))} 
-                      className="h-16 px-6 bg-black/5 rounded-2xl font-black text-lg outline-none focus:ring-2 focus:ring-[#0052CC] transition-all" 
+                      className="industrial-input h-20 px-8 bg-black rounded-2xl border-2 border-white/20 focus:border-[#3B82F6] font-black text-2xl text-white outline-none transition-all uppercase" 
                     />
                   </div>
-                  <div className="flex flex-col gap-3">
-                    <span className="text-[10px] font-black text-black/40 uppercase tracking-widest">ID / Cédula</span>
+                  <div className="flex flex-col gap-4">
+                    <span className="text-xs font-black text-white/40 uppercase tracking-widest">ID / Cédula</span>
                     <input 
                       type="text" 
                       value={contactForm.externalId} 
                       onChange={e => setContactForm(prev => ({ ...prev, externalId: e.target.value }))} 
-                      className="h-16 px-6 bg-black/5 rounded-2xl font-black text-lg outline-none focus:ring-2 focus:ring-[#0052CC] transition-all" 
+                      className="industrial-input h-20 px-8 bg-black rounded-2xl border-2 border-white/20 focus:border-[#3B82F6] font-black text-2xl text-white outline-none transition-all uppercase" 
                     />
                   </div>
                 </div>
@@ -291,7 +292,7 @@ const ContactManagementView = ({
                     }
                     setIsModalOpen(false); 
                   }}
-                  className="h-20 bg-[#0052CC] text-white font-black rounded-3xl shadow-xl shadow-blue-200 mt-4 text-xl uppercase tracking-widest hover:scale-[1.02] active:scale-[0.98] transition-all"
+                  className="h-20 bg-[#3B82F6] text-white rounded-2xl font-black uppercase tracking-widest text-lg shadow-[0_0_30px_rgba(59,130,246,0.4)] hover:scale-[1.02] active:scale-[0.98] transition-all mt-6 border-2 border-white/20"
                 >
                   {editingContact ? 'Guardar Cambios' : 'Guardar Contacto'}
                 </button>
@@ -305,12 +306,12 @@ const ContactManagementView = ({
 };
 
 const BentoCard = ({ children, title, icon: Icon, className = "", noPadding = false }: { children: React.Key | React.ReactNode, title: string, icon: any, className?: string, noPadding?: boolean, key?: React.Key }) => (
-  <div className={`bg-zinc-900 border border-white/5 rounded-[2.5rem] shadow-2xl flex flex-col ${noPadding ? '' : 'p-10'} gap-8 ${className}`}>
+  <div className={`bg-black border-2 border-[#3B82F6] rounded-[2.5rem] shadow-[0_0_30px_rgba(59,130,246,0.1)] flex flex-col ${noPadding ? '' : 'p-10'} gap-8 ${className}`}>
     <div className={`flex items-center gap-4 ${noPadding ? 'p-10 pb-0' : ''}`}>
-      <div className="p-4 bg-white/5 rounded-2xl text-[#3B82F6]">
-        <Icon size={28} />
+      <div className="p-4 bg-[#3B82F6]/10 rounded-2xl text-[#3B82F6]">
+        <Icon size={32} />
       </div>
-      <h3 className="text-2xl font-black tracking-tighter uppercase text-white">{title}</h3>
+      <h3 className="text-3xl font-black tracking-tighter uppercase text-white">{title}</h3>
     </div>
     <div className="flex-1">
       {children}
@@ -363,25 +364,25 @@ const Stepper = ({
   const decrement = () => onChange(Math.max(min, Number((value - step).toFixed(2))));
 
   return (
-    <div className="flex flex-col gap-3 w-full">
+    <div className="flex flex-col gap-4 w-full">
       <div className="flex justify-between items-end">
-        <span className="text-sm font-medium text-black/50 uppercase tracking-wider">{label}</span>
-        <span className="text-2xl font-bold text-[#0052CC]">
-          {value} <span className="text-sm font-normal text-black/30">{unit}</span>
+        <span className="text-xs font-black text-white uppercase tracking-widest">{label}</span>
+        <span className="text-3xl font-black text-[#3B82F6]">
+          {value} <span className="text-sm font-normal text-white">{unit}</span>
         </span>
       </div>
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-3">
         <button 
           onClick={decrement}
-          className="flex-1 h-16 bg-black/5 active:bg-black/10 rounded-2xl flex items-center justify-center transition-colors"
+          className="flex-1 h-20 bg-black border-2 border-white/20 active:bg-white/10 rounded-2xl flex items-center justify-center transition-colors"
         >
-          <Minus size={28} />
+          <Minus size={32} className="text-white" />
         </button>
         <button 
           onClick={increment}
-          className="flex-1 h-16 bg-[#0052CC] active:bg-[#0041a3] text-white rounded-2xl flex items-center justify-center transition-colors shadow-lg shadow-blue-200"
+          className="flex-1 h-20 bg-[#3B82F6] active:bg-[#2563EB] text-white rounded-2xl flex items-center justify-center transition-colors shadow-[0_0_20px_rgba(59,130,246,0.3)]"
         >
-          <Plus size={28} />
+          <Plus size={32} />
         </button>
       </div>
     </div>
@@ -426,12 +427,12 @@ const PrecisionSlider = ({
 
 const StatusBadge = ({ status }: { status: LotStatus }) => {
   const styles = {
-    'PREPARACIÓN': 'bg-amber-100 text-amber-700 border-amber-200',
-    'SEMBRADO': 'bg-emerald-100 text-emerald-700 border-emerald-200',
-    'VACÍO': 'bg-slate-100 text-slate-700 border-slate-200'
+    'PREPARACIÓN': 'bg-amber-500/10 text-amber-400 border-amber-500/30',
+    'SEMBRADO': 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30',
+    'VACÍO': 'bg-slate-500/10 text-slate-400 border-slate-500/30'
   };
   return (
-    <span className={`px-3 py-1 rounded-full text-[10px] font-black tracking-widest border ${styles[status]}`}>
+    <span className={`px-4 py-1.5 rounded-xl text-[10px] font-black tracking-widest border uppercase ${styles[status]}`}>
       {status}
     </span>
   );
@@ -510,14 +511,14 @@ const CropMasterView = ({
           <button
             key={crop.id}
             onClick={() => setSelectedCropId(crop.id)}
-            className={`flex items-center gap-4 px-10 py-6 rounded-[2rem] border transition-all whitespace-nowrap ${
+            className={`flex items-center gap-6 px-10 py-8 rounded-[2.5rem] border-2 transition-all whitespace-nowrap ${
               selectedCropId === crop.id 
-                ? 'bg-[#3B82F6] border-transparent shadow-2xl shadow-blue-500/20 text-white scale-105' 
-                : 'bg-white/5 border-white/10 text-white/40 hover:border-white/20'
+                ? 'bg-[#3B82F6] border-white/20 shadow-[0_0_30px_rgba(59,130,246,0.4)] text-white scale-105' 
+                : 'bg-black border-white/10 text-white/40 hover:border-white/40 hover:text-white'
             }`}
           >
-            <span className="text-4xl">{crop.icon}</span>
-            <span className="font-black text-2xl tracking-tighter uppercase">{crop.name}</span>
+            <span className="text-5xl">{crop.icon}</span>
+            <span className="font-black text-3xl tracking-tighter uppercase">{crop.name}</span>
           </button>
         ))}
       </div>
@@ -525,46 +526,51 @@ const CropMasterView = ({
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
         {/* Physical-Chemical Section */}
         <div className="lg:col-span-12 flex flex-col gap-8">
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 px-4 bg-white/5 p-8 rounded-[3rem] border border-white/10 backdrop-blur-md">
-            <div>
-              <h3 className="text-4xl font-black tracking-tighter uppercase leading-none">Constructor de Análisis</h3>
-              <p className="text-white/20 font-black uppercase text-[10px] tracking-widest mt-3">Define los parámetros dinámicos para el control de calidad.</p>
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-8 bg-black p-10 rounded-[2.5rem] border-2 border-white/20 shadow-[0_0_30px_rgba(255,255,255,0.05)]">
+            <div className="flex items-center gap-6">
+              <div className="w-20 h-20 bg-[#3B82F6] text-black rounded-3xl flex items-center justify-center shadow-[0_0_20px_rgba(59,130,246,0.4)]">
+                <Target size={40} />
+              </div>
+              <div>
+                <h3 className="text-4xl font-black tracking-tighter uppercase leading-none text-white">Constructor de Análisis</h3>
+                <p className="text-white/40 font-black uppercase text-[10px] tracking-widest mt-3">Define los parámetros dinámicos para el control de calidad.</p>
+              </div>
             </div>
             <button 
               onClick={() => setIsAddingParam(true)}
-              className="flex items-center gap-3 px-10 py-5 bg-[#3B82F6] text-white rounded-2xl font-black text-xs uppercase tracking-widest hover:scale-105 transition-all shadow-2xl shadow-blue-500/20"
+              className="h-20 px-12 bg-[#3B82F6] text-white rounded-2xl font-black text-lg uppercase tracking-widest hover:scale-105 transition-all shadow-[0_0_30px_rgba(59,130,246,0.4)] border-2 border-white/20 flex items-center gap-4"
             >
-              <Plus size={20} /> Agregar Parámetro
+              <Plus size={28} /> AGREGAR PARÁMETRO
             </button>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-10">
             {currentCrop.parameters.map(param => (
               <div 
                 key={param.id} 
-                className="relative group p-8 bg-white/5 rounded-[3rem] border border-white/10 backdrop-blur-md hover:bg-white/[0.07] transition-all"
+                className="relative group p-10 bg-black rounded-[2.5rem] border-2 border-white/10 hover:border-[#3B82F6] transition-all shadow-[0_0_30px_rgba(255,255,255,0.02)]"
               >
                 <button 
                   onClick={() => removeParameter(param.id)}
-                  className="absolute top-8 right-8 p-3 text-white/10 hover:text-red-500 transition-colors bg-white/5 rounded-xl border border-white/10"
+                  className="absolute top-10 right-10 w-12 h-12 flex items-center justify-center text-white/20 hover:text-red-500 transition-colors bg-white/5 rounded-2xl border border-white/10"
                 >
-                  <Trash2 size={20} />
+                  <Trash2 size={24} />
                 </button>
                 
-                <div className="flex flex-col gap-8">
-                  <div className="flex items-center gap-4">
-                    <div className={`p-4 rounded-2xl ${param.category === 'FISICO_QUIMICO' ? 'bg-blue-500/10 text-[#3B82F6]' : 'bg-purple-500/10 text-purple-400'}`}>
-                      {param.category === 'FISICO_QUIMICO' ? <Beaker size={32} /> : <ShieldCheck size={32} />}
+                <div className="flex flex-col gap-10">
+                  <div className="flex items-center gap-6">
+                    <div className={`w-20 h-20 rounded-3xl flex items-center justify-center ${param.category === 'FISICO_QUIMICO' ? 'bg-[#3B82F6]/10 text-[#3B82F6]' : 'bg-emerald-500/10 text-emerald-400'}`}>
+                      {param.category === 'FISICO_QUIMICO' ? <Beaker size={40} /> : <ShieldCheck size={40} />}
                     </div>
                     <div>
-                      <h4 className="text-2xl font-black tracking-tight uppercase text-white">{param.name}</h4>
-                      <div className="flex items-center gap-2 mt-1">
-                        <span className={`px-2 py-0.5 rounded text-[8px] font-black tracking-widest uppercase ${
-                          param.category === 'FISICO_QUIMICO' ? 'bg-blue-500/10 text-[#3B82F6]' : 'bg-purple-500/10 text-purple-400'
+                      <h4 className="text-3xl font-black tracking-tighter uppercase text-white leading-tight">{param.name}</h4>
+                      <div className="flex items-center gap-3 mt-2">
+                        <span className={`px-3 py-1 rounded-lg text-[10px] font-black tracking-widest uppercase border ${
+                          param.category === 'FISICO_QUIMICO' ? 'bg-[#3B82F6]/5 text-[#3B82F6] border-[#3B82F6]/20' : 'bg-emerald-500/5 text-emerald-400 border-emerald-500/20'
                         }`}>
                           {param.category.replace('_', ' ')}
                         </span>
-                        <span className="px-2 py-0.5 rounded text-[8px] font-black tracking-widest uppercase bg-white/5 text-white/20">
+                        <span className="px-3 py-1 rounded-lg text-[10px] font-black tracking-widest uppercase bg-white/5 text-white/40 border border-white/10">
                           {param.type}
                         </span>
                       </div>
@@ -572,32 +578,44 @@ const CropMasterView = ({
                   </div>
 
                   {param.type === 'NUMERIC' && (
-                    <div className="flex flex-col gap-6">
-                      <div className="flex justify-between text-[10px] font-black text-white/20 uppercase tracking-widest">
-                        <span>Rango de Aceptación</span>
-                        <span className="text-[#3B82F6]">{param.unit}</span>
+                    <div className="flex flex-col gap-6 pt-8 border-t border-white/10">
+                      <div className="flex justify-between items-center">
+                        <span className="text-xs font-black text-white/40 uppercase tracking-widest">Rango de Aceptación</span>
+                        <span className="text-xl font-black text-[#3B82F6] uppercase">{param.unit}</span>
                       </div>
-                      <div className="flex items-center gap-6 bg-white/5 p-6 rounded-3xl border border-white/5">
+                      <div className="flex items-center gap-8 bg-white/5 p-8 rounded-3xl border-2 border-white/5">
                         <div className="flex-1 text-center">
-                          <span className="text-[10px] block text-white/10 font-black uppercase tracking-widest mb-1">MIN</span>
-                          <span className="text-2xl font-black text-white">{param.min}</span>
+                          <span className="text-[10px] block text-white/20 font-black uppercase tracking-widest mb-2">MÍNIMO</span>
+                          <span className="text-4xl font-black text-white">{param.min}</span>
                         </div>
-                        <div className="w-px h-10 bg-white/10" />
+                        <div className="w-px h-16 bg-white/10" />
                         <div className="flex-1 text-center">
-                          <span className="text-[10px] block text-white/10 font-black uppercase tracking-widest mb-1">MAX</span>
-                          <span className="text-2xl font-black text-white">{param.max}</span>
+                          <span className="text-[10px] block text-white/20 font-black uppercase tracking-widest mb-2">MÁXIMO</span>
+                          <span className="text-4xl font-black text-white">{param.max}</span>
                         </div>
                       </div>
                     </div>
                   )}
 
                   {param.type === 'SELECTION' && (
-                    <div className="flex flex-wrap gap-3">
-                      {param.options?.map((opt, idx) => (
-                        <span key={idx} className="px-4 py-2 bg-white/5 rounded-xl text-xs font-black text-white/60 border border-white/5">
-                          {opt}
-                        </span>
-                      ))}
+                    <div className="flex flex-col gap-6 pt-8 border-t border-white/10">
+                      <span className="text-xs font-black text-white/40 uppercase tracking-widest">Opciones de Selección</span>
+                      <div className="flex flex-wrap gap-3">
+                        {param.options?.map((opt, idx) => (
+                          <span key={idx} className="px-5 py-3 bg-white/5 rounded-2xl text-sm font-black text-white border-2 border-white/10 uppercase tracking-tight">
+                            {opt}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {param.type === 'BOOLEAN' && (
+                    <div className="flex flex-col gap-6 pt-8 border-t border-white/10">
+                      <span className="text-xs font-black text-white/40 uppercase tracking-widest">Estado Óptimo</span>
+                      <div className="h-20 bg-emerald-500/10 border-2 border-emerald-500/20 rounded-2xl flex items-center justify-center">
+                        <span className="text-2xl font-black text-emerald-400 uppercase tracking-widest">SÍ (ACTIVO)</span>
+                      </div>
                     </div>
                   )}
                 </div>
@@ -614,41 +632,41 @@ const CropMasterView = ({
             <motion.div 
               initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
               onClick={() => setIsAddingParam(false)}
-              className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+              className="absolute inset-0 bg-black/80 backdrop-blur-md"
             />
             <motion.div 
               initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.9, opacity: 0 }}
-              className="relative bg-zinc-900 w-full max-w-3xl rounded-[3rem] shadow-2xl overflow-hidden border border-white/10"
+              className="relative bg-black w-full max-w-3xl rounded-[3rem] shadow-[0_0_50px_rgba(0,0,0,0.5)] overflow-hidden border-2 border-white/20"
             >
-              <div className="p-10 border-b border-white/5 flex justify-between items-center">
+              <div className="p-10 border-b border-white/10 flex justify-between items-center bg-white/5">
                 <div>
-                  <h3 className="text-3xl font-black tracking-tight uppercase text-white">Nuevo Parámetro</h3>
-                  <p className="text-white/20 font-black uppercase text-[10px] tracking-widest mt-1">Configuración técnica del análisis</p>
+                  <h3 className="text-4xl font-black tracking-tighter uppercase text-white">Nuevo Parámetro</h3>
+                  <p className="text-white/40 font-black uppercase text-[10px] tracking-widest mt-2">Configuración técnica del análisis</p>
                 </div>
-                <button onClick={() => setIsAddingParam(false)} className="w-14 h-14 bg-white/5 text-white/40 rounded-2xl flex items-center justify-center hover:bg-white/10 transition-all border border-white/10">
-                  <Plus className="rotate-45" size={24} />
+                <button onClick={() => setIsAddingParam(false)} className="w-16 h-16 bg-white/10 text-white rounded-2xl flex items-center justify-center hover:bg-white/20 transition-all border border-white/10">
+                  <Plus className="rotate-45" size={32} />
                 </button>
               </div>
-              <div className="p-10 flex flex-col gap-10">
-                <div className="grid grid-cols-2 gap-8">
-                  <div className="flex flex-col gap-2">
-                    <span className="text-[10px] font-black text-white/20 uppercase tracking-widest">Nombre del Análisis</span>
+              <div className="p-10 flex flex-col gap-10 max-h-[70vh] overflow-y-auto custom-scrollbar">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+                  <div className="flex flex-col gap-4">
+                    <span className="text-xs font-black text-white/40 uppercase tracking-widest">Nombre del Análisis</span>
                     <input 
                       type="text" 
-                      placeholder="Ej: Grados Brix"
+                      placeholder="EJ: GRADOS BRIX"
                       value={newParam.name}
                       onChange={e => setNewParam(prev => ({ ...prev, name: e.target.value }))}
-                      className="h-16 px-6 bg-white/5 rounded-2xl font-black focus:outline-none focus:ring-2 focus:ring-[#3B82F6] text-white border border-white/10"
+                      className="industrial-input h-20 px-8 bg-black rounded-2xl border-2 border-white/20 focus:border-[#3B82F6] font-black text-2xl text-white outline-none transition-all uppercase placeholder:text-white/10"
                     />
                   </div>
-                  <div className="flex flex-col gap-2">
-                    <span className="text-[10px] font-black text-white/20 uppercase tracking-widest">Categoría</span>
-                    <div className="flex bg-white/5 p-1 rounded-2xl h-16 border border-white/10">
+                  <div className="flex flex-col gap-4">
+                    <span className="text-xs font-black text-white/40 uppercase tracking-widest">Categoría</span>
+                    <div className="flex bg-white/5 p-2 rounded-2xl h-20 border-2 border-white/10">
                       {(['FISICO_QUIMICO', 'MICROBIOLOGICO'] as ParameterCategory[]).map(c => (
                         <button
                           key={c}
                           onClick={() => setNewParam(prev => ({ ...prev, category: c }))}
-                          className={`flex-1 rounded-xl font-black text-[10px] transition-all ${newParam.category === c ? 'bg-[#3B82F6] text-white shadow-lg shadow-blue-500/20' : 'text-white/20 hover:bg-white/5'}`}
+                          className={`flex-1 rounded-xl font-black text-xs uppercase tracking-widest transition-all ${newParam.category === c ? 'bg-[#3B82F6] text-white shadow-[0_0_20px_rgba(59,130,246,0.4)]' : 'text-white/20 hover:bg-white/5'}`}
                         >
                           {c.replace('_', ' ')}
                         </button>
@@ -657,29 +675,29 @@ const CropMasterView = ({
                   </div>
                 </div>
 
-                <div className="grid grid-cols-2 gap-8">
-                  <div className="flex flex-col gap-2">
-                    <span className="text-[10px] font-black text-white/20 uppercase tracking-widest">Tipo de Valor</span>
-                    <div className="grid grid-cols-3 gap-2">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+                  <div className="flex flex-col gap-4">
+                    <span className="text-xs font-black text-white/40 uppercase tracking-widest">Tipo de Valor</span>
+                    <div className="grid grid-cols-3 gap-3">
                       {(['NUMERIC', 'BOOLEAN', 'SELECTION'] as ParameterType[]).map(t => (
                         <button
                           key={t}
                           onClick={() => setNewParam(prev => ({ ...prev, type: t }))}
-                          className={`h-12 rounded-xl font-black text-[10px] border transition-all ${newParam.type === t ? 'bg-[#3B82F6] text-white border-transparent shadow-lg shadow-blue-500/20' : 'bg-white/5 text-white/20 border-white/10 hover:bg-white/10'}`}
+                          className={`h-16 rounded-xl font-black text-[10px] uppercase tracking-widest border-2 transition-all ${newParam.type === t ? 'bg-[#3B82F6] text-white border-white/20 shadow-[0_0_20px_rgba(59,130,246,0.4)]' : 'bg-black text-white/20 border-white/10 hover:border-white/40'}`}
                         >
                           {t}
                         </button>
                       ))}
                     </div>
                   </div>
-                  <div className="flex flex-col gap-2">
-                    <span className="text-[10px] font-black text-white/20 uppercase tracking-widest">Unidad de Medida</span>
-                    <div className="flex gap-2 overflow-x-auto no-scrollbar pb-2">
+                  <div className="flex flex-col gap-4">
+                    <span className="text-xs font-black text-white/40 uppercase tracking-widest">Unidad de Medida</span>
+                    <div className="flex gap-3 overflow-x-auto no-scrollbar pb-2">
                       {UNITS_MASTER.map(u => (
                         <button
                           key={u}
                           onClick={() => setNewParam(prev => ({ ...prev, unit: u }))}
-                          className={`h-12 px-4 rounded-xl font-black text-[10px] border transition-all whitespace-nowrap ${newParam.unit === u ? 'bg-[#3B82F6] text-white border-transparent shadow-lg shadow-blue-500/20' : 'bg-white/5 text-white/20 border-white/10 hover:bg-white/10'}`}
+                          className={`h-16 px-6 rounded-xl font-black text-xs border-2 transition-all whitespace-nowrap ${newParam.unit === u ? 'bg-[#3B82F6] text-white border-white/20 shadow-[0_0_20px_rgba(59,130,246,0.4)]' : 'bg-black text-white/20 border-white/10 hover:border-white/40'}`}
                         >
                           {u}
                         </button>
@@ -689,7 +707,7 @@ const CropMasterView = ({
                 </div>
 
                 {newParam.type === 'NUMERIC' && (
-                  <div className="grid grid-cols-2 gap-10 bg-white/5 p-8 rounded-[2rem] border border-white/10">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-10 bg-white/5 p-10 rounded-[2.5rem] border-2 border-white/10">
                     <Stepper 
                       label="Mínimo Permitido" 
                       value={newParam.min || 0} 
@@ -706,20 +724,20 @@ const CropMasterView = ({
                 )}
 
                 {newParam.type === 'BOOLEAN' && (
-                  <div className="flex flex-col gap-4 bg-white/5 p-8 rounded-[2rem] border border-white/10">
-                    <span className="text-xs font-bold text-white/20 uppercase tracking-widest">Lógica de Calidad (Boolean)</span>
-                    <div className="flex items-center justify-between bg-white/5 p-6 rounded-2xl border border-white/10">
-                      <span className="font-bold text-white">Estado 'ACTIVO' significa:</span>
-                      <div className="flex bg-black/40 p-1 rounded-xl">
+                  <div className="flex flex-col gap-6 bg-white/5 p-10 rounded-[2.5rem] border-2 border-white/10">
+                    <span className="text-xs font-black text-white/40 uppercase tracking-widest">Lógica de Calidad (Boolean)</span>
+                    <div className="flex flex-col md:flex-row items-center justify-between bg-black p-8 rounded-2xl border-2 border-white/10 gap-6">
+                      <span className="font-black text-xl text-white uppercase tracking-tight">Estado 'ACTIVO' significa:</span>
+                      <div className="flex bg-white/5 p-2 rounded-2xl w-full md:w-auto">
                         <button 
                           onClick={() => setNewParam(prev => ({ ...prev, booleanOptimalState: true }))}
-                          className={`px-4 py-2 rounded-lg font-bold text-xs transition-all ${newParam.booleanOptimalState !== false ? 'bg-emerald-500 text-white shadow-lg' : 'text-white/20'}`}
+                          className={`flex-1 md:px-8 py-4 rounded-xl font-black text-xs uppercase tracking-widest transition-all ${newParam.booleanOptimalState !== false ? 'bg-emerald-500 text-white shadow-[0_0_20px_rgba(16,185,129,0.4)]' : 'text-white/20 hover:bg-white/5'}`}
                         >
                           ÓPTIMO
                         </button>
                         <button 
                           onClick={() => setNewParam(prev => ({ ...prev, booleanOptimalState: false }))}
-                          className={`px-4 py-2 rounded-lg font-bold text-xs transition-all ${newParam.booleanOptimalState === false ? 'bg-red-500 text-white shadow-lg' : 'text-white/20'}`}
+                          className={`flex-1 md:px-8 py-4 rounded-xl font-black text-xs uppercase tracking-widest transition-all ${newParam.booleanOptimalState === false ? 'bg-red-500 text-white shadow-[0_0_20px_rgba(239,68,68,0.4)]' : 'text-white/20 hover:bg-white/5'}`}
                         >
                           ALERTA
                         </button>
@@ -939,109 +957,119 @@ const MaterialReceptionView = ({
 
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex flex-col gap-10">
-      <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-8 bg-zinc-900 p-10 rounded-[3rem] border border-white/5 shadow-2xl">
-        <div className="flex items-center gap-6">
-          <div className="w-20 h-20 bg-blue-500/10 text-[#3B82F6] rounded-3xl flex items-center justify-center shadow-inner border border-blue-500/20">
+      <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-10 bg-black p-10 rounded-[2rem] border-2 border-white/20 shadow-[0_0_30px_rgba(255,255,255,0.05)]">
+        <div className="flex items-center gap-8">
+          <div className="w-20 h-20 bg-blue-500 text-black rounded-3xl flex items-center justify-center shadow-[0_0_20px_rgba(59,130,246,0.4)]">
             <Layers size={40} />
           </div>
           <div>
             <h2 className="text-4xl font-black tracking-tighter uppercase leading-none text-white">Recepción de Material</h2>
             <div className="flex items-center gap-3 mt-3">
-              <span className="text-white/20 font-black uppercase text-[10px] tracking-widest">Página</span>
+              <span className="text-white/40 font-black uppercase text-[10px] tracking-widest">Página</span>
               <span className="text-[#3B82F6] font-black text-xs uppercase tracking-widest">{currentPage} de {totalPages}</span>
             </div>
           </div>
         </div>
         <div className="flex flex-col sm:flex-row items-center gap-6 w-full lg:w-auto">
           <div className="relative w-full sm:w-80">
-            <Search className="absolute left-6 top-1/2 -translate-y-1/2 text-white/20" size={24} />
+            <Search className="absolute left-6 top-1/2 -translate-y-1/2 text-white/40" size={24} />
             <input 
               type="text" 
               placeholder="BUSCAR RECEPCIÓN..." 
               value={searchTerm}
               onChange={(e) => { setSearchTerm(e.target.value); setCurrentPage(1); }}
-              className="w-full h-16 pl-16 pr-6 bg-white/5 rounded-2xl border border-white/10 focus:border-[#3B82F6] font-black text-white outline-none transition-all uppercase text-xs tracking-widest"
+              className="industrial-input w-full h-16 pl-16 pr-6 bg-black rounded-2xl border-2 border-white/20 focus:border-[#3B82F6] font-black text-white outline-none transition-all uppercase text-xs tracking-widest"
             />
           </div>
           <div className="flex gap-3">
             <button 
               onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
               disabled={currentPage === 1}
-              className="w-16 h-16 rounded-2xl bg-white/5 flex items-center justify-center disabled:opacity-10 hover:bg-white/10 transition-colors border border-white/5"
+              className="w-16 h-16 rounded-2xl bg-black border-2 border-white/20 flex items-center justify-center disabled:opacity-10 hover:bg-white/10 transition-colors text-white"
             >
-              <ChevronLeft size={28} className="text-white" />
+              <ChevronLeft size={28} />
             </button>
             <button 
               onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
               disabled={currentPage === totalPages}
-              className="w-16 h-16 rounded-2xl bg-white/5 flex items-center justify-center disabled:opacity-10 hover:bg-white/10 transition-colors border border-white/5"
+              className="w-16 h-16 rounded-2xl bg-black border-2 border-white/20 flex items-center justify-center disabled:opacity-10 hover:bg-white/10 transition-colors text-white"
             >
-              <ChevronRight size={28} className="text-white" />
+              <ChevronRight size={28} />
             </button>
           </div>
           <button
             onClick={() => setIsAdding(true)}
-            className="flex items-center justify-center gap-3 h-16 px-10 bg-[#3B82F6] text-white rounded-2xl font-black uppercase tracking-widest text-xs shadow-xl shadow-blue-500/20 hover:scale-105 active:scale-95 transition-all whitespace-nowrap"
+            className="flex items-center justify-center gap-4 h-16 px-10 bg-[#3B82F6] text-white rounded-2xl font-black uppercase tracking-widest text-xs shadow-[0_0_30px_rgba(59,130,246,0.4)] hover:scale-105 active:scale-95 transition-all whitespace-nowrap border-2 border-white/30"
           >
             <Plus size={24} /> <span>Registrar Entrada</span>
           </button>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
         {paginatedReceptions.length === 0 ? (
-          <div className="col-span-full text-center py-20 opacity-50 font-bold">No se encontraron recepciones</div>
+          <div className="col-span-full bg-black border-2 border-dashed border-white/10 rounded-[3rem] py-32 text-center flex flex-col items-center justify-center text-white/20">
+            <Layers size={80} className="mb-6 opacity-10" />
+            <p className="font-black text-xl uppercase tracking-[0.3em]">No se encontraron recepciones</p>
+          </div>
         ) : (
           paginatedReceptions.map(rec => {
             const crop = crops.find(c => c.id === rec.cropId);
             const lot = lots.find(l => l.id === rec.lotId);
+            const statusColors = {
+              'Bueno': 'border-emerald-500 text-emerald-500 shadow-emerald-500/10',
+              'Regular': 'border-amber-500 text-amber-500 shadow-amber-500/10',
+              'Malo': 'border-red-500 text-red-500 shadow-red-500/10'
+            };
+            const colorClass = statusColors[rec.status as keyof typeof statusColors] || 'border-white/20 text-white';
+
             return (
               <button
                 key={rec.id}
-                className="p-8 rounded-[2rem] text-left transition-all flex flex-col gap-6 bg-zinc-900 border border-white/5 hover:border-[#3B82F6]/30 hover:scale-[1.02] active:scale-[0.98] shadow-2xl group relative"
+                className="p-10 rounded-[3rem] text-left transition-all flex flex-col gap-8 bg-black border-2 border-white/10 hover:border-[#3B82F6] hover:scale-[1.02] active:scale-[0.98] shadow-[0_0_40px_rgba(0,0,0,0.5)] group relative overflow-hidden"
               >
-                <div className="absolute top-8 right-8">
-                  <span className={`px-4 py-2 rounded-xl text-[10px] font-black tracking-widest border ${
-                    rec.status === 'Bueno' ? 'bg-[#10B981]/10 text-[#10B981] border-[#10B981]/20' : 
-                    rec.status === 'Regular' ? 'bg-amber-500/10 text-amber-500 border-amber-500/20' : 
-                    'bg-red-500/10 text-red-500 border-red-500/20'
-                  }`}>
-                    {rec.status.toUpperCase()}
+                <div className="absolute top-0 right-0 p-10 opacity-5 group-hover:scale-110 transition-transform text-white">
+                  <Layers size={160} />
+                </div>
+                <div className="flex justify-between items-start w-full z-10">
+                  <div className="p-5 rounded-2xl bg-white/5 text-[#3B82F6] border-2 border-white/10 transition-all group-hover:bg-white/10">
+                    <Layers size={32} />
+                  </div>
+                  <span className={`px-4 py-1.5 rounded-lg text-[10px] font-black tracking-widest border-2 uppercase ${colorClass}`}>
+                    {rec.status}
                   </span>
                 </div>
-                <div className="flex flex-col gap-6">
+                <div className="z-10">
+                  <h4 className="font-black text-3xl mb-2 tracking-tighter text-white leading-tight uppercase">{rec.provider}</h4>
+                  <div className="flex flex-col gap-2">
+                    <p className="text-[10px] font-black text-white/40 uppercase tracking-widest flex items-center gap-2">
+                      <Clock size={14} /> {new Date(rec.date).toLocaleDateString()}
+                    </p>
+                    <p className="text-[10px] font-black text-white/40 uppercase tracking-widest flex items-center gap-2">
+                      <Box size={14} /> {lot?.lotCode}
+                    </p>
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-4 z-10">
+                  <div className="bg-white/5 p-5 rounded-2xl border-2 border-white/5">
+                    <span className="text-[10px] uppercase font-black text-white/20 block mb-1 tracking-widest">Bultos</span>
+                    <span className="text-2xl font-black text-white">{rec.bundleCount}</span>
+                  </div>
+                  <div className="bg-white/5 p-5 rounded-2xl border-2 border-white/5">
+                    <span className="text-[10px] uppercase font-black text-white/20 block mb-1 tracking-widest">Peso Prom.</span>
+                    <span className="text-2xl font-black text-white">{rec.averageWeight} <span className="text-xs font-normal opacity-40">Kg</span></span>
+                  </div>
+                </div>
+                <div className="flex items-center justify-between bg-white/5 p-6 rounded-[2rem] border-2 border-white/5 z-10 mt-2">
                   <div className="flex items-center gap-4">
-                    <div className="p-4 rounded-2xl bg-white/5 text-[#3B82F6] border border-white/5">
-                      <Layers size={32} />
-                    </div>
-                    <div>
-                      <h4 className="font-black text-2xl tracking-tight text-white">{rec.provider}</h4>
-                      <div className="flex items-center gap-2 text-white/20 text-[10px] font-black uppercase tracking-widest">
-                        <Clock size={12} /> {new Date(rec.date).toLocaleDateString()} • {lot?.lotCode}
-                      </div>
-                    </div>
+                    <span className="text-4xl grayscale group-hover:grayscale-0 transition-all">{crop?.icon}</span>
+                    <span className="font-black text-white uppercase text-sm tracking-tight">{crop?.name}</span>
                   </div>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="bg-white/5 p-4 rounded-2xl border border-white/5">
-                      <span className="text-[10px] uppercase font-black text-white/20 block mb-1">Bultos</span>
-                      <span className="text-xl font-black text-white">{rec.bundleCount}</span>
-                    </div>
-                    <div className="bg-white/5 p-4 rounded-2xl border border-white/5">
-                      <span className="text-[10px] uppercase font-black text-white/20 block mb-1">Peso Prom.</span>
-                      <span className="text-xl font-black text-white">{rec.averageWeight} Kg</span>
-                    </div>
-                  </div>
-                  <div className="flex items-center justify-between bg-white/5 p-5 rounded-2xl border border-white/5">
-                    <div className="flex items-center gap-3">
-                      <span className="text-3xl">{crop?.icon}</span>
-                      <span className="font-black text-white">{crop?.name}</span>
-                    </div>
-                    <div className="text-right">
-                      <span className="text-[10px] uppercase font-black text-white/20 block">Health Score</span>
-                      <span className={`text-2xl font-black ${rec.healthScore >= 80 ? 'text-[#10B981]' : rec.healthScore >= 50 ? 'text-amber-500' : 'text-red-500'}`}>
-                        {rec.healthScore}%
-                      </span>
-                    </div>
+                  <div className="text-right">
+                    <span className="text-[10px] uppercase font-black text-white/20 block tracking-widest">Health Score</span>
+                    <span className={`text-3xl font-black ${rec.healthScore >= 80 ? 'text-emerald-500' : rec.healthScore >= 50 ? 'text-amber-500' : 'text-red-500'}`}>
+                      {rec.healthScore}%
+                    </span>
                   </div>
                 </div>
               </button>
@@ -1053,36 +1081,39 @@ const MaterialReceptionView = ({
       <AnimatePresence>
         {isAdding && (
           <div className="fixed inset-0 z-50 flex items-center justify-center p-6">
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setIsAdding(false)} className="absolute inset-0 bg-black/40 backdrop-blur-sm" />
-            <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.9, opacity: 0 }} className="relative bg-zinc-900 w-full max-w-5xl rounded-[3rem] shadow-2xl overflow-hidden flex flex-col max-h-[90vh] border border-white/10">
-              <div className="p-10 border-b border-white/5 flex justify-between items-center bg-zinc-900 sticky top-0 z-10">
-                <h3 className="text-3xl font-black tracking-tighter uppercase text-white">Recepción de Material Vegetal</h3>
-                <button onClick={() => setIsAdding(false)} className="p-4 bg-white/5 rounded-2xl text-white hover:bg-white/10 transition-colors"><Plus className="rotate-45" size={24} /></button>
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setIsAdding(false)} className="absolute inset-0 bg-black/80 backdrop-blur-md" />
+            <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.9, opacity: 0 }} className="relative bg-black w-full max-w-6xl rounded-[3rem] shadow-[0_0_50px_rgba(0,0,0,0.5)] overflow-hidden flex flex-col max-h-[90vh] border-2 border-white/20">
+              <div className="p-12 border-b-2 border-white/10 flex justify-between items-center bg-white/5 sticky top-0 z-10">
+                <div>
+                  <h3 className="text-4xl font-black tracking-tighter uppercase text-white">Recepción de Material</h3>
+                  <p className="text-white/40 font-black uppercase text-[10px] tracking-widest mt-2">Ingreso técnico de material vegetal</p>
+                </div>
+                <button onClick={() => setIsAdding(false)} className="w-16 h-16 bg-white/10 text-white rounded-2xl flex items-center justify-center hover:bg-white/20 transition-all border border-white/10"><Plus className="rotate-45" size={32} /></button>
               </div>
 
-              <div className="p-10 flex flex-col gap-10 overflow-y-auto">
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+              <div className="p-12 flex flex-col gap-12 overflow-y-auto custom-scrollbar">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-16">
                   {/* Left Column: Basic Info */}
-                  <div className="flex flex-col gap-8">
-                    <div className="flex flex-col gap-3">
-                      <span className="text-[10px] font-black text-white/20 uppercase tracking-widest">Proveedor</span>
+                  <div className="flex flex-col gap-10">
+                    <div className="flex flex-col gap-4">
+                      <span className="text-xs font-black text-white/40 uppercase tracking-widest">Proveedor / Origen</span>
                       <input 
                         type="text" 
                         value={newReception.provider}
                         onChange={e => setNewReception(prev => ({ ...prev, provider: e.target.value }))}
-                        className="h-16 px-8 bg-white/5 rounded-2xl font-black text-white border border-white/10 focus:border-[#3B82F6] outline-none transition-all uppercase text-sm tracking-widest"
+                        className="industrial-input h-20 px-8 bg-black rounded-2xl font-black text-2xl text-white border-2 border-white/20 focus:border-[#3B82F6] outline-none transition-all uppercase placeholder:text-white/10"
                         placeholder="NOMBRE DEL PROVEEDOR"
                       />
                     </div>
 
-                    <div className="flex flex-col gap-3">
-                      <span className="text-[10px] font-black text-white/20 uppercase tracking-widest">Finca de Recepción</span>
-                      <div className="grid grid-cols-2 gap-3">
+                    <div className="flex flex-col gap-4">
+                      <span className="text-xs font-black text-white/40 uppercase tracking-widest">Finca de Recepción</span>
+                      <div className="grid grid-cols-2 gap-4">
                         {farms.map(f => (
                           <button
                             key={f.id}
                             onClick={() => setNewReception(prev => ({ ...prev, farmId: f.id, lotId: '' }))}
-                            className={`h-16 px-6 rounded-xl font-black border transition-all text-[10px] tracking-widest uppercase flex items-center justify-between ${newReception.farmId === f.id ? 'bg-[#3B82F6] text-white border-transparent shadow-xl' : 'bg-white/5 border-white/5 text-white/40 hover:border-white/20'}`}
+                            className={`h-20 rounded-2xl font-black text-xs uppercase tracking-widest border-2 transition-all flex items-center justify-center gap-2 ${newReception.farmId === f.id ? 'bg-[#3B82F6] text-white border-white/30 shadow-[0_0_20px_rgba(59,130,246,0.4)]' : 'bg-black text-white/20 border-white/10 hover:border-white/40'}`}
                           >
                             {f.name}
                             {newReception.farmId === f.id && <CheckCircle2 size={16} />}
@@ -1091,139 +1122,169 @@ const MaterialReceptionView = ({
                       </div>
                     </div>
 
-                    <div className="flex flex-col gap-3">
-                      <span className="text-[10px] font-black text-white/20 uppercase tracking-widest">Rubro</span>
-                      <div className="flex gap-3 overflow-x-auto no-scrollbar pb-2">
-                        {crops.map(c => (
-                          <button
-                            key={c.id}
-                            onClick={() => setNewReception(prev => ({ ...prev, cropId: c.id, lotId: '' }))}
-                            className={`px-8 py-5 rounded-2xl font-black border transition-all flex items-center gap-3 whitespace-nowrap ${newReception.cropId === c.id ? 'bg-white text-black border-transparent shadow-xl' : 'bg-white/5 border-white/5 text-white/40 hover:border-white/20'}`}
-                          >
-                            <span className="text-xl">{c.icon}</span> <span className="uppercase tracking-widest text-xs">{c.name}</span>
-                          </button>
-                        ))}
+                    <div className="grid grid-cols-2 gap-10">
+                      <div className="flex flex-col gap-4">
+                        <span className="text-xs font-black text-white/40 uppercase tracking-widest">Cultivo</span>
+                        <div className="flex gap-3 overflow-x-auto no-scrollbar pb-2">
+                          {crops.map(c => (
+                            <button
+                              key={c.id}
+                              onClick={() => setNewReception(prev => ({ ...prev, cropId: c.id, lotId: '' }))}
+                              className={`h-20 px-8 rounded-2xl font-black text-xs border-2 transition-all whitespace-nowrap flex items-center gap-3 ${newReception.cropId === c.id ? 'bg-[#3B82F6] text-white border-white/30 shadow-[0_0_20px_rgba(59,130,246,0.4)]' : 'bg-black text-white/20 border-white/10 hover:border-white/40'}`}
+                            >
+                              <span className="text-2xl">{c.icon}</span>
+                              <span className="uppercase tracking-widest">{c.name}</span>
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                      <div className="flex flex-col gap-4">
+                        <span className="text-xs font-black text-white/40 uppercase tracking-widest">Lote Destino</span>
+                        <div className="flex gap-3 overflow-x-auto no-scrollbar pb-2">
+                          {filteredLots.map(l => (
+                            <button
+                              key={l.id}
+                              onClick={() => setNewReception(prev => ({ ...prev, lotId: l.id }))}
+                              className={`h-20 px-8 rounded-2xl font-black text-xs border-2 transition-all whitespace-nowrap flex items-center gap-2 ${newReception.lotId === l.id ? 'bg-[#3B82F6] text-white border-white/30 shadow-[0_0_20px_rgba(59,130,246,0.4)]' : 'bg-black text-white/20 border-white/10 hover:border-white/40'}`}
+                            >
+                              {l.lotCode}
+                              {newReception.lotId === l.id && <CheckCircle2 size={16} />}
+                            </button>
+                          ))}
+                          {filteredLots.length === 0 && (
+                            <div className="h-20 px-8 rounded-2xl border-2 border-dashed border-white/10 flex items-center text-white/20 text-[10px] font-black uppercase tracking-widest">
+                              Sin lotes disponibles
+                            </div>
+                          )}
+                        </div>
                       </div>
                     </div>
 
-                    <div className="flex flex-col gap-3">
-                      <span className="text-[10px] font-black text-white/20 uppercase tracking-widest">Lote de Destino</span>
-                      <div className="grid grid-cols-2 gap-3">
-                        {filteredLots.map(l => (
-                          <button
-                            key={l.id}
-                            onClick={() => setNewReception(prev => ({ ...prev, lotId: l.id }))}
-                            className={`h-16 px-6 rounded-xl font-black border transition-all text-[10px] tracking-widest uppercase flex items-center justify-between ${newReception.lotId === l.id ? 'bg-[#3B82F6] text-white border-transparent shadow-xl' : 'bg-white/5 border-white/5 text-white/40 hover:border-white/20'}`}
-                          >
-                            {l.lotCode}
-                            {newReception.lotId === l.id && <CheckCircle2 size={16} />}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-
-                    <div className="grid grid-cols-1 gap-8 bg-white/5 p-8 rounded-[2rem] border border-white/5">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-10 bg-white/5 p-10 rounded-[2.5rem] border-2 border-white/10">
                       <Stepper 
-                        label="CANTIDAD DE BULTOS" 
+                        label="Cantidad de Bultos" 
                         value={newReception.bundleCount || 0} 
                         onChange={v => setNewReception(prev => ({ ...prev, bundleCount: v }))} 
                         step={1}
                         min={1}
+                        max={5000}
                       />
-                      <PrecisionSlider 
-                        label="PESO PROMEDIO (KG)" 
+                      <Stepper 
+                        label="Peso Promedio (Kg)" 
                         value={newReception.averageWeight || 0} 
                         onChange={v => setNewReception(prev => ({ ...prev, averageWeight: v }))} 
-                        min={0.1} 
-                        max={50} 
+                        step={0.1}
+                        min={0.1}
+                        max={100}
                         unit="Kg"
                       />
                     </div>
                   </div>
 
-                  {/* Right Column: Dynamic Quality Parameters */}
+                  {/* Right Column: Quality Parameters */}
                   <div className="flex flex-col gap-8">
-                    <div className="flex justify-between items-center">
-                      <span className="text-[10px] font-black text-white/20 uppercase tracking-widest">Control de Calidad en Tiempo Real</span>
-                      <div className="flex items-center gap-3">
-                        <span className="text-[10px] font-black uppercase text-white/10">Score:</span>
-                        <span className="text-2xl font-black text-[#3B82F6]">{calculateHealthScore(newReception.qualityValues || {})}%</span>
-                      </div>
+                    <div className="flex items-center gap-4 mb-2">
+                      <ShieldCheck className="text-[#3B82F6]" size={32} />
+                      <h4 className="text-2xl font-black uppercase tracking-tighter text-white">Control de Calidad</h4>
+                    </div>
+                    
+                    <div className="grid grid-cols-1 gap-6 max-h-[500px] overflow-y-auto pr-4 custom-scrollbar">
+                      {selectedCrop?.parameters.map(param => (
+                        <div key={param.id} className="p-8 bg-white/5 rounded-[2rem] border-2 border-white/5 flex flex-col gap-6 hover:border-white/20 transition-all">
+                          <div className="flex justify-between items-center">
+                            <span className="text-[10px] font-black text-white/60 uppercase tracking-widest">{param.name}</span>
+                            <span className="text-[10px] font-black px-3 py-1 bg-white/5 rounded-lg border border-white/10 text-white/40 uppercase tracking-widest">{param.unit}</span>
+                          </div>
+
+                          {param.type === 'NUMERIC' && (
+                            <PrecisionSlider 
+                              label="Valor Detectado"
+                              min={param.min || 0}
+                              max={param.max || 100}
+                              value={newReception.qualityValues?.[param.id] || 0}
+                              onChange={v => setNewReception(prev => ({ 
+                                ...prev, 
+                                qualityValues: { ...prev.qualityValues, [param.id]: v } 
+                              }))}
+                              unit={param.unit}
+                            />
+                          )}
+
+                          {param.type === 'BOOLEAN' && (
+                            <div className="flex bg-black p-2 rounded-2xl h-16 border-2 border-white/10">
+                              {[true, false].map(v => (
+                                <button
+                                  key={v.toString()}
+                                  onClick={() => setNewReception(prev => ({ 
+                                    ...prev, 
+                                    qualityValues: { ...prev.qualityValues, [param.id]: v } 
+                                  }))}
+                                  className={`flex-1 rounded-xl font-black text-[10px] uppercase tracking-widest transition-all ${newReception.qualityValues?.[param.id] === v ? 'bg-[#3B82F6] text-white shadow-[0_0_20px_rgba(59,130,246,0.4)]' : 'text-white/20 hover:bg-white/5'}`}
+                                >
+                                  {v ? 'ÓPTIMO' : 'ALERTA'}
+                                </button>
+                              ))}
+                            </div>
+                          )}
+
+                          {param.type === 'SELECTION' && (
+                            <div className="flex flex-wrap gap-2">
+                              {param.options?.map(opt => (
+                                <button
+                                  key={opt}
+                                  onClick={() => setNewReception(prev => ({ 
+                                    ...prev, 
+                                    qualityValues: { ...prev.qualityValues, [param.id]: opt } 
+                                  }))}
+                                  className={`px-4 py-2 rounded-xl font-black text-[10px] uppercase tracking-widest border-2 transition-all ${newReception.qualityValues?.[param.id] === opt ? 'bg-[#3B82F6] text-white border-white/20 shadow-[0_0_20px_rgba(59,130,246,0.4)]' : 'bg-black text-white/20 border-white/10 hover:border-white/40'}`}
+                                >
+                                  {opt}
+                                </button>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      ))}
+                      {(!selectedCrop || selectedCrop.parameters.length === 0) && (
+                        <div className="py-10 text-center text-white/10 font-black uppercase tracking-widest text-xs">
+                          Sin parámetros de calidad definidos para este cultivo
+                        </div>
+                      )}
                     </div>
 
-                    <div className="flex flex-col gap-4">
-                      {selectedCrop?.parameters.map(param => {
-                        const val = newReception.qualityValues?.[param.id];
-                        let isGood = true;
-                        if (param.type === 'NUMERIC') isGood = val >= param.min! && val <= param.max!;
-                        else if (param.type === 'BOOLEAN') isGood = val === (param.booleanOptimalState !== false);
-                        else if (param.type === 'SELECTION') isGood = (param.selectionCategories?.[val] || 'Bueno') === 'Bueno';
-
-                        return (
-                          <div key={param.id} className={`p-8 rounded-[2rem] border transition-all ${isGood ? 'bg-emerald-500/5 border-emerald-500/20' : 'bg-red-500/5 border-red-500/20'}`}>
-                            <div className="flex justify-between items-center mb-6">
-                              <span className="font-black text-white uppercase text-[10px] tracking-widest">{param.name}</span>
-                              {isGood ? <CheckCircle2 className="text-[#10B981]" size={24} /> : <XCircle className="text-red-500" size={24} />}
-                            </div>
-
-                            {param.type === 'NUMERIC' && (
-                              <div className="flex flex-col gap-4">
-                                <Stepper 
-                                  label={`Valor (${param.unit})`}
-                                  value={val}
-                                  onChange={v => setNewReception(prev => ({ ...prev, qualityValues: { ...prev.qualityValues, [param.id]: v } }))}
-                                  min={0}
-                                  max={1000}
-                                  step={0.1}
-                                />
-                                <div className="flex justify-between text-[10px] font-black text-black/30 uppercase tracking-widest">
-                                  <span>Rango: {param.min} - {param.max}</span>
-                                </div>
-                              </div>
-                            )}
-
-                            {param.type === 'BOOLEAN' && (
-                              <div className="flex bg-white p-1 rounded-2xl h-14 border border-black/5">
-                                {[true, false].map(v => (
-                                  <button
-                                    key={v.toString()}
-                                    onClick={() => setNewReception(prev => ({ ...prev, qualityValues: { ...prev.qualityValues, [param.id]: v } }))}
-                                    className={`flex-1 rounded-xl font-black text-xs tracking-widest transition-all ${val === v ? 'bg-black text-white shadow-lg' : 'text-black/40'}`}
-                                  >
-                                    {v ? 'SI' : 'NO'}
-                                  </button>
-                                ))}
-                              </div>
-                            )}
-
-                            {param.type === 'SELECTION' && (
-                              <div className="flex flex-wrap gap-2">
-                                {param.options?.map(opt => (
-                                  <button
-                                    key={opt}
-                                    onClick={() => setNewReception(prev => ({ ...prev, qualityValues: { ...prev.qualityValues, [param.id]: opt } }))}
-                                    className={`px-4 py-2 rounded-xl font-black text-[10px] uppercase tracking-widest border transition-all ${val === opt ? 'bg-black text-white border-black shadow-md' : 'bg-white text-black/40 border-black/10'}`}
-                                  >
-                                    {opt}
-                                  </button>
-                                ))}
-                              </div>
-                            )}
-                          </div>
-                        );
-                      })}
+                    <div className="mt-auto pt-8 border-t-2 border-white/10">
+                      <div className="flex justify-between items-center mb-8">
+                        <div>
+                          <span className="text-[10px] font-black text-white/40 uppercase tracking-widest block">Índice de Salud Proyectado</span>
+                          <span className="text-5xl font-black text-white tracking-tighter">
+                            {calculateHealthScore(newReception.qualityValues || {})}%
+                          </span>
+                        </div>
+                        <div className={`px-6 py-3 rounded-2xl border-2 font-black uppercase tracking-widest text-xs ${
+                          calculateHealthScore(newReception.qualityValues || {}) >= 80 ? 'border-emerald-500 text-emerald-500 bg-emerald-500/10' :
+                          calculateHealthScore(newReception.qualityValues || {}) >= 50 ? 'border-amber-500 text-amber-500 bg-amber-500/10' :
+                          'border-red-500 text-red-500 bg-red-500/10'
+                        }`}>
+                          {getStatusFromScore(calculateHealthScore(newReception.qualityValues || {}))}
+                        </div>
+                      </div>
+                      <div className="flex gap-4">
+                        <button 
+                          onClick={() => setIsAdding(false)}
+                          className="flex-1 h-20 bg-black text-white rounded-[1.5rem] font-black uppercase tracking-widest text-xs border-2 border-white/20 hover:bg-white/5 transition-all"
+                        >
+                          Cancelar
+                        </button>
+                        <button 
+                          onClick={handleAdd}
+                          className="flex-[2] h-20 bg-white text-black rounded-[1.5rem] font-black uppercase tracking-widest text-xs hover:scale-[1.02] active:scale-[0.98] transition-all shadow-[0_0_30px_rgba(255,255,255,0.2)]"
+                        >
+                          Confirmar Recepción
+                        </button>
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
-
-              <div className="p-10 border-t border-black/5 bg-white sticky bottom-0">
-                <button 
-                  onClick={handleAdd}
-                  className="w-full h-20 bg-black text-white font-bold rounded-3xl shadow-2xl text-xl active:scale-95 transition-transform"
-                >
-                  Confirmar Recepción y Guardar
-                </button>
               </div>
             </motion.div>
           </div>
@@ -1261,110 +1322,120 @@ const DispatchManagementView = ({
   const paginatedDispatches = filteredDispatches.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 
   return (
-    <div className="flex flex-col gap-10">
-      <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-8 bg-zinc-900 p-10 rounded-[3rem] border border-white/5 shadow-2xl">
+    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex flex-col gap-10">
+      <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-8 bg-black p-10 rounded-[2rem] border-2 border-white/20 shadow-[0_0_30px_rgba(255,255,255,0.05)]">
         <div className="flex items-center gap-6">
-          <div className="w-20 h-20 bg-blue-500/10 text-[#3B82F6] rounded-3xl flex items-center justify-center shadow-inner border border-blue-500/20">
+          <div className="w-20 h-20 bg-[#3B82F6] text-white rounded-3xl flex items-center justify-center shadow-[0_0_20px_rgba(59,130,246,0.4)]">
             <Truck size={40} />
           </div>
           <div>
             <h2 className="text-4xl font-black tracking-tighter uppercase leading-none text-white">Despachos a Planta</h2>
             <div className="flex items-center gap-3 mt-3">
-              <span className="text-white/20 font-black uppercase text-[10px] tracking-widest">Página</span>
+              <span className="text-white/40 font-black uppercase text-[10px] tracking-widest">Página</span>
               <span className="text-[#3B82F6] font-black text-xs uppercase tracking-widest">{currentPage} de {totalPages}</span>
             </div>
           </div>
         </div>
-        <div className="flex items-center gap-6 w-full lg:w-auto">
-          <div className="relative flex-1 lg:w-80">
-            <Search className="absolute left-6 top-1/2 -translate-y-1/2 text-white/20" size={24} />
+        <div className="flex flex-col sm:flex-row items-center gap-6 w-full lg:w-auto">
+          <div className="relative w-full sm:w-80">
+            <Search className="absolute left-6 top-1/2 -translate-y-1/2 text-white/40" size={24} />
             <input 
               type="text" 
               placeholder="BUSCAR DESPACHO..." 
               value={searchTerm}
               onChange={(e) => { setSearchTerm(e.target.value); setCurrentPage(1); }}
-              className="w-full h-16 pl-16 pr-6 bg-white/5 rounded-2xl border border-white/10 focus:border-[#3B82F6] font-black text-white outline-none transition-all uppercase text-xs tracking-widest"
+              className="industrial-input w-full h-16 pl-16 pr-6 bg-black rounded-2xl border-2 border-white/20 focus:border-[#3B82F6] font-black text-white outline-none transition-all uppercase text-xs tracking-widest"
             />
           </div>
           <div className="flex gap-3">
             <button 
               onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
               disabled={currentPage === 1}
-              className="w-16 h-16 rounded-2xl bg-white/5 flex items-center justify-center disabled:opacity-10 hover:bg-white/10 transition-colors border border-white/5"
+              className="w-16 h-16 rounded-2xl bg-black border-2 border-white/20 flex items-center justify-center disabled:opacity-10 hover:bg-white/10 transition-colors text-white"
             >
-              <ChevronLeft size={28} className="text-white" />
+              <ChevronLeft size={28} />
             </button>
             <button 
               onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
               disabled={currentPage === totalPages}
-              className="w-16 h-16 rounded-2xl bg-white/5 flex items-center justify-center disabled:opacity-10 hover:bg-white/10 transition-colors border border-white/5"
+              className="w-16 h-16 rounded-2xl bg-black border-2 border-white/20 flex items-center justify-center disabled:opacity-10 hover:bg-white/10 transition-colors text-white"
             >
-              <ChevronRight size={28} className="text-white" />
+              <ChevronRight size={28} />
             </button>
           </div>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
         {paginatedDispatches.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-32 bg-zinc-900 rounded-[3rem] border border-white/5 text-white/20">
-            <Truck size={80} strokeWidth={1} className="mb-6 opacity-20" />
-            <p className="font-black uppercase tracking-widest text-sm">No hay despachos registrados.</p>
-          </div>
+          <div className="col-span-full text-center py-20 text-white/20 font-black uppercase tracking-widest text-2xl">No hay despachos registrados</div>
         ) : (
           paginatedDispatches.map(dispatch => {
             const lot = lots.find(l => l.id === dispatch.lotId);
             const farm = farms.find(f => f.id === dispatch.originFarmId);
-            return (
-              <div key={dispatch.id} className="bg-zinc-900 p-10 rounded-[3rem] border border-white/5 flex flex-col lg:flex-row justify-between items-start lg:items-center gap-8 shadow-2xl hover:border-[#3B82F6]/30 transition-all group">
-                <div className="flex items-center gap-10">
-                  <div className="p-6 bg-white/5 text-[#3B82F6] rounded-3xl border border-white/5 group-hover:bg-[#3B82F6] group-hover:text-white transition-colors">
-                    <Truck size={32} />
-                  </div>
-                  <div>
-                    <div className="flex items-center gap-4 mb-2">
-                      <span className="font-black text-3xl tracking-tighter text-white uppercase">{dispatch.id.split('-')[1]}</span>
-                      <span className={`px-4 py-1.5 rounded-xl text-[10px] font-black tracking-widest border ${dispatch.type === 'INTERNO' ? 'bg-blue-500/10 text-[#3B82F6] border-blue-500/20' : 'bg-amber-500/10 text-amber-500 border-amber-500/20'}`}>
-                        {dispatch.type}
-                      </span>
-                    </div>
-                    <p className="text-[10px] font-black text-white/20 uppercase tracking-widest">
-                      {farm?.name || 'Proveedor Externo'} • {lot?.lotCode || 'N/A'}
-                    </p>
-                  </div>
-                </div>
 
-                <div className="flex flex-wrap gap-10 lg:gap-16 items-center w-full lg:w-auto justify-between lg:justify-end">
-                  <div className="text-right">
-                    <span className="text-[10px] font-black text-white/20 uppercase tracking-widest block mb-1">Cantidad</span>
-                    <span className="text-3xl font-black text-white">{dispatch.quantity} Kg</span>
-                  </div>
-                  <div className="text-right">
-                    <span className="text-[10px] font-black text-white/20 uppercase tracking-widest block mb-1">Fecha</span>
-                    <span className="text-sm font-black text-white uppercase tracking-widest">{new Date(dispatch.date).toLocaleDateString()}</span>
-                  </div>
-                  <div className="flex items-center gap-6">
-                    <div className={`px-5 py-2.5 rounded-xl text-[10px] font-black tracking-widest border ${
-                      dispatch.status === 'RECIBIDO' ? 'bg-[#10B981]/10 border-[#10B981]/20 text-[#10B981]' : 'bg-blue-500/10 border-blue-500/20 text-[#3B82F6]'
-                    }`}>
-                      {dispatch.status}
+            return (
+              <div
+                key={dispatch.id}
+                className="p-8 rounded-[2rem] text-left transition-all flex flex-col gap-6 bg-black border-2 border-white/20 shadow-[0_0_30px_rgba(0,0,0,0.5)] group relative"
+              >
+                <div className="absolute top-8 right-8">
+                  <span className={`px-4 py-2 rounded-xl text-[10px] font-black tracking-widest border-2 ${
+                    dispatch.status === 'RECIBIDO' ? 'border-[#10B981] text-[#10B981]' : 'border-[#3B82F6] text-[#3B82F6]'
+                  }`}>
+                    {dispatch.status}
+                  </span>
+                </div>
+                <div className="flex flex-col gap-6">
+                  <div className="flex items-center gap-4">
+                    <div className="p-4 rounded-2xl bg-white/5 text-[#3B82F6] border-2 border-white/20">
+                      <Truck size={32} />
                     </div>
-                    {dispatch.status === 'PENDIENTE' && (
-                      <button 
-                        onClick={() => onReceiveDispatch(dispatch.id)}
-                        className="h-16 px-10 bg-white text-black rounded-2xl font-black text-xs uppercase tracking-widest hover:scale-105 active:scale-95 transition-all shadow-xl"
-                      >
-                        RECIBIR
-                      </button>
-                    )}
+                    <div>
+                      <h4 className="font-black text-2xl tracking-tight text-white uppercase">{dispatch.id.split('-')[1]}</h4>
+                      <div className="flex items-center gap-2 text-white/40 text-[10px] font-black uppercase tracking-widest">
+                        <Clock size={12} /> {new Date(dispatch.date).toLocaleDateString()}
+                      </div>
+                    </div>
                   </div>
+                  
+                  <div className="flex flex-col gap-4 bg-white/5 p-6 rounded-2xl border-2 border-white/10">
+                    <div className="flex flex-col">
+                      <span className="text-[10px] uppercase font-black text-white/40">Origen</span>
+                      <span className="text-sm font-black text-white">{farm?.name || 'Proveedor Externo'}</span>
+                    </div>
+                    <div className="flex flex-col">
+                      <span className="text-[10px] uppercase font-black text-white/40">Lote</span>
+                      <span className="text-sm font-black text-white">{lot?.lotCode || 'N/A'}</span>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="bg-white/5 p-4 rounded-2xl border-2 border-white/10">
+                      <span className="text-[10px] uppercase font-black text-white/40 block mb-1">Tipo</span>
+                      <span className="text-xs font-black text-white uppercase">{dispatch.type}</span>
+                    </div>
+                    <div className="bg-white/5 p-4 rounded-2xl border-2 border-white/10">
+                      <span className="text-[10px] uppercase font-black text-white/40 block mb-1">Cantidad</span>
+                      <span className="text-xl font-black text-white">{dispatch.quantity} Kg</span>
+                    </div>
+                  </div>
+
+                  {dispatch.status === 'PENDIENTE' && (
+                    <button
+                      onClick={() => onReceiveDispatch(dispatch.id)}
+                      className="w-full h-16 bg-white text-black font-black rounded-xl shadow-[0_0_20px_rgba(255,255,255,0.2)] flex items-center justify-center gap-3 hover:scale-[1.02] active:scale-[0.98] transition-all uppercase tracking-widest text-xs border-2 border-black"
+                    >
+                      <CheckCircle2 size={20} /> RECIBIR
+                    </button>
+                  )}
                 </div>
               </div>
             );
           })
         )}
       </div>
-    </div>
+    </motion.div>
   );
 };
 
@@ -1391,27 +1462,27 @@ const CureManagementView = ({
   const selectedChemical = chemicals.find(c => c.id === newCure.chemicalId);
 
   return (
-    <div className="flex flex-col gap-8">
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 bg-white p-8 rounded-[3rem] shadow-xl shadow-black/5 border border-black/5">
+    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex flex-col gap-10">
+      <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-8 bg-black p-10 rounded-[2rem] border-2 border-white/20 shadow-[0_0_30px_rgba(255,255,255,0.05)]">
         <div className="flex items-center gap-6">
-          <div className="w-16 h-16 bg-blue-100 text-[#0052CC] rounded-2xl flex items-center justify-center shadow-inner">
-            <Droplets size={32} />
+          <div className="w-20 h-20 bg-[#3B82F6] text-white rounded-3xl flex items-center justify-center shadow-[0_0_20px_rgba(59,130,246,0.4)]">
+            <Droplets size={40} />
           </div>
           <div>
-            <h2 className="text-3xl font-black tracking-tight uppercase">Tratamiento de Semilla (Cura)</h2>
-            <p className="text-black/40 font-black uppercase text-[10px] tracking-widest mt-1">Registro de Aplicación Fitosanitaria</p>
+            <h2 className="text-4xl font-black tracking-tighter uppercase leading-none text-white">Tratamiento de Semilla</h2>
+            <p className="text-white/40 font-black uppercase text-[10px] tracking-widest mt-3">Registro de Aplicación Fitosanitaria (Cura)</p>
           </div>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-        <div className="lg:col-span-4 flex flex-col gap-6">
-          <div className="bg-white p-8 rounded-[3rem] shadow-xl shadow-black/5 border border-black/5">
-            <div className="flex items-center gap-4 mb-8">
-              <div className="w-12 h-12 bg-black/5 rounded-2xl flex items-center justify-center text-[#0052CC]">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
+        <div className="lg:col-span-4 flex flex-col gap-8">
+          <div className="bg-black p-10 rounded-[2rem] border-2 border-white/20 shadow-[0_0_30px_rgba(0,0,0,0.5)]">
+            <div className="flex items-center gap-4 mb-10">
+              <div className="w-12 h-12 bg-white/5 rounded-2xl flex items-center justify-center text-[#3B82F6] border-2 border-white/10">
                 <Map size={24} />
               </div>
-              <h3 className="text-xl font-black uppercase tracking-tight">Selección de Lote</h3>
+              <h3 className="text-xl font-black uppercase tracking-tight text-white">Selección de Lote</h3>
             </div>
             <div className="flex flex-col gap-4">
               {lots.filter(l => l.status === 'VACÍO' || l.status === 'PREPARACIÓN').map(lot => (
@@ -1419,60 +1490,62 @@ const CureManagementView = ({
                   key={lot.id}
                   onClick={() => setSelectedLotId(lot.id)}
                   className={`p-6 rounded-2xl border-2 transition-all text-left flex flex-col gap-2 ${
-                    selectedLotId === lot.id ? 'bg-white border-[#0052CC] shadow-lg scale-[1.02]' : 'bg-black/5 border-transparent opacity-60 hover:opacity-100'
+                    selectedLotId === lot.id ? 'bg-white border-white shadow-[0_0_20px_rgba(255,255,255,0.2)] scale-[1.02]' : 'bg-white/5 border-white/10 opacity-60 hover:opacity-100 hover:border-white/20'
                   }`}
                 >
-                  <span className={`font-black text-xl ${selectedLotId === lot.id ? 'text-[#0052CC]' : 'text-black'}`}>{lot.lotCode}</span>
-                  <span className="block text-[10px] font-black text-black/40 uppercase tracking-widest">{lot.soilType} • {lot.area} Ha</span>
+                  <span className={`font-black text-2xl ${selectedLotId === lot.id ? 'text-black' : 'text-white'}`}>{lot.lotCode}</span>
+                  <span className={`block text-[10px] font-black uppercase tracking-widest ${selectedLotId === lot.id ? 'text-black/60' : 'text-white/40'}`}>
+                    {lot.soilType} • {lot.area} Ha
+                  </span>
                 </button>
               ))}
               {lots.filter(l => l.status === 'VACÍO' || l.status === 'PREPARACIÓN').length === 0 && (
-                <div className="text-center py-10 opacity-30 font-bold">No hay lotes disponibles</div>
+                <div className="text-center py-10 text-white/20 font-black uppercase tracking-widest">No hay lotes disponibles</div>
               )}
             </div>
           </div>
         </div>
 
-        <div className="lg:col-span-8 flex flex-col gap-6">
-          <div className="bg-white p-10 rounded-[3rem] shadow-xl shadow-black/5 border border-black/5">
+        <div className="lg:col-span-8 flex flex-col gap-8">
+          <div className="bg-black p-10 rounded-[2rem] border-2 border-white/20 shadow-[0_0_30px_rgba(0,0,0,0.5)]">
             <div className="flex items-center gap-4 mb-10">
-              <div className="w-12 h-12 bg-black/5 rounded-2xl flex items-center justify-center text-[#0052CC]">
+              <div className="w-12 h-12 bg-white/5 rounded-2xl flex items-center justify-center text-[#3B82F6] border-2 border-white/10">
                 <Droplets size={24} />
               </div>
-              <h3 className="text-xl font-black uppercase tracking-tight">Detalles del Tratamiento</h3>
+              <h3 className="text-xl font-black uppercase tracking-tight text-white">Detalles del Tratamiento</h3>
             </div>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-              <div className="flex flex-col gap-8">
-                <div className="flex flex-col gap-3">
-                  <span className="text-xs font-black text-black/40 uppercase tracking-widest">Producto Químico</span>
+              <div className="flex flex-col gap-10">
+                <div className="flex flex-col gap-4">
+                  <span className="text-xs font-black text-white/40 uppercase tracking-widest">Producto Químico</span>
                   <div className="grid grid-cols-1 gap-3">
                     {chemicals.map(c => (
                       <button
                         key={c.id}
                         onClick={() => setNewCure(prev => ({ ...prev, chemicalId: c.id }))}
                         className={`h-16 px-6 rounded-2xl font-black border-2 transition-all text-left flex justify-between items-center ${
-                          newCure.chemicalId === c.id ? 'bg-white border-[#0052CC] text-[#0052CC] shadow-md' : 'bg-black/5 border-transparent text-black/40 hover:bg-black/10'
+                          newCure.chemicalId === c.id ? 'bg-white border-white text-black shadow-lg' : 'bg-white/5 border-white/10 text-white/40 hover:bg-white/10 hover:border-white/20'
                         }`}
                       >
                         {c.name}
-                        <span className="text-[10px] font-black uppercase tracking-widest opacity-50">{c.type}</span>
+                        <span className={`text-[10px] font-black uppercase tracking-widest ${newCure.chemicalId === c.id ? 'text-black/60' : 'text-white/20'}`}>{c.type}</span>
                       </button>
                     ))}
                   </div>
                 </div>
-                <div className="flex flex-col gap-3">
-                  <span className="text-xs font-black text-black/40 uppercase tracking-widest">Fecha de Aplicación</span>
+                <div className="flex flex-col gap-4">
+                  <span className="text-xs font-black text-white/40 uppercase tracking-widest">Fecha de Aplicación</span>
                   <input 
                     type="date" 
                     value={newCure.date}
                     onChange={e => setNewCure(prev => ({ ...prev, date: e.target.value }))}
-                    className="h-16 px-6 bg-black/5 rounded-2xl font-black text-xl outline-none focus:ring-2 focus:ring-[#0052CC] transition-all"
+                    className="industrial-input w-full h-16 px-6 bg-black rounded-2xl border-2 border-white/20 font-black text-xl text-white outline-none focus:border-[#3B82F6] transition-all uppercase"
                   />
                 </div>
               </div>
 
-              <div className="flex flex-col gap-10">
+              <div className="flex flex-col gap-12">
                 <Stepper 
                   label={`Dosis (${selectedChemical?.unit || 'ml/L'})`}
                   value={newCure.dosage || 0}
@@ -1482,43 +1555,45 @@ const CureManagementView = ({
                   step={0.1}
                 />
                 
-                <div className="flex flex-col gap-3">
-                  <span className="text-xs font-black text-black/40 uppercase tracking-widest">Responsable de Aplicación</span>
+                <div className="flex flex-col gap-4">
+                  <span className="text-xs font-black text-white/40 uppercase tracking-widest">Responsable de Aplicación</span>
                   <div className="relative">
                     <select 
                       value={newCure.responsibleId}
                       onChange={e => setNewCure(prev => ({ ...prev, responsibleId: e.target.value }))}
-                      className="w-full h-16 px-6 bg-black/5 rounded-2xl font-black appearance-none outline-none focus:ring-2 focus:ring-[#0052CC] transition-all"
+                      className="industrial-input w-full h-16 px-6 bg-black rounded-2xl border-2 border-white/20 font-black text-white appearance-none outline-none focus:border-[#3B82F6] transition-all uppercase"
                     >
                       {contacts.filter(c => c.role === 'Operador' || c.role === 'Administrador').map(c => (
                         <option key={c.id} value={c.id}>{c.name}</option>
                       ))}
                     </select>
-                    <div className="absolute right-6 top-1/2 -translate-y-1/2 pointer-events-none opacity-40">
-                      <ChevronRight className="rotate-90" size={20} />
+                    <div className="absolute right-6 top-1/2 -translate-y-1/2 pointer-events-none text-white/40">
+                      <ChevronRight className="rotate-90" size={24} />
                     </div>
                   </div>
                 </div>
-
-                <button
-                  onClick={() => {
-                    if (!selectedLotId) {
-                      alert("Seleccione un lote primero");
-                      return;
-                    }
-                    onAddCureRecord({ ...newCure, lotId: selectedLotId });
-                    alert("Tratamiento registrado con éxito");
-                  }}
-                  className="w-full h-20 bg-[#0052CC] text-white rounded-3xl font-black text-xl shadow-xl shadow-blue-200 hover:scale-[1.02] active:scale-[0.98] transition-all mt-4"
-                >
-                  Registrar Cura
-                </button>
               </div>
+            </div>
+
+            <div className="mt-16 pt-10 border-t-2 border-white/10">
+              <button
+                onClick={() => {
+                  if (!selectedLotId) {
+                    alert("Seleccione un lote primero");
+                    return;
+                  }
+                  onAddCureRecord({ ...newCure, lotId: selectedLotId });
+                  alert("Tratamiento registrado con éxito");
+                }}
+                className="w-full h-20 bg-[#3B82F6] text-white rounded-2xl font-black text-xl shadow-[0_0_20px_rgba(59,130,246,0.4)] hover:scale-[1.02] active:scale-[0.98] transition-all uppercase tracking-widest border-2 border-white/20"
+              >
+                Registrar Tratamiento (Cura)
+              </button>
             </div>
           </div>
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 };
 
@@ -1763,7 +1838,7 @@ export default function App() {
     }));
   };
 
-  const handleAddSowingRecord = (record: Partial<SowingRecord>) => {
+  const handleAddSowingRecord = (record: Partial<SowingRecord>, consumedReceptionId?: string, consumedQuantity?: number) => {
     setLots(prev => prev.map(l => {
       if (l.id === record.lotId) {
         return {
@@ -1774,6 +1849,15 @@ export default function App() {
       }
       return l;
     }));
+
+    if (consumedReceptionId && consumedQuantity) {
+      setReceptions(prev => prev.map(r => {
+        if (r.id === consumedReceptionId) {
+          return { ...r, usedQuantity: (r.usedQuantity || 0) + consumedQuantity };
+        }
+        return r;
+      }));
+    }
   };
 
   const handleAddCureRecord = (record: Partial<CureRecord>) => {
@@ -1867,14 +1951,14 @@ export default function App() {
   return (
     <div className="min-h-screen bg-[#000000] text-white font-sans flex flex-col">
       {/* Navigation Header */}
-      <div className="px-10 py-8 flex justify-between items-center sticky top-0 z-40 backdrop-blur-xl bg-black/40">
+      <div className="px-10 py-8 flex justify-between items-center sticky top-0 z-40 bg-black border-b-2 border-white/20">
         <div className="flex items-center gap-12">
           {currentModule === 'home' ? (
             <button 
               onClick={() => setCurrentModule('home')}
-              className="flex items-center gap-2 text-[#3B82F6] font-black tracking-tighter text-3xl hover:scale-105 transition-transform"
+              className="flex items-center gap-2 text-[#3B82F6] font-black tracking-tighter text-4xl hover:scale-105 transition-transform"
             >
-              <Leaf fill="currentColor" size={32} />
+              <Leaf fill="currentColor" size={40} />
               <span>TERRASYNC</span>
             </button>
           ) : (
@@ -1883,39 +1967,39 @@ export default function App() {
                 setCurrentModule('home');
                 setActiveTab('');
               }}
-              className="w-16 h-16 bg-white/5 text-white rounded-2xl flex items-center justify-center hover:bg-white/10 transition-colors border border-white/10"
+              className="w-20 h-20 bg-black text-white rounded-2xl flex items-center justify-center hover:bg-white/10 transition-colors border-2 border-white"
             >
-              <ArrowLeft size={32} />
+              <ArrowLeft size={40} />
             </button>
           )}
           
           {currentModule !== 'home' && (
-            <nav className="flex gap-2">
+            <nav className="flex gap-4">
               {currentModule === 'maestros' && (
                 <>
-                  <button onClick={() => setActiveTab('crops')} className={`px-8 py-3 rounded-2xl font-black text-sm uppercase tracking-widest transition-all ${activeTab === 'crops' ? 'bg-[#3B82F6] text-white shadow-[0_0_20px_rgba(59,130,246,0.5)]' : 'text-white/40 hover:text-white'}`}>Rubros</button>
-                  <button onClick={() => setActiveTab('contacts')} className={`px-8 py-3 rounded-2xl font-black text-sm uppercase tracking-widest transition-all ${activeTab === 'contacts' ? 'bg-[#3B82F6] text-white shadow-[0_0_20px_rgba(59,130,246,0.5)]' : 'text-white/40 hover:text-white'}`}>Contactos</button>
+                  <button onClick={() => setActiveTab('crops')} className={`px-10 py-4 rounded-2xl font-black text-lg uppercase tracking-widest transition-all ${activeTab === 'crops' ? 'bg-[#3B82F6] text-white shadow-[0_0_30px_rgba(59,130,246,0.6)]' : 'text-white hover:bg-white/5'}`}>Rubros</button>
+                  <button onClick={() => setActiveTab('contacts')} className={`px-10 py-4 rounded-2xl font-black text-lg uppercase tracking-widest transition-all ${activeTab === 'contacts' ? 'bg-[#3B82F6] text-white shadow-[0_0_30px_rgba(59,130,246,0.6)]' : 'text-white hover:bg-white/5'}`}>Contactos</button>
                 </>
               )}
               {currentModule === 'campo' && (
                 <>
-                  <button onClick={() => setActiveTab('fincas')} className={`px-8 py-3 rounded-2xl font-black text-sm uppercase tracking-widest transition-all ${activeTab === 'fincas' ? 'bg-[#10B981] text-white shadow-[0_0_20px_rgba(16,185,129,0.5)]' : 'text-white/40 hover:text-white'}`}>Fincas</button>
-                  <button onClick={() => setActiveTab('lots')} className={`px-8 py-3 rounded-2xl font-black text-sm uppercase tracking-widest transition-all ${activeTab === 'lots' ? 'bg-[#10B981] text-white shadow-[0_0_20px_rgba(16,185,129,0.5)]' : 'text-white/40 hover:text-white'}`}>Lotes</button>
-                  <button onClick={() => setActiveTab('cura')} className={`px-8 py-3 rounded-2xl font-black text-sm uppercase tracking-widest transition-all ${activeTab === 'cura' ? 'bg-[#10B981] text-white shadow-[0_0_20px_rgba(16,185,129,0.5)]' : 'text-white/40 hover:text-white'}`}>Cura</button>
-                  <button onClick={() => setActiveTab('control-siembra')} className={`px-8 py-3 rounded-2xl font-black text-sm uppercase tracking-widest transition-all ${activeTab === 'control-siembra' ? 'bg-[#10B981] text-white shadow-[0_0_20px_rgba(16,185,129,0.5)]' : 'text-white/40 hover:text-white'}`}>Proyectos</button>
+                  <button onClick={() => setActiveTab('fincas')} className={`px-10 py-4 rounded-2xl font-black text-lg uppercase tracking-widest transition-all ${activeTab === 'fincas' ? 'bg-[#10B981] text-white shadow-[0_0_30px_rgba(16,185,129,0.6)]' : 'text-white hover:bg-white/5'}`}>Fincas</button>
+                  <button onClick={() => setActiveTab('lots')} className={`px-10 py-4 rounded-2xl font-black text-lg uppercase tracking-widest transition-all ${activeTab === 'lots' ? 'bg-[#10B981] text-white shadow-[0_0_30px_rgba(16,185,129,0.6)]' : 'text-white hover:bg-white/5'}`}>Lotes</button>
+                  <button onClick={() => setActiveTab('cura')} className={`px-10 py-4 rounded-2xl font-black text-lg uppercase tracking-widest transition-all ${activeTab === 'cura' ? 'bg-[#10B981] text-white shadow-[0_0_30px_rgba(16,185,129,0.6)]' : 'text-white hover:bg-white/5'}`}>Cura</button>
+                  <button onClick={() => setActiveTab('control-siembra')} className={`px-10 py-4 rounded-2xl font-black text-lg uppercase tracking-widest transition-all ${activeTab === 'control-siembra' ? 'bg-[#10B981] text-white shadow-[0_0_30px_rgba(16,185,129,0.6)]' : 'text-white hover:bg-white/5'}`}>Proyectos</button>
                 </>
               )}
               {currentModule === 'planta' && (
                 <>
-                  <button onClick={() => setActiveTab('recepcion')} className={`px-8 py-3 rounded-2xl font-black text-sm uppercase tracking-widest transition-all ${activeTab === 'recepcion' ? 'bg-[#3B82F6] text-white shadow-[0_0_20px_rgba(59,130,246,0.5)]' : 'text-white/40 hover:text-white'}`}>Recepción</button>
-                  <button onClick={() => setActiveTab('despacho')} className={`px-8 py-3 rounded-2xl font-black text-sm uppercase tracking-widest transition-all ${activeTab === 'despacho' ? 'bg-[#3B82F6] text-white shadow-[0_0_20px_rgba(59,130,246,0.5)]' : 'text-white/40 hover:text-white'}`}>Despacho</button>
-                  <button onClick={() => setActiveTab('silos')} className={`px-8 py-3 rounded-2xl font-black text-sm uppercase tracking-widest transition-all ${activeTab === 'silos' ? 'bg-[#3B82F6] text-white shadow-[0_0_20px_rgba(59,130,246,0.5)]' : 'text-white/40 hover:text-white'}`}>Silos</button>
+                  <button onClick={() => setActiveTab('recepcion')} className={`px-10 py-4 rounded-2xl font-black text-lg uppercase tracking-widest transition-all ${activeTab === 'recepcion' ? 'bg-[#3B82F6] text-white shadow-[0_0_30px_rgba(59,130,246,0.6)]' : 'text-white hover:bg-white/5'}`}>Recepción</button>
+                  <button onClick={() => setActiveTab('despacho')} className={`px-10 py-4 rounded-2xl font-black text-lg uppercase tracking-widest transition-all ${activeTab === 'despacho' ? 'bg-[#3B82F6] text-white shadow-[0_0_30px_rgba(59,130,246,0.6)]' : 'text-white hover:bg-white/5'}`}>Despacho</button>
+                  <button onClick={() => setActiveTab('silos')} className={`px-10 py-4 rounded-2xl font-black text-lg uppercase tracking-widest transition-all ${activeTab === 'silos' ? 'bg-[#3B82F6] text-white shadow-[0_0_30px_rgba(59,130,246,0.6)]' : 'text-white hover:bg-white/5'}`}>Silos</button>
                 </>
               )}
               {currentModule === 'calidad' && (
                 <>
-                  <button onClick={() => setActiveTab('analisis')} className={`px-8 py-3 rounded-2xl font-black text-sm uppercase tracking-widest transition-all ${activeTab === 'analisis' ? 'bg-[#F59E0B] text-white shadow-[0_0_20px_rgba(245,158,11,0.5)]' : 'text-white/40 hover:text-white'}`}>Calidad</button>
-                  <button onClick={() => setActiveTab('cuarentena')} className={`px-8 py-3 rounded-2xl font-black text-sm uppercase tracking-widest transition-all ${activeTab === 'cuarentena' ? 'bg-[#F59E0B] text-white shadow-[0_0_20px_rgba(245,158,11,0.5)]' : 'text-white/40 hover:text-white'}`}>Cuarentena</button>
+                  <button onClick={() => setActiveTab('analisis')} className={`px-10 py-4 rounded-2xl font-black text-lg uppercase tracking-widest transition-all ${activeTab === 'analisis' ? 'bg-[#F59E0B] text-white shadow-[0_0_30px_rgba(245,158,11,0.6)]' : 'text-white hover:bg-white/5'}`}>Calidad</button>
+                  <button onClick={() => setActiveTab('cuarentena')} className={`px-10 py-4 rounded-2xl font-black text-lg uppercase tracking-widest transition-all ${activeTab === 'cuarentena' ? 'bg-[#F59E0B] text-white shadow-[0_0_30px_rgba(245,158,11,0.6)]' : 'text-white hover:bg-white/5'}`}>Cuarentena</button>
                 </>
               )}
             </nav>
@@ -1923,9 +2007,9 @@ export default function App() {
         </div>
 
         <div className="flex items-center gap-6">
-          <div className="flex items-center gap-2 px-6 py-3 bg-white/5 rounded-2xl border border-white/10">
-            <div className="w-3 h-3 bg-[#10B981] rounded-full animate-pulse shadow-[0_0_10px_#10B981]" />
-            <span className="text-xs font-black tracking-widest uppercase text-white/60">Sistema Online</span>
+          <div className="flex items-center gap-2 px-6 py-3 bg-black rounded-2xl border-2 border-[#10B981]">
+            <div className="w-4 h-4 bg-[#10B981] rounded-full animate-pulse shadow-[0_0_15px_#10B981]" />
+            <span className="text-sm font-black tracking-widest uppercase text-white">Sistema Online</span>
           </div>
         </div>
       </div>

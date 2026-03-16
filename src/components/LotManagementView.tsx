@@ -133,17 +133,17 @@ export const LotManagementView = ({
 
     return (
       <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="flex flex-col gap-8 min-h-[80vh]">
-        <div className="flex justify-between items-center bg-white/5 p-8 rounded-[3rem] border border-white/10 backdrop-blur-md">
+        <div className="flex justify-between items-center bg-black p-8 rounded-[3rem] border-2 border-white/10">
           <div className="flex items-center gap-6">
             <button 
               onClick={() => { setSelectedLotId(null); setIsAdding(false); setEditLot({}); }}
-              className="w-16 h-16 bg-white/5 text-white/60 rounded-2xl flex items-center justify-center hover:bg-white/10 transition-colors"
+              className="w-16 h-16 bg-white/5 text-white rounded-2xl flex items-center justify-center hover:bg-white/10 transition-colors border-2 border-white/10"
             >
               <ArrowLeft size={32} />
             </button>
             <div>
-              <h2 className="text-3xl font-black tracking-tighter uppercase">{isEditing ? `Lote ${selectedLot.lotCode}` : 'Nuevo Lote'}</h2>
-              <p className="text-white/20 font-black uppercase text-[10px] tracking-[0.2em] mt-1">Configuración de Terreno</p>
+              <h2 className="text-4xl font-black tracking-tighter uppercase text-white">{isEditing ? `Lote ${selectedLot.lotCode}` : 'Nuevo Lote'}</h2>
+              <p className="text-white/40 font-black uppercase text-[10px] tracking-widest mt-2">Configuración de Terreno</p>
             </div>
           </div>
 
@@ -151,7 +151,7 @@ export const LotManagementView = ({
             {isEditing && (
               <button 
                 onClick={() => handleStartAnalysis(selectedLot)}
-                className="flex items-center gap-3 px-8 py-4 bg-amber-500/10 text-amber-500 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-amber-500 hover:text-black transition-all"
+                className="flex items-center gap-3 px-8 py-4 bg-amber-500/10 text-amber-500 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-amber-500 hover:text-black transition-all border-2 border-amber-500/20 hover:border-amber-500"
               >
                 <Beaker size={20} /> Nuevo Análisis
               </button>
@@ -168,7 +168,7 @@ export const LotManagementView = ({
                   }
                 }}
                 disabled={!isAreaValid}
-                className="flex items-center gap-3 px-10 py-5 bg-[#3B82F6] text-white rounded-2xl font-black text-xs uppercase tracking-widest hover:scale-105 transition-all shadow-xl shadow-blue-500/20 disabled:opacity-50"
+                className="flex items-center gap-3 px-10 py-5 bg-[#3B82F6] text-white rounded-2xl font-black text-xs uppercase tracking-widest hover:scale-105 transition-all shadow-[0_0_20px_rgba(59,130,246,0.4)] disabled:opacity-50"
               >
                 <Save size={20} /> Guardar Lote
               </button>
@@ -177,50 +177,50 @@ export const LotManagementView = ({
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          <div className="lg:col-span-2 bg-white/5 rounded-[3rem] border border-white/10 p-10 flex flex-col gap-10 backdrop-blur-md">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-              <div className="flex flex-col gap-3">
-                <label className="text-[10px] font-black text-white/20 uppercase tracking-[0.2em]">Código de Lote</label>
+          <div className="lg:col-span-2 bg-black rounded-[3rem] border-2 border-white/10 p-12 flex flex-col gap-12">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
+              <div className="flex flex-col gap-4">
+                <label className="text-[10px] font-black text-white/40 uppercase tracking-widest">Código de Lote</label>
                 <input 
                   type="text" 
                   value={lotData.lotCode || ''} 
                   onChange={e => setLotData({ ...lotData, lotCode: e.target.value })} 
-                  className="w-full h-20 px-8 bg-white/5 rounded-3xl border border-white/10 focus:border-[#3B82F6] focus:ring-4 focus:ring-[#3B82F6]/10 font-black text-xl outline-none transition-all text-white" 
+                  className="industrial-input w-full h-20 px-8 bg-black rounded-2xl border-2 border-white/20 focus:border-[#3B82F6] font-black text-2xl outline-none transition-all text-white uppercase" 
                 />
               </div>
-              <div className="flex flex-col gap-3">
-                <label className="text-[10px] font-black text-white/20 uppercase tracking-[0.2em]">Finca Asociada</label>
+              <div className="flex flex-col gap-4">
+                <label className="text-[10px] font-black text-white/40 uppercase tracking-widest">Finca Asociada</label>
                 <select 
                   value={lotData.farmId || ''} 
                   onChange={e => setLotData({ ...lotData, farmId: e.target.value })} 
-                  className="w-full h-20 px-8 bg-white/5 rounded-3xl border border-white/10 focus:border-[#3B82F6] focus:ring-4 focus:ring-[#3B82F6]/10 font-black text-xl outline-none transition-all text-white appearance-none"
+                  className="industrial-input w-full h-20 px-8 bg-black rounded-2xl border-2 border-white/20 focus:border-[#3B82F6] font-black text-xl outline-none transition-all text-white appearance-none uppercase"
                 >
-                  <option value="" className="bg-zinc-900">Seleccione una finca</option>
+                  <option value="" className="bg-black">SELECCIONE UNA FINCA</option>
                   {farms.map(f => (
-                    <option key={f.id} value={f.id} className="bg-zinc-900">{f.name}</option>
+                    <option key={f.id} value={f.id} className="bg-black uppercase">{f.name}</option>
                   ))}
                 </select>
               </div>
-              <div className="flex flex-col gap-3">
-                <label className="text-[10px] font-black text-white/20 uppercase tracking-[0.2em]">Tipo de Cultivo</label>
+              <div className="flex flex-col gap-4">
+                <label className="text-[10px] font-black text-white/40 uppercase tracking-widest">Tipo de Cultivo</label>
                 <select 
                   value={lotData.cropId || ''} 
                   onChange={e => setLotData({ ...lotData, cropId: e.target.value })} 
-                  className="w-full h-20 px-8 bg-white/5 rounded-3xl border border-white/10 focus:border-[#3B82F6] focus:ring-4 focus:ring-[#3B82F6]/10 font-black text-xl outline-none transition-all text-white appearance-none"
+                  className="industrial-input w-full h-20 px-8 bg-black rounded-2xl border-2 border-white/20 focus:border-[#3B82F6] font-black text-xl outline-none transition-all text-white appearance-none uppercase"
                 >
                   {crops.map(c => (
-                    <option key={c.id} value={c.id} className="bg-zinc-900">{c.name}</option>
+                    <option key={c.id} value={c.id} className="bg-black uppercase">{c.name}</option>
                   ))}
                 </select>
               </div>
-              <div className="flex flex-col gap-3">
-                <label className="text-[10px] font-black text-white/20 uppercase tracking-[0.2em]">Área de Cultivo (Ha)</label>
+              <div className="flex flex-col gap-4">
+                <label className="text-[10px] font-black text-white/40 uppercase tracking-widest">Área de Cultivo (Ha)</label>
                 <div className="flex flex-col gap-2">
                   <input 
                     type="number" 
                     value={lotData.area || ''} 
                     onChange={e => setLotData({ ...lotData, area: parseFloat(e.target.value) || 0 })} 
-                    className={`w-full h-20 px-8 bg-white/5 rounded-3xl border border-white/10 focus:border-[#3B82F6] focus:ring-4 focus:ring-[#3B82F6]/10 font-black text-xl outline-none transition-all text-white ${!isAreaValid ? 'border-red-500 ring-4 ring-red-500/10' : ''}`} 
+                    className={`industrial-input w-full h-20 px-8 bg-black rounded-2xl border-2 ${!isAreaValid ? 'border-red-500 focus:border-red-500 text-red-500' : 'border-white/20 focus:border-[#3B82F6] text-white'} font-black text-2xl outline-none transition-all uppercase`} 
                   />
                   {selectedFarm && (
                     <span className={`text-[10px] font-black ${isAreaValid ? 'text-[#10B981]' : 'text-red-500'} uppercase tracking-widest`}>
@@ -229,34 +229,34 @@ export const LotManagementView = ({
                   )}
                 </div>
               </div>
-              <div className="flex flex-col gap-3">
-                <label className="text-[10px] font-black text-white/20 uppercase tracking-[0.2em]">Tipo de Suelo</label>
+              <div className="flex flex-col gap-4">
+                <label className="text-[10px] font-black text-white/40 uppercase tracking-widest">Tipo de Suelo</label>
                 <select 
                   value={lotData.soilType || ''} 
                   onChange={e => setLotData({ ...lotData, soilType: e.target.value as SoilType })} 
-                  className="w-full h-20 px-8 bg-white/5 rounded-3xl border border-white/10 focus:border-[#3B82F6] focus:ring-4 focus:ring-[#3B82F6]/10 font-black text-xl outline-none transition-all text-white appearance-none"
+                  className="industrial-input w-full h-20 px-8 bg-black rounded-2xl border-2 border-white/20 focus:border-[#3B82F6] font-black text-xl outline-none transition-all text-white appearance-none uppercase"
                 >
                   {(['Arcilloso', 'Arenoso', 'Franco', 'Limoso'] as SoilType[]).map(t => (
-                    <option key={t} value={t} className="bg-zinc-900">{t}</option>
+                    <option key={t} value={t} className="bg-black uppercase">{t}</option>
                   ))}
                 </select>
               </div>
-              <div className="flex flex-col gap-3">
-                <label className="text-[10px] font-black text-white/20 uppercase tracking-[0.2em]">Estado Operativo</label>
+              <div className="flex flex-col gap-4">
+                <label className="text-[10px] font-black text-white/40 uppercase tracking-widest">Estado Operativo</label>
                 <select 
                   value={lotData.status || ''} 
                   onChange={e => setLotData({ ...lotData, status: e.target.value as LotStatus })} 
-                  className="w-full h-20 px-8 bg-white/5 rounded-3xl border border-white/10 focus:border-[#3B82F6] focus:ring-4 focus:ring-[#3B82F6]/10 font-black text-xl outline-none transition-all text-white appearance-none"
+                  className="industrial-input w-full h-20 px-8 bg-black rounded-2xl border-2 border-white/20 focus:border-[#3B82F6] font-black text-xl outline-none transition-all text-white appearance-none uppercase"
                 >
                   {(['VACÍO', 'PREPARACIÓN', 'SEMBRADO', 'COSECHA', 'DESCANSO'] as LotStatus[]).map(s => (
-                    <option key={s} value={s} className="bg-zinc-900">{s}</option>
+                    <option key={s} value={s} className="bg-black uppercase">{s}</option>
                   ))}
                 </select>
               </div>
             </div>
 
             {isEditing && (
-              <div className="flex justify-start mt-10 pt-10 border-t border-white/5">
+              <div className="flex justify-start mt-10 pt-10 border-t-2 border-white/10">
                 <button 
                   onClick={() => {
                     if (confirm('¿Está seguro de eliminar este lote?')) {
@@ -264,7 +264,7 @@ export const LotManagementView = ({
                       setSelectedLotId(null);
                     }
                   }}
-                  className="px-10 py-5 bg-red-500/10 text-red-500 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-red-500 hover:text-white transition-all"
+                  className="px-10 py-5 bg-red-500/10 text-red-500 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-red-500 hover:text-white transition-all border-2 border-red-500/20 hover:border-red-500"
                 >
                   Eliminar Lote
                 </button>
@@ -273,18 +273,18 @@ export const LotManagementView = ({
           </div>
 
           {isEditing && (
-            <div className="bg-white/5 rounded-[3rem] border border-white/10 p-10 flex flex-col gap-8 backdrop-blur-md">
+            <div className="bg-black rounded-[3rem] border-2 border-white/10 p-12 flex flex-col gap-8">
               <h3 className="text-xl font-black tracking-tighter uppercase text-white/40">Historial de Análisis</h3>
               <div className="flex flex-col gap-6">
                 {selectedLot.analyses && selectedLot.analyses.length > 0 ? (
                   selectedLot.analyses.map(analysis => (
-                    <div key={analysis.id} className="p-8 bg-white/5 rounded-[2rem] border border-white/5 flex flex-col gap-4">
+                    <div key={analysis.id} className="p-8 bg-white/5 rounded-[2rem] border-2 border-white/10 flex flex-col gap-4">
                       <div className="flex justify-between items-center">
                         <div className="flex items-center gap-3">
-                          <Clock size={16} className="text-white/20" />
-                          <span className="text-xs font-black text-white/40">{new Date(analysis.date).toLocaleDateString()}</span>
+                          <Clock size={16} className="text-white/40" />
+                          <span className="text-xs font-black text-white/60">{new Date(analysis.date).toLocaleDateString()}</span>
                         </div>
-                        <span className={`px-4 py-1.5 rounded-xl text-[10px] font-black tracking-widest ${analysis.status === 'APROBADO' ? 'bg-[#10B981]/10 text-[#10B981]' : 'bg-red-500/10 text-red-500'}`}>
+                        <span className={`px-4 py-1.5 rounded-xl text-[10px] font-black tracking-widest border-2 ${analysis.status === 'APROBADO' ? 'bg-[#10B981]/10 text-[#10B981] border-[#10B981]/30' : 'bg-red-500/10 text-red-500 border-red-500/30'}`}>
                           {analysis.status}
                         </span>
                       </div>
@@ -293,7 +293,7 @@ export const LotManagementView = ({
                           const param = crop?.parameters.find(p => p.id === key);
                           return (
                             <div key={key} className="flex justify-between items-center text-xs">
-                              <span className="text-white/20 font-black uppercase tracking-widest">{param?.name || key}</span>
+                              <span className="text-white/40 font-black uppercase tracking-widest">{param?.name || key}</span>
                               <span className="font-black text-white">{String(value)}</span>
                             </div>
                           );
@@ -302,8 +302,8 @@ export const LotManagementView = ({
                     </div>
                   ))
                 ) : (
-                  <div className="text-center py-16 bg-white/5 rounded-[2rem] border border-white/5 border-dashed">
-                    <p className="text-white/10 font-black uppercase tracking-widest text-xs">Sin registros</p>
+                  <div className="text-center py-16 bg-white/5 rounded-[2rem] border-2 border-white/10 border-dashed">
+                    <p className="text-white/40 font-black uppercase tracking-widest text-xs">Sin registros</p>
                   </div>
                 )}
               </div>
@@ -316,18 +316,18 @@ export const LotManagementView = ({
 
   return (
     <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="flex flex-col gap-8">
-      <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-8 bg-white/5 p-10 rounded-[3rem] border border-white/10 backdrop-blur-md">
+      <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-8 bg-black p-10 rounded-[3rem] border-2 border-white/10">
         <div className="flex items-center gap-8">
-          <div className="w-20 h-20 bg-[#10B981] text-black rounded-3xl flex items-center justify-center shadow-2xl shadow-[#10B981]/20">
+          <div className="w-20 h-20 bg-[#10B981] text-black rounded-3xl flex items-center justify-center shadow-[0_0_30px_rgba(16,185,129,0.3)]">
             <LayoutGrid size={40} />
           </div>
           <div>
-            <h2 className="text-4xl font-black tracking-tighter uppercase leading-none">Gestión de Lotes</h2>
+            <h2 className="text-4xl font-black tracking-tighter uppercase leading-none text-white">Gestión de Lotes</h2>
             <div className="flex items-center gap-3 mt-3">
-              <span className="px-3 py-1 bg-white/5 rounded-lg text-[10px] font-black uppercase tracking-widest text-white/40">
+              <span className="px-3 py-1 bg-white/10 rounded-lg text-[10px] font-black uppercase tracking-widest text-white/60">
                 Página {currentPage} de {totalPages}
               </span>
-              <span className="w-1.5 h-1.5 bg-white/10 rounded-full" />
+              <span className="w-1.5 h-1.5 bg-white/20 rounded-full" />
               <span className="text-[10px] font-black uppercase tracking-widest text-[#10B981]">
                 {filteredLots.length} Lotes Activos
               </span>
@@ -337,34 +337,34 @@ export const LotManagementView = ({
         
         <div className="flex flex-col sm:flex-row items-center gap-4 w-full lg:w-auto">
           <div className="relative w-full sm:w-80">
-            <Search className="absolute left-6 top-1/2 -translate-y-1/2 text-white/20" size={24} />
+            <Search className="absolute left-6 top-1/2 -translate-y-1/2 text-white/40" size={24} />
             <input 
               type="text" 
               placeholder="BUSCAR LOTE..." 
               value={searchTerm}
               onChange={(e) => { setSearchTerm(e.target.value); setCurrentPage(1); }}
-              className="w-full h-16 pl-16 pr-6 bg-white/5 rounded-2xl border border-white/10 focus:border-[#10B981] font-black text-sm uppercase tracking-widest outline-none transition-all text-white"
+              className="industrial-input w-full h-16 pl-16 pr-6 bg-black rounded-2xl border-2 border-white/20 focus:border-[#10B981] font-black text-sm uppercase tracking-widest outline-none transition-all text-white placeholder:text-white/20"
             />
           </div>
           <div className="flex gap-3">
             <button 
               onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
               disabled={currentPage === 1}
-              className="w-16 h-16 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center disabled:opacity-10 hover:bg-white/10 transition-colors"
+              className="w-16 h-16 rounded-2xl bg-white/5 border-2 border-white/10 flex items-center justify-center disabled:opacity-10 hover:bg-white/10 transition-colors text-white"
             >
               <ChevronLeft size={28} />
             </button>
             <button 
               onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
               disabled={currentPage === totalPages}
-              className="w-16 h-16 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center disabled:opacity-10 hover:bg-white/10 transition-colors"
+              className="w-16 h-16 rounded-2xl bg-white/5 border-2 border-white/10 flex items-center justify-center disabled:opacity-10 hover:bg-white/10 transition-colors text-white"
             >
               <ChevronRight size={28} />
             </button>
           </div>
           <button
             onClick={() => setIsAdding(true)}
-            className="w-full sm:w-auto flex items-center justify-center gap-3 h-16 px-10 bg-[#10B981] text-black rounded-2xl font-black text-xs uppercase tracking-widest hover:scale-105 active:scale-95 transition-all shadow-xl shadow-[#10B981]/20"
+            className="w-full sm:w-auto flex items-center justify-center gap-3 h-16 px-10 bg-[#10B981] text-black rounded-2xl font-black text-xs uppercase tracking-widest hover:scale-105 active:scale-95 transition-all shadow-[0_0_20px_rgba(16,185,129,0.4)]"
           >
             <Plus size={24} /> Nuevo Lote
           </button>
@@ -373,8 +373,8 @@ export const LotManagementView = ({
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         {paginatedLots.length === 0 ? (
-          <div className="col-span-full text-center py-32 bg-zinc-900 rounded-[3rem] border border-white/5 border-dashed">
-            <p className="text-white/20 font-black uppercase tracking-[0.3em]">No se encontraron lotes</p>
+          <div className="col-span-full text-center py-32 bg-black rounded-[3rem] border-2 border-white/10 border-dashed">
+            <p className="text-white/40 font-black uppercase tracking-[0.3em]">No se encontraron lotes</p>
           </div>
         ) : (
           paginatedLots.map(lot => {
@@ -384,7 +384,7 @@ export const LotManagementView = ({
               <button
                 key={lot.id}
                 onClick={() => setSelectedLotId(lot.id)}
-                className="p-10 rounded-[3rem] text-left transition-all flex flex-col gap-6 bg-[#10B981] text-black hover:-translate-y-2 active:scale-95 shadow-2xl shadow-[#10B981]/10 group relative overflow-hidden h-[340px]"
+                className="p-10 rounded-[3rem] text-left transition-all flex flex-col gap-6 bg-[#10B981] text-black hover:-translate-y-2 active:scale-95 shadow-[0_0_30px_rgba(16,185,129,0.2)] group relative overflow-hidden h-[340px]"
               >
                 <div className="absolute top-0 right-0 p-10 opacity-10 group-hover:scale-110 transition-transform">
                   <LayoutGrid size={120} />
@@ -408,7 +408,7 @@ export const LotManagementView = ({
                   <h3 className="font-black text-4xl tracking-tighter leading-none mb-4">Lote {lot.lotCode}</h3>
                   <div className="flex flex-wrap gap-3">
                     <div className="px-3 py-1.5 bg-black/5 rounded-lg text-[10px] font-black uppercase tracking-widest flex items-center gap-2">
-                      <MapPin size={12} /> {farm?.name || 'Sin Finca'}
+                      <MapPin size={12} /> {farm?.name || 'SIN FINCA'}
                     </div>
                     <div className="px-3 py-1.5 bg-black/5 rounded-lg text-[10px] font-black uppercase tracking-widest flex items-center gap-2">
                       <Beaker size={12} /> {crop?.name}
@@ -438,14 +438,14 @@ export const LotManagementView = ({
             />
             <motion.div 
               initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.9, opacity: 0 }}
-              className="relative bg-zinc-900 w-full max-w-2xl rounded-[3rem] shadow-2xl overflow-hidden border border-white/10"
+              className="relative bg-black w-full max-w-2xl rounded-[3rem] shadow-[0_0_50px_rgba(0,0,0,0.5)] overflow-hidden border-2 border-white/10"
             >
-              <div className="p-10 border-b border-white/5 flex justify-between items-center">
+              <div className="p-10 border-b-2 border-white/10 flex justify-between items-center bg-white/5">
                 <div>
-                  <h3 className="text-3xl font-black tracking-tighter uppercase">Análisis de Lote</h3>
-                  <p className="text-white/20 font-black uppercase text-[10px] tracking-widest mt-1">Registro de Parámetros</p>
+                  <h3 className="text-3xl font-black tracking-tighter uppercase text-white">Análisis de Lote</h3>
+                  <p className="text-white/40 font-black uppercase text-[10px] tracking-widest mt-1">Registro de Parámetros</p>
                 </div>
-                <button onClick={() => setAnalyzingLotId(null)} className="p-4 bg-white/5 rounded-2xl hover:bg-white/10 transition-colors">
+                <button onClick={() => setAnalyzingLotId(null)} className="p-4 bg-white/5 rounded-2xl hover:bg-white/10 transition-colors text-white">
                   <Plus className="rotate-45" />
                 </button>
               </div>
@@ -453,33 +453,33 @@ export const LotManagementView = ({
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
                   {analyzingCrop?.parameters.map(param => (
                     <div key={param.id} className="flex flex-col gap-3">
-                      <span className="text-[10px] font-black text-white/20 uppercase tracking-widest">{param.name}</span>
+                      <span className="text-[10px] font-black text-white/40 uppercase tracking-widest">{param.name}</span>
                       {param.type === 'NUMERIC' && (
                         <input 
                           type="number" 
                           value={analysisValues[param.id] || ''}
                           onChange={e => setAnalysisValues(prev => ({ ...prev, [param.id]: Number(e.target.value) }))}
-                          className="h-16 px-6 bg-white/5 rounded-2xl font-black text-white border border-white/10 focus:border-[#3B82F6] outline-none"
+                          className="industrial-input h-16 px-6 bg-black rounded-2xl font-black text-white border-2 border-white/20 focus:border-[#3B82F6] outline-none transition-all"
                         />
                       )}
                       {param.type === 'BOOLEAN' && (
                         <select 
                           value={String(analysisValues[param.id])}
                           onChange={e => setAnalysisValues(prev => ({ ...prev, [param.id]: e.target.value === 'true' }))}
-                          className="h-16 px-6 bg-white/5 rounded-2xl font-black text-white border border-white/10 focus:border-[#3B82F6] outline-none appearance-none"
+                          className="industrial-input h-16 px-6 bg-black rounded-2xl font-black text-white border-2 border-white/20 focus:border-[#3B82F6] outline-none appearance-none transition-all"
                         >
-                          <option value="true" className="bg-zinc-900">Sí</option>
-                          <option value="false" className="bg-zinc-900">No</option>
+                          <option value="true" className="bg-black">SÍ</option>
+                          <option value="false" className="bg-black">NO</option>
                         </select>
                       )}
                       {param.type === 'SELECTION' && (
                         <select 
                           value={analysisValues[param.id] || ''}
                           onChange={e => setAnalysisValues(prev => ({ ...prev, [param.id]: e.target.value }))}
-                          className="h-16 px-6 bg-white/5 rounded-2xl font-black text-white border border-white/10 focus:border-[#3B82F6] outline-none appearance-none"
+                          className="industrial-input h-16 px-6 bg-black rounded-2xl font-black text-white border-2 border-white/20 focus:border-[#3B82F6] outline-none appearance-none transition-all"
                         >
                           {param.options?.map(opt => (
-                            <option key={opt} value={opt} className="bg-zinc-900">{opt}</option>
+                            <option key={opt} value={opt} className="bg-black">{opt}</option>
                           ))}
                         </select>
                       )}
@@ -488,7 +488,7 @@ export const LotManagementView = ({
                 </div>
                 <button 
                   onClick={submitAnalysis}
-                  className="h-20 bg-[#3B82F6] text-white font-black text-xs uppercase tracking-widest rounded-3xl shadow-xl shadow-blue-500/20 hover:scale-[1.02] transition-all"
+                  className="h-20 bg-[#3B82F6] text-white font-black text-xs uppercase tracking-widest rounded-3xl shadow-[0_0_30px_rgba(59,130,246,0.3)] hover:scale-[1.02] active:scale-95 transition-all"
                 >
                   Registrar Análisis
                 </button>

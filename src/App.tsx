@@ -8,7 +8,7 @@ import {
   Plus, Minus, Beaker, ShieldCheck, Clock, ChevronRight, ChevronLeft, Save, Leaf, 
   Map, LayoutGrid, MapPin, Layers, Info, Home, User, Settings, 
   Activity, Trash2, CheckCircle2, XCircle, ListFilter, Briefcase, Factory, Users, Search, Phone, CreditCard,
-  Droplets, Sprout, Truck, Box, Sun, Moon, FlaskConical, ClipboardCheck
+  Droplets, Sprout, Truck, Box, Sun, Moon, FlaskConical, ClipboardCheck, ArrowLeft
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { SiembraControlView } from './components/SiembraControlView';
@@ -407,9 +407,9 @@ const PrecisionSlider = ({
 }) => (
   <div className="flex flex-col gap-4 w-full">
     <div className="flex justify-between items-end">
-      <span className="text-sm font-medium text-black/50 uppercase tracking-wider">{label}</span>
-      <span className="text-xl font-bold text-black">
-        {value} <span className="text-xs font-normal text-black/30">{unit}</span>
+      <span className="text-[10px] font-black text-white/20 uppercase tracking-widest">{label}</span>
+      <span className="text-xl font-black text-white">
+        {value} <span className="text-xs font-normal text-white/20">{unit}</span>
       </span>
     </div>
     <input 
@@ -419,7 +419,7 @@ const PrecisionSlider = ({
       step={step} 
       value={value} 
       onChange={(e) => onChange(parseFloat(e.target.value))}
-      className="w-full h-3 bg-black/5 rounded-full appearance-none cursor-pointer accent-[#0052CC]"
+      className="w-full h-2 bg-white/5 rounded-full appearance-none cursor-pointer accent-[#3B82F6] hover:bg-white/10 transition-all"
     />
   </div>
 );
@@ -513,7 +513,7 @@ const CropMasterView = ({
             className={`flex items-center gap-4 px-10 py-6 rounded-[2rem] border transition-all whitespace-nowrap ${
               selectedCropId === crop.id 
                 ? 'bg-[#3B82F6] border-transparent shadow-2xl shadow-blue-500/20 text-white scale-105' 
-                : 'bg-zinc-900 border-white/5 text-white/40 hover:border-white/20'
+                : 'bg-white/5 border-white/10 text-white/40 hover:border-white/20'
             }`}
           >
             <span className="text-4xl">{crop.icon}</span>
@@ -525,14 +525,14 @@ const CropMasterView = ({
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
         {/* Physical-Chemical Section */}
         <div className="lg:col-span-12 flex flex-col gap-8">
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 px-4">
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 px-4 bg-white/5 p-8 rounded-[3rem] border border-white/10 backdrop-blur-md">
             <div>
               <h3 className="text-4xl font-black tracking-tighter uppercase leading-none">Constructor de Análisis</h3>
               <p className="text-white/20 font-black uppercase text-[10px] tracking-widest mt-3">Define los parámetros dinámicos para el control de calidad.</p>
             </div>
             <button 
               onClick={() => setIsAddingParam(true)}
-              className="flex items-center gap-3 px-10 py-5 bg-[#3B82F6] text-white rounded-2xl font-black text-xs uppercase tracking-widest hover:scale-105 transition-all shadow-xl shadow-blue-500/20"
+              className="flex items-center gap-3 px-10 py-5 bg-[#3B82F6] text-white rounded-2xl font-black text-xs uppercase tracking-widest hover:scale-105 transition-all shadow-2xl shadow-blue-500/20"
             >
               <Plus size={20} /> Agregar Parámetro
             </button>
@@ -540,29 +540,35 @@ const CropMasterView = ({
 
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
             {currentCrop.parameters.map(param => (
-              <BentoCard 
+              <div 
                 key={param.id} 
-                title={param.name} 
-                icon={param.category === 'FISICO_QUIMICO' ? Beaker : ShieldCheck}
-                className="relative group"
+                className="relative group p-8 bg-white/5 rounded-[3rem] border border-white/10 backdrop-blur-md hover:bg-white/[0.07] transition-all"
               >
                 <button 
                   onClick={() => removeParameter(param.id)}
-                  className="absolute top-10 right-10 p-3 text-white/10 hover:text-red-500 transition-colors bg-white/5 rounded-xl"
+                  className="absolute top-8 right-8 p-3 text-white/10 hover:text-red-500 transition-colors bg-white/5 rounded-xl border border-white/10"
                 >
                   <Trash2 size={20} />
                 </button>
                 
                 <div className="flex flex-col gap-8">
-                  <div className="flex items-center gap-3">
-                    <span className={`px-4 py-1.5 rounded-xl text-[10px] font-black tracking-widest border ${
-                      param.category === 'FISICO_QUIMICO' ? 'bg-blue-500/10 text-[#3B82F6] border-blue-500/20' : 'bg-purple-500/10 text-purple-400 border-purple-500/20'
-                    }`}>
-                      {param.category.replace('_', ' ')}
-                    </span>
-                    <span className="px-4 py-1.5 rounded-xl text-[10px] font-black tracking-widest border bg-white/5 text-white/20 border-white/5">
-                      {param.type}
-                    </span>
+                  <div className="flex items-center gap-4">
+                    <div className={`p-4 rounded-2xl ${param.category === 'FISICO_QUIMICO' ? 'bg-blue-500/10 text-[#3B82F6]' : 'bg-purple-500/10 text-purple-400'}`}>
+                      {param.category === 'FISICO_QUIMICO' ? <Beaker size={32} /> : <ShieldCheck size={32} />}
+                    </div>
+                    <div>
+                      <h4 className="text-2xl font-black tracking-tight uppercase text-white">{param.name}</h4>
+                      <div className="flex items-center gap-2 mt-1">
+                        <span className={`px-2 py-0.5 rounded text-[8px] font-black tracking-widest uppercase ${
+                          param.category === 'FISICO_QUIMICO' ? 'bg-blue-500/10 text-[#3B82F6]' : 'bg-purple-500/10 text-purple-400'
+                        }`}>
+                          {param.category.replace('_', ' ')}
+                        </span>
+                        <span className="px-2 py-0.5 rounded text-[8px] font-black tracking-widest uppercase bg-white/5 text-white/20">
+                          {param.type}
+                        </span>
+                      </div>
+                    </div>
                   </div>
 
                   {param.type === 'NUMERIC' && (
@@ -595,7 +601,7 @@ const CropMasterView = ({
                     </div>
                   )}
                 </div>
-              </BentoCard>
+              </div>
             ))}
           </div>
         </div>
@@ -608,36 +614,41 @@ const CropMasterView = ({
             <motion.div 
               initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
               onClick={() => setIsAddingParam(false)}
-              className="absolute inset-0 bg-black/40 backdrop-blur-sm"
+              className="absolute inset-0 bg-black/60 backdrop-blur-sm"
             />
             <motion.div 
               initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.9, opacity: 0 }}
-              className="relative bg-white w-full max-w-3xl rounded-[3rem] shadow-2xl overflow-hidden"
+              className="relative bg-zinc-900 w-full max-w-3xl rounded-[3rem] shadow-2xl overflow-hidden border border-white/10"
             >
-              <div className="p-10 border-b border-black/5 flex justify-between items-center">
-                <h3 className="text-3xl font-bold tracking-tight">Nuevo Parámetro</h3>
-                <button onClick={() => setIsAddingParam(false)} className="p-4 bg-black/5 rounded-2xl"><Plus className="rotate-45" /></button>
+              <div className="p-10 border-b border-white/5 flex justify-between items-center">
+                <div>
+                  <h3 className="text-3xl font-black tracking-tight uppercase text-white">Nuevo Parámetro</h3>
+                  <p className="text-white/20 font-black uppercase text-[10px] tracking-widest mt-1">Configuración técnica del análisis</p>
+                </div>
+                <button onClick={() => setIsAddingParam(false)} className="w-14 h-14 bg-white/5 text-white/40 rounded-2xl flex items-center justify-center hover:bg-white/10 transition-all border border-white/10">
+                  <Plus className="rotate-45" size={24} />
+                </button>
               </div>
               <div className="p-10 flex flex-col gap-10">
                 <div className="grid grid-cols-2 gap-8">
                   <div className="flex flex-col gap-2">
-                    <span className="text-[10px] font-black text-black/40 uppercase tracking-widest">Nombre del Análisis</span>
+                    <span className="text-[10px] font-black text-white/20 uppercase tracking-widest">Nombre del Análisis</span>
                     <input 
                       type="text" 
                       placeholder="Ej: Grados Brix"
                       value={newParam.name}
                       onChange={e => setNewParam(prev => ({ ...prev, name: e.target.value }))}
-                      className="h-16 px-6 bg-black/5 rounded-2xl font-black focus:outline-none focus:ring-4 focus:ring-blue-100"
+                      className="h-16 px-6 bg-white/5 rounded-2xl font-black focus:outline-none focus:ring-2 focus:ring-[#3B82F6] text-white border border-white/10"
                     />
                   </div>
                   <div className="flex flex-col gap-2">
-                    <span className="text-[10px] font-black text-black/40 uppercase tracking-widest">Categoría</span>
-                    <div className="flex bg-black/5 p-1 rounded-2xl h-16">
+                    <span className="text-[10px] font-black text-white/20 uppercase tracking-widest">Categoría</span>
+                    <div className="flex bg-white/5 p-1 rounded-2xl h-16 border border-white/10">
                       {(['FISICO_QUIMICO', 'MICROBIOLOGICO'] as ParameterCategory[]).map(c => (
                         <button
                           key={c}
                           onClick={() => setNewParam(prev => ({ ...prev, category: c }))}
-                          className={`flex-1 rounded-xl font-black text-[10px] transition-all ${newParam.category === c ? 'bg-white shadow-sm text-[#0052CC]' : 'text-black/40'}`}
+                          className={`flex-1 rounded-xl font-black text-[10px] transition-all ${newParam.category === c ? 'bg-[#3B82F6] text-white shadow-lg shadow-blue-500/20' : 'text-white/20 hover:bg-white/5'}`}
                         >
                           {c.replace('_', ' ')}
                         </button>
@@ -648,13 +659,13 @@ const CropMasterView = ({
 
                 <div className="grid grid-cols-2 gap-8">
                   <div className="flex flex-col gap-2">
-                    <span className="text-[10px] font-black text-black/40 uppercase tracking-widest">Tipo de Valor</span>
+                    <span className="text-[10px] font-black text-white/20 uppercase tracking-widest">Tipo de Valor</span>
                     <div className="grid grid-cols-3 gap-2">
                       {(['NUMERIC', 'BOOLEAN', 'SELECTION'] as ParameterType[]).map(t => (
                         <button
                           key={t}
                           onClick={() => setNewParam(prev => ({ ...prev, type: t }))}
-                          className={`h-12 rounded-xl font-black text-[10px] border transition-all ${newParam.type === t ? 'bg-black text-white border-black' : 'bg-white text-black/40 border-black/10'}`}
+                          className={`h-12 rounded-xl font-black text-[10px] border transition-all ${newParam.type === t ? 'bg-[#3B82F6] text-white border-transparent shadow-lg shadow-blue-500/20' : 'bg-white/5 text-white/20 border-white/10 hover:bg-white/10'}`}
                         >
                           {t}
                         </button>
@@ -662,13 +673,13 @@ const CropMasterView = ({
                     </div>
                   </div>
                   <div className="flex flex-col gap-2">
-                    <span className="text-[10px] font-black text-black/40 uppercase tracking-widest">Unidad de Medida</span>
+                    <span className="text-[10px] font-black text-white/20 uppercase tracking-widest">Unidad de Medida</span>
                     <div className="flex gap-2 overflow-x-auto no-scrollbar pb-2">
                       {UNITS_MASTER.map(u => (
                         <button
                           key={u}
                           onClick={() => setNewParam(prev => ({ ...prev, unit: u }))}
-                          className={`px-4 py-2 rounded-xl font-black text-xs border whitespace-nowrap transition-all ${newParam.unit === u ? 'bg-[#0052CC] text-white border-[#0052CC]' : 'bg-white text-black/40 border-black/10'}`}
+                          className={`h-12 px-4 rounded-xl font-black text-[10px] border transition-all whitespace-nowrap ${newParam.unit === u ? 'bg-[#3B82F6] text-white border-transparent shadow-lg shadow-blue-500/20' : 'bg-white/5 text-white/20 border-white/10 hover:bg-white/10'}`}
                         >
                           {u}
                         </button>
@@ -678,7 +689,7 @@ const CropMasterView = ({
                 </div>
 
                 {newParam.type === 'NUMERIC' && (
-                  <div className="grid grid-cols-2 gap-10 bg-blue-50/50 p-8 rounded-[2rem] border border-blue-100">
+                  <div className="grid grid-cols-2 gap-10 bg-white/5 p-8 rounded-[2rem] border border-white/10">
                     <Stepper 
                       label="Mínimo Permitido" 
                       value={newParam.min || 0} 
@@ -695,20 +706,20 @@ const CropMasterView = ({
                 )}
 
                 {newParam.type === 'BOOLEAN' && (
-                  <div className="flex flex-col gap-4 bg-emerald-50/50 p-8 rounded-[2rem] border border-emerald-100">
-                    <span className="text-xs font-bold text-black/40 uppercase tracking-widest">Lógica de Calidad (Boolean)</span>
-                    <div className="flex items-center justify-between bg-white p-6 rounded-2xl border border-emerald-200">
-                      <span className="font-bold">Estado 'ACTIVO' significa:</span>
-                      <div className="flex bg-black/5 p-1 rounded-xl">
+                  <div className="flex flex-col gap-4 bg-white/5 p-8 rounded-[2rem] border border-white/10">
+                    <span className="text-xs font-bold text-white/20 uppercase tracking-widest">Lógica de Calidad (Boolean)</span>
+                    <div className="flex items-center justify-between bg-white/5 p-6 rounded-2xl border border-white/10">
+                      <span className="font-bold text-white">Estado 'ACTIVO' significa:</span>
+                      <div className="flex bg-black/40 p-1 rounded-xl">
                         <button 
                           onClick={() => setNewParam(prev => ({ ...prev, booleanOptimalState: true }))}
-                          className={`px-4 py-2 rounded-lg font-bold text-xs transition-all ${newParam.booleanOptimalState !== false ? 'bg-emerald-500 text-white shadow-lg' : 'text-black/40'}`}
+                          className={`px-4 py-2 rounded-lg font-bold text-xs transition-all ${newParam.booleanOptimalState !== false ? 'bg-emerald-500 text-white shadow-lg' : 'text-white/20'}`}
                         >
                           ÓPTIMO
                         </button>
                         <button 
                           onClick={() => setNewParam(prev => ({ ...prev, booleanOptimalState: false }))}
-                          className={`px-4 py-2 rounded-lg font-bold text-xs transition-all ${newParam.booleanOptimalState === false ? 'bg-red-500 text-white shadow-lg' : 'text-black/40'}`}
+                          className={`px-4 py-2 rounded-lg font-bold text-xs transition-all ${newParam.booleanOptimalState === false ? 'bg-red-500 text-white shadow-lg' : 'text-white/20'}`}
                         >
                           ALERTA
                         </button>
@@ -718,15 +729,15 @@ const CropMasterView = ({
                 )}
 
                 {newParam.type === 'SELECTION' && (
-                  <div className="flex flex-col gap-4 bg-purple-50/50 p-8 rounded-[2rem] border border-purple-100">
-                    <span className="text-xs font-bold text-black/40 uppercase tracking-widest">Opciones y Categorías</span>
+                  <div className="flex flex-col gap-4 bg-white/5 p-8 rounded-[2rem] border border-white/10">
+                    <span className="text-xs font-bold text-white/20 uppercase tracking-widest">Opciones y Categorías</span>
                     <div className="flex gap-2">
                       <input 
                         type="text" 
                         placeholder="Nueva opción..."
                         value={optionInput}
                         onChange={e => setOptionInput(e.target.value)}
-                        className="flex-1 h-14 px-6 bg-white rounded-xl font-bold border border-purple-200"
+                        className="flex-1 h-14 px-6 bg-white/5 rounded-xl font-bold border border-white/10 text-white placeholder:text-white/20 focus:outline-none focus:border-[#3B82F6]/50"
                         onKeyPress={(e) => {
                           if (e.key === 'Enter' && optionInput.trim()) {
                             const opt = optionInput.trim();
@@ -751,15 +762,15 @@ const CropMasterView = ({
                             setOptionInput('');
                           }
                         }}
-                        className="px-6 bg-black text-white rounded-xl font-bold"
+                        className="px-6 bg-[#3B82F6] text-white rounded-xl font-bold shadow-lg shadow-blue-500/20"
                       >
                         Agregar
                       </button>
                     </div>
                     <div className="flex flex-col gap-3">
                       {newParam.options?.map((opt, idx) => (
-                        <div key={idx} className="flex items-center justify-between p-4 bg-white border border-purple-200 rounded-2xl">
-                          <span className="font-bold">{opt}</span>
+                        <div key={idx} className="flex items-center justify-between p-4 bg-white/5 border border-white/10 rounded-2xl">
+                          <span className="font-bold text-white">{opt}</span>
                           <div className="flex items-center gap-2">
                             {(['Bueno', 'Regular', 'Malo'] as QualityCategory[]).map(cat => (
                               <button
@@ -770,10 +781,10 @@ const CropMasterView = ({
                                 }))}
                                 className={`px-3 py-1.5 rounded-lg text-[10px] font-black transition-all border ${
                                   newParam.selectionCategories?.[opt] === cat
-                                    ? cat === 'Bueno' ? 'bg-emerald-500 text-white border-emerald-600' : 
-                                      cat === 'Regular' ? 'bg-amber-500 text-white border-amber-600' : 
-                                      'bg-red-500 text-white border-red-600'
-                                    : 'bg-black/5 text-black/40 border-transparent'
+                                    ? cat === 'Bueno' ? 'bg-emerald-500 text-white border-transparent' : 
+                                      cat === 'Regular' ? 'bg-amber-500 text-white border-transparent' : 
+                                      'bg-red-500 text-white border-transparent'
+                                    : 'bg-white/5 text-white/20 border-white/10 hover:bg-white/10'
                                 }`}
                               >
                                 {cat.toUpperCase()}
@@ -786,7 +797,7 @@ const CropMasterView = ({
                                 delete newCats[opt];
                                 setNewParam(prev => ({ ...prev, options: newOpts, selectionCategories: newCats }));
                               }}
-                              className="ml-2 p-2 text-red-500"
+                              className="ml-2 p-2 text-red-500 hover:bg-red-500/10 rounded-lg transition-colors"
                             >
                               <Trash2 size={16} />
                             </button>
@@ -797,12 +808,20 @@ const CropMasterView = ({
                   </div>
                 )}
 
-                <button 
-                  onClick={addParameter}
-                  className="h-20 bg-black text-white font-bold rounded-3xl shadow-2xl active:scale-95 transition-transform"
-                >
-                  Crear Parámetro Dinámico
-                </button>
+                <div className="flex gap-6 pt-10 border-t border-white/5">
+                  <button 
+                    onClick={() => setIsAddingParam(false)}
+                    className="flex-1 h-16 bg-white/5 text-white/40 rounded-2xl font-black uppercase tracking-widest text-xs border border-white/10"
+                  >
+                    Cancelar
+                  </button>
+                  <button 
+                    onClick={addParameter}
+                    className="flex-1 h-16 bg-[#3B82F6] text-white rounded-2xl font-black shadow-2xl shadow-blue-500/20 uppercase tracking-widest text-xs"
+                  >
+                    Guardar Parámetro
+                  </button>
+                </div>
               </div>
             </motion.div>
           </div>
@@ -1846,45 +1865,57 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-black text-white font-sans flex flex-col">
+    <div className="min-h-screen bg-[#000000] text-white font-sans flex flex-col">
       {/* Navigation Header */}
-      <div className="bg-black border-b border-white/5 px-10 py-6 flex justify-between items-center sticky top-0 z-40 backdrop-blur-xl bg-black/80">
+      <div className="px-10 py-8 flex justify-between items-center sticky top-0 z-40 backdrop-blur-xl bg-black/40">
         <div className="flex items-center gap-12">
-          <button 
-            onClick={() => setCurrentModule('home')}
-            className="flex items-center gap-2 text-[#3B82F6] font-black tracking-tighter text-2xl hover:scale-105 transition-transform"
-          >
-            <Leaf fill="currentColor" />
-            <span>TERRASYNC</span>
-          </button>
+          {currentModule === 'home' ? (
+            <button 
+              onClick={() => setCurrentModule('home')}
+              className="flex items-center gap-2 text-[#3B82F6] font-black tracking-tighter text-3xl hover:scale-105 transition-transform"
+            >
+              <Leaf fill="currentColor" size={32} />
+              <span>TERRASYNC</span>
+            </button>
+          ) : (
+            <button 
+              onClick={() => {
+                setCurrentModule('home');
+                setActiveTab('');
+              }}
+              className="w-16 h-16 bg-white/5 text-white rounded-2xl flex items-center justify-center hover:bg-white/10 transition-colors border border-white/10"
+            >
+              <ArrowLeft size={32} />
+            </button>
+          )}
           
           {currentModule !== 'home' && (
-            <nav className="flex bg-white/5 p-1.5 rounded-2xl">
+            <nav className="flex gap-2">
               {currentModule === 'maestros' && (
                 <>
-                  <button onClick={() => setActiveTab('crops')} className={`px-6 py-2.5 rounded-xl font-black text-xs uppercase tracking-widest transition-all ${activeTab === 'crops' ? 'bg-white text-black shadow-lg' : 'text-white/30'}`}>Rubros</button>
-                  <button onClick={() => setActiveTab('contacts')} className={`px-6 py-2.5 rounded-xl font-black text-xs uppercase tracking-widest transition-all ${activeTab === 'contacts' ? 'bg-white text-black shadow-lg' : 'text-white/30'}`}>Contactos</button>
+                  <button onClick={() => setActiveTab('crops')} className={`px-8 py-3 rounded-2xl font-black text-sm uppercase tracking-widest transition-all ${activeTab === 'crops' ? 'bg-[#3B82F6] text-white shadow-[0_0_20px_rgba(59,130,246,0.5)]' : 'text-white/40 hover:text-white'}`}>Rubros</button>
+                  <button onClick={() => setActiveTab('contacts')} className={`px-8 py-3 rounded-2xl font-black text-sm uppercase tracking-widest transition-all ${activeTab === 'contacts' ? 'bg-[#3B82F6] text-white shadow-[0_0_20px_rgba(59,130,246,0.5)]' : 'text-white/40 hover:text-white'}`}>Contactos</button>
                 </>
               )}
               {currentModule === 'campo' && (
                 <>
-                  <button onClick={() => setActiveTab('fincas')} className={`px-6 py-2.5 rounded-xl font-black text-xs uppercase tracking-widest transition-all ${activeTab === 'fincas' ? 'bg-white text-black shadow-lg' : 'text-white/30'}`}>Fincas</button>
-                  <button onClick={() => setActiveTab('lots')} className={`px-6 py-2.5 rounded-xl font-black text-xs uppercase tracking-widest transition-all ${activeTab === 'lots' ? 'bg-white text-black shadow-lg' : 'text-white/30'}`}>Lotes</button>
-                  <button onClick={() => setActiveTab('cura')} className={`px-6 py-2.5 rounded-xl font-black text-xs uppercase tracking-widest transition-all ${activeTab === 'cura' ? 'bg-white text-black shadow-lg' : 'text-white/30'}`}>Cura</button>
-                  <button onClick={() => setActiveTab('control-siembra')} className={`px-6 py-2.5 rounded-xl font-black text-xs uppercase tracking-widest transition-all ${activeTab === 'control-siembra' ? 'bg-white text-black shadow-lg' : 'text-white/30'}`}>Proyectos</button>
+                  <button onClick={() => setActiveTab('fincas')} className={`px-8 py-3 rounded-2xl font-black text-sm uppercase tracking-widest transition-all ${activeTab === 'fincas' ? 'bg-[#10B981] text-white shadow-[0_0_20px_rgba(16,185,129,0.5)]' : 'text-white/40 hover:text-white'}`}>Fincas</button>
+                  <button onClick={() => setActiveTab('lots')} className={`px-8 py-3 rounded-2xl font-black text-sm uppercase tracking-widest transition-all ${activeTab === 'lots' ? 'bg-[#10B981] text-white shadow-[0_0_20px_rgba(16,185,129,0.5)]' : 'text-white/40 hover:text-white'}`}>Lotes</button>
+                  <button onClick={() => setActiveTab('cura')} className={`px-8 py-3 rounded-2xl font-black text-sm uppercase tracking-widest transition-all ${activeTab === 'cura' ? 'bg-[#10B981] text-white shadow-[0_0_20px_rgba(16,185,129,0.5)]' : 'text-white/40 hover:text-white'}`}>Cura</button>
+                  <button onClick={() => setActiveTab('control-siembra')} className={`px-8 py-3 rounded-2xl font-black text-sm uppercase tracking-widest transition-all ${activeTab === 'control-siembra' ? 'bg-[#10B981] text-white shadow-[0_0_20px_rgba(16,185,129,0.5)]' : 'text-white/40 hover:text-white'}`}>Proyectos</button>
                 </>
               )}
               {currentModule === 'planta' && (
                 <>
-                  <button onClick={() => setActiveTab('recepcion')} className={`px-6 py-2.5 rounded-xl font-black text-xs uppercase tracking-widest transition-all ${activeTab === 'recepcion' ? 'bg-white text-black shadow-lg' : 'text-white/30'}`}>Recepción</button>
-                  <button onClick={() => setActiveTab('despacho')} className={`px-6 py-2.5 rounded-xl font-black text-xs uppercase tracking-widest transition-all ${activeTab === 'despacho' ? 'bg-white text-black shadow-lg' : 'text-white/30'}`}>Despacho</button>
-                  <button onClick={() => setActiveTab('silos')} className={`px-6 py-2.5 rounded-xl font-black text-xs uppercase tracking-widest transition-all ${activeTab === 'silos' ? 'bg-white text-black shadow-lg' : 'text-white/30'}`}>Silos</button>
+                  <button onClick={() => setActiveTab('recepcion')} className={`px-8 py-3 rounded-2xl font-black text-sm uppercase tracking-widest transition-all ${activeTab === 'recepcion' ? 'bg-[#3B82F6] text-white shadow-[0_0_20px_rgba(59,130,246,0.5)]' : 'text-white/40 hover:text-white'}`}>Recepción</button>
+                  <button onClick={() => setActiveTab('despacho')} className={`px-8 py-3 rounded-2xl font-black text-sm uppercase tracking-widest transition-all ${activeTab === 'despacho' ? 'bg-[#3B82F6] text-white shadow-[0_0_20px_rgba(59,130,246,0.5)]' : 'text-white/40 hover:text-white'}`}>Despacho</button>
+                  <button onClick={() => setActiveTab('silos')} className={`px-8 py-3 rounded-2xl font-black text-sm uppercase tracking-widest transition-all ${activeTab === 'silos' ? 'bg-[#3B82F6] text-white shadow-[0_0_20px_rgba(59,130,246,0.5)]' : 'text-white/40 hover:text-white'}`}>Silos</button>
                 </>
               )}
               {currentModule === 'calidad' && (
                 <>
-                  <button onClick={() => setActiveTab('analisis')} className={`px-6 py-2.5 rounded-xl font-black text-xs uppercase tracking-widest transition-all ${activeTab === 'analisis' ? 'bg-white text-black shadow-lg' : 'text-white/30'}`}>Calidad</button>
-                  <button onClick={() => setActiveTab('cuarentena')} className={`px-6 py-2.5 rounded-xl font-black text-xs uppercase tracking-widest transition-all ${activeTab === 'cuarentena' ? 'bg-white text-black shadow-lg' : 'text-white/30'}`}>Cuarentena</button>
+                  <button onClick={() => setActiveTab('analisis')} className={`px-8 py-3 rounded-2xl font-black text-sm uppercase tracking-widest transition-all ${activeTab === 'analisis' ? 'bg-[#F59E0B] text-white shadow-[0_0_20px_rgba(245,158,11,0.5)]' : 'text-white/40 hover:text-white'}`}>Calidad</button>
+                  <button onClick={() => setActiveTab('cuarentena')} className={`px-8 py-3 rounded-2xl font-black text-sm uppercase tracking-widest transition-all ${activeTab === 'cuarentena' ? 'bg-[#F59E0B] text-white shadow-[0_0_20px_rgba(245,158,11,0.5)]' : 'text-white/40 hover:text-white'}`}>Cuarentena</button>
                 </>
               )}
             </nav>
@@ -1892,14 +1923,14 @@ export default function App() {
         </div>
 
         <div className="flex items-center gap-6">
-          <div className="flex items-center gap-2 px-4 py-2 bg-white/5 rounded-xl border border-white/10">
-            <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse" />
-            <span className="text-[10px] font-black tracking-widest uppercase opacity-40">Sistema Online</span>
+          <div className="flex items-center gap-2 px-6 py-3 bg-white/5 rounded-2xl border border-white/10">
+            <div className="w-3 h-3 bg-[#10B981] rounded-full animate-pulse shadow-[0_0_10px_#10B981]" />
+            <span className="text-xs font-black tracking-widest uppercase text-white/60">Sistema Online</span>
           </div>
         </div>
       </div>
 
-      <div className="p-6 md:p-10 flex-1 bg-black">
+      <div className="p-6 md:p-10 flex-1 bg-[#000000]">
         <main className="max-w-7xl mx-auto w-full">
           <AnimatePresence mode="wait">
             {currentModule === 'home' && (
@@ -2023,20 +2054,6 @@ export default function App() {
           </AnimatePresence>
         </main>
       </div>
-
-      <footer className="bg-black border-t border-white/5 p-10">
-        <div className="max-w-7xl mx-auto w-full flex justify-between items-center text-white/10 text-[10px] font-black uppercase tracking-[0.2em]">
-          <div className="flex items-center gap-6">
-            <span>TERRASYNC v2.1.0</span>
-            <span className="w-1.5 h-1.5 bg-white/10 rounded-full" />
-            <span>Industrial High-Contrast OS</span>
-          </div>
-          <div className="flex items-center gap-3">
-            <Activity size={14} />
-            Silicon Valley Industrial Design
-          </div>
-        </div>
-      </footer>
     </div>
   );
 }

@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Plus, LayoutGrid, MapPin, Search, ChevronLeft, ChevronRight, ArrowLeft, Trash2, Beaker, CheckCircle2, XCircle, Info, Clock } from 'lucide-react';
+import { Plus, LayoutGrid, MapPin, Search, ChevronLeft, ChevronRight, ArrowLeft, Trash2, Beaker, CheckCircle2, XCircle, Info, Clock, Save } from 'lucide-react';
 import { Lot, Crop, Farm, LotAnalysis, SoilType, LotStatus } from '../types';
 
 export const LotManagementView = ({
@@ -133,7 +133,7 @@ export const LotManagementView = ({
 
     return (
       <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="flex flex-col gap-8 min-h-[80vh]">
-        <div className="flex justify-between items-center bg-zinc-900 p-8 rounded-[3rem] border border-white/5">
+        <div className="flex justify-between items-center bg-white/5 p-8 rounded-[3rem] border border-white/10 backdrop-blur-md">
           <div className="flex items-center gap-6">
             <button 
               onClick={() => { setSelectedLotId(null); setIsAdding(false); setEditLot({}); }}
@@ -177,7 +177,7 @@ export const LotManagementView = ({
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          <div className="lg:col-span-2 bg-zinc-900 rounded-[3rem] border border-white/5 p-10 flex flex-col gap-10">
+          <div className="lg:col-span-2 bg-white/5 rounded-[3rem] border border-white/10 p-10 flex flex-col gap-10 backdrop-blur-md">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
               <div className="flex flex-col gap-3">
                 <label className="text-[10px] font-black text-white/20 uppercase tracking-[0.2em]">Código de Lote</label>
@@ -273,7 +273,7 @@ export const LotManagementView = ({
           </div>
 
           {isEditing && (
-            <div className="bg-zinc-900 rounded-[3rem] border border-white/5 p-10 flex flex-col gap-8">
+            <div className="bg-white/5 rounded-[3rem] border border-white/10 p-10 flex flex-col gap-8 backdrop-blur-md">
               <h3 className="text-xl font-black tracking-tighter uppercase text-white/40">Historial de Análisis</h3>
               <div className="flex flex-col gap-6">
                 {selectedLot.analyses && selectedLot.analyses.length > 0 ? (
@@ -316,7 +316,7 @@ export const LotManagementView = ({
 
   return (
     <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="flex flex-col gap-8">
-      <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-8 bg-zinc-900 p-10 rounded-[3rem] border border-white/5">
+      <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-8 bg-white/5 p-10 rounded-[3rem] border border-white/10 backdrop-blur-md">
         <div className="flex items-center gap-8">
           <div className="w-20 h-20 bg-[#10B981] text-black rounded-3xl flex items-center justify-center shadow-2xl shadow-[#10B981]/20">
             <LayoutGrid size={40} />

@@ -84,7 +84,7 @@ export const FarmManagementView = ({
 
     return (
       <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="flex flex-col gap-8 min-h-[80vh]">
-        <div className="flex justify-between items-center bg-zinc-900 p-8 rounded-[3rem] border border-white/5">
+        <div className="flex justify-between items-center bg-white/5 p-8 rounded-[3rem] border border-white/10 backdrop-blur-md">
           <div className="flex items-center gap-6">
             <button 
               onClick={() => { setSelectedFarmId(null); setIsAdding(false); setEditFarm({}); }}
@@ -118,7 +118,7 @@ export const FarmManagementView = ({
           )}
         </div>
 
-        <div className="bg-zinc-900 rounded-[3rem] border border-white/5 p-10 flex flex-col gap-10">
+        <div className="bg-white/5 rounded-[3rem] border border-white/10 p-10 flex flex-col gap-10 backdrop-blur-md">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
             <div className="flex flex-col gap-3">
               <label className="text-[10px] font-black text-white/20 uppercase tracking-[0.2em]">Nombre de la Finca</label>

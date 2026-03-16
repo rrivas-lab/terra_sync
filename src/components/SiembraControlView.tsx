@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Plus, Calendar, List, AlertCircle, CheckCircle2, ChevronRight, Sprout, Clock, ArrowLeft, Search, ChevronLeft, Package, Truck, ClipboardCheck, Minus } from 'lucide-react';
+import { Plus, Calendar, List, AlertCircle, CheckCircle2, ChevronRight, Sprout, Clock, ArrowLeft, Search, ChevronLeft, Package, Truck, ClipboardCheck, Minus, X } from 'lucide-react';
 import { SowingProject, Lot, ActivityLog, MaterialReception, Contact, SowingRecord } from '../types';
 
 const Stepper = ({ value, onChange, min = 0, max = 100, step = 1, label }: any) => (
@@ -100,9 +100,9 @@ export const SiembraControlView = ({
                 setActivitySearchTerm('');
                 setActivityCurrentPage(1);
               }}
-              className="w-20 h-20 bg-black text-white rounded-2xl flex items-center justify-center hover:bg-white/10 transition-colors border-2 border-white"
+              className="w-16 h-16 md:w-20 md:h-20 shrink-0 bg-black text-white rounded-2xl flex items-center justify-center hover:bg-white/10 transition-colors border-2 border-white"
             >
-              <ArrowLeft size={40} />
+              <ArrowLeft size={32} className="md:w-10 md:h-10" />
             </button>
             <div>
               <h2 className="text-4xl font-black tracking-tighter uppercase leading-none text-white">{selectedProject.name}</h2>
@@ -444,10 +444,10 @@ export const SiembraControlView = ({
                   </div>
                 </div>
 
-                <div className="p-10 bg-white/5 border-t-2 border-white/10 flex gap-6">
+                <div className="p-10 bg-white/5 border-t-2 border-white/10 flex flex-col md:flex-row gap-6">
                   <button 
                     onClick={() => setIsActivityModalOpen(false)} 
-                    className="flex-1 h-20 bg-black text-white/40 rounded-2xl font-black uppercase tracking-widest text-xs border-2 border-white/20 hover:bg-white/10 transition-all"
+                    className="w-full md:w-auto flex-1 h-20 bg-black text-white/40 rounded-2xl font-black uppercase tracking-widest text-xs border-2 border-white/20 hover:bg-white/10 transition-all"
                   >
                     Cancelar
                   </button>
@@ -457,7 +457,7 @@ export const SiembraControlView = ({
                       setIsActivityModalOpen(false);
                       setNewActivity({ description: '', date: new Date().toISOString().split('T')[0], consumedReceptionId: '', consumedQuantity: 0 });
                     }} 
-                    className="flex-[2] h-20 bg-[#3B82F6] text-white rounded-2xl font-black shadow-[0_0_30px_rgba(59,130,246,0.4)] uppercase tracking-widest text-xs border-2 border-white/20 hover:scale-[1.02] active:scale-[0.98] transition-all"
+                    className="w-full md:w-auto flex-[2] h-20 bg-[#3B82F6] text-white rounded-2xl font-black shadow-[0_0_30px_rgba(59,130,246,0.4)] uppercase tracking-widest text-xs border-2 border-white/20 hover:scale-[1.02] active:scale-[0.98] transition-all"
                   >
                     Guardar Actividad
                   </button>
@@ -639,10 +639,10 @@ export const SiembraControlView = ({
                 </div>
               </div>
 
-              <div className="p-10 bg-white/5 border-t-2 border-white/10 flex gap-6">
+              <div className="p-10 bg-white/5 border-t-2 border-white/10 flex flex-col md:flex-row gap-6">
                 <button 
                   onClick={() => setIsModalOpen(false)} 
-                  className="flex-1 h-20 bg-black text-white/40 rounded-2xl font-black uppercase tracking-widest text-xs border-2 border-white/20 hover:bg-white/10 transition-all"
+                  className="w-full md:w-auto flex-1 h-20 bg-black text-white/40 rounded-2xl font-black uppercase tracking-widest text-xs border-2 border-white/20 hover:bg-white/10 transition-all"
                 >
                   Cancelar
                 </button>
@@ -652,7 +652,7 @@ export const SiembraControlView = ({
                     setIsModalOpen(false);
                     setNewProject({ name: '', lotIds: [], startDate: new Date().toISOString().split('T')[0] });
                   }} 
-                  className="flex-[2] h-20 bg-[#3B82F6] text-white rounded-2xl font-black shadow-[0_0_30px_rgba(59,130,246,0.4)] uppercase tracking-widest text-xs border-2 border-white/20 hover:scale-[1.02] active:scale-[0.98] transition-all"
+                  className="w-full md:w-auto flex-[2] h-20 bg-[#3B82F6] text-white rounded-2xl font-black shadow-[0_0_30px_rgba(59,130,246,0.4)] uppercase tracking-widest text-xs border-2 border-white/20 hover:scale-[1.02] active:scale-[0.98] transition-all"
                 >
                   Crear Proyecto
                 </button>

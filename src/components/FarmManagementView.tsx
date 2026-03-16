@@ -94,7 +94,7 @@ export const FarmManagementView = ({
             </button>
             <div>
               <h2 className="text-4xl font-black tracking-tighter uppercase text-white">{isEditing ? selectedFarm.name : 'Nueva Finca'}</h2>
-              <p className="text-white/40 font-black uppercase text-[10px] tracking-widest mt-2">Configuración de Activo</p>
+              <p className="text-[#4ADE80] font-black uppercase text-lg tracking-widest mt-2">Configuración de Activo</p>
             </div>
           </div>
 
@@ -121,7 +121,7 @@ export const FarmManagementView = ({
         <div className="bg-black rounded-[3rem] border-2 border-white/10 p-12 flex flex-col gap-12">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
             <div className="flex flex-col gap-4">
-              <label className="text-[10px] font-black text-white/40 uppercase tracking-widest">Nombre de la Finca</label>
+              <label className="text-lg font-black text-white uppercase tracking-widest">Nombre de la Finca</label>
               <input 
                 type="text" 
                 value={farmData.name || ''} 
@@ -131,7 +131,7 @@ export const FarmManagementView = ({
               />
             </div>
             <div className="flex flex-col gap-4">
-              <label className="text-[10px] font-black text-white/40 uppercase tracking-widest">Ubicación GPS</label>
+              <label className="text-lg font-black text-white uppercase tracking-widest">Ubicación GPS</label>
               <div className="flex gap-4">
                 <input 
                   type="text" 
@@ -146,7 +146,7 @@ export const FarmManagementView = ({
               </div>
             </div>
             <div className="flex flex-col gap-4">
-              <label className="text-[10px] font-black text-white/40 uppercase tracking-widest">Administrador Responsable</label>
+              <label className="text-lg font-black text-white uppercase tracking-widest">Administrador Responsable</label>
               <select 
                 value={farmData.adminId || ''} 
                 onChange={e => setFarmData({ ...farmData, adminId: e.target.value })} 
@@ -159,7 +159,7 @@ export const FarmManagementView = ({
               </select>
             </div>
             <div className="flex flex-col gap-4">
-              <label className="text-[10px] font-black text-white/40 uppercase tracking-widest">Superficie Total (Ha)</label>
+              <label className="text-lg font-black text-white uppercase tracking-widest">Superficie Total (Ha)</label>
               <input 
                 type="number" 
                 value={farmData.totalHectares || ''} 
@@ -199,12 +199,12 @@ export const FarmManagementView = ({
           </div>
           <div>
             <h2 className="text-4xl font-black tracking-tighter uppercase leading-none text-white">Gestión de Fincas</h2>
-            <div className="flex items-center gap-3 mt-3">
-              <span className="px-3 py-1 bg-white/10 rounded-lg text-[10px] font-black uppercase tracking-widest text-white/60">
+            <div className="flex items-center gap-3 mt-3 flex-wrap">
+              <span className="px-3 py-1 bg-white/10 rounded-lg text-lg font-black uppercase tracking-widest text-white">
                 Página {currentPage} de {totalPages}
               </span>
-              <span className="w-1.5 h-1.5 bg-white/20 rounded-full" />
-              <span className="text-[10px] font-black uppercase tracking-widest text-[#10B981]">
+              <span className="w-1.5 h-1.5 bg-white/20 rounded-full hidden sm:block" />
+              <span className="text-lg font-black uppercase tracking-widest text-[#4ADE80]">
                 {filteredFarms.length} Activos Registrados
               </span>
             </div>
@@ -247,10 +247,10 @@ export const FarmManagementView = ({
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
         {paginatedFarms.length === 0 ? (
           <div className="col-span-full text-center py-32 bg-black rounded-[3rem] border-2 border-white/10 border-dashed">
-            <p className="text-white/40 font-black uppercase tracking-[0.3em]">No se encontraron activos</p>
+            <p className="text-white font-black uppercase tracking-[0.3em] text-lg">No se encontraron activos</p>
           </div>
         ) : (
           paginatedFarms.map(farm => {
@@ -259,7 +259,7 @@ export const FarmManagementView = ({
               <button
                 key={farm.id}
                 onClick={() => setSelectedFarmId(farm.id)}
-                className="p-10 rounded-[3rem] text-left transition-all flex flex-col gap-6 bg-[#10B981] text-black hover:-translate-y-2 active:scale-95 shadow-[0_0_30px_rgba(16,185,129,0.2)] group relative overflow-hidden h-[320px]"
+                className="p-10 rounded-[3rem] text-left transition-all flex flex-col gap-6 bg-[#4ADE80] text-black hover:-translate-y-2 active:scale-95 shadow-[0_0_30px_rgba(74,222,128,0.2)] group relative overflow-hidden min-h-[320px]"
               >
                 <div className="absolute top-0 right-0 p-10 opacity-10 group-hover:scale-110 transition-transform">
                   <Home size={120} />
@@ -274,14 +274,14 @@ export const FarmManagementView = ({
                   </div>
                 </div>
 
-                <div className="z-10 mt-auto">
-                  <h3 className="font-black text-4xl tracking-tighter leading-none mb-4">{farm.name}</h3>
-                  <div className="flex flex-wrap gap-3">
-                    <div className="px-3 py-1.5 bg-black/5 rounded-lg text-[10px] font-black uppercase tracking-widest flex items-center gap-2">
-                      <MapPin size={12} /> {farm.location}
+                <div className="z-10 mt-auto flex flex-col gap-4">
+                  <h3 className="font-black text-4xl tracking-tighter leading-none">{farm.name}</h3>
+                  <div className="flex flex-col gap-3">
+                    <div className="px-3 py-2 bg-black/5 rounded-lg text-lg font-black uppercase tracking-widest flex items-center gap-2">
+                      <MapPin size={16} className="shrink-0" /> <span className="truncate">{farm.location}</span>
                     </div>
-                    <div className="px-3 py-1.5 bg-black/5 rounded-lg text-[10px] font-black uppercase tracking-widest flex items-center gap-2">
-                      <User size={12} /> {admin?.name || 'SIN ASIGNAR'}
+                    <div className="px-3 py-2 bg-black/5 rounded-lg text-lg font-black uppercase tracking-widest flex items-center gap-2">
+                      <User size={16} className="shrink-0" /> <span className="truncate">{admin?.name || 'SIN ASIGNAR'}</span>
                     </div>
                   </div>
                 </div>

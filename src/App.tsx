@@ -44,7 +44,7 @@ const HomeDashboardView = ({ onNavigate }: { onNavigate: (tab: string) => void, 
         <button
           key={m.id}
           onClick={() => onNavigate(m.id)}
-          className={`${m.color} rounded-[3rem] p-10 flex flex-col justify-between text-left transition-all hover:-translate-y-2 group relative overflow-hidden h-[400px]`}
+          className={`${m.color} rounded-[3rem] p-10 flex flex-col justify-between text-left transition-all hover:-translate-y-2 group relative overflow-hidden`}
         >
           <div className="absolute top-0 right-0 p-8 opacity-10 group-hover:scale-110 transition-transform">
             <m.icon size={200} />
@@ -538,7 +538,7 @@ const CropMasterView = ({
             </div>
             <button 
               onClick={() => setIsAddingParam(true)}
-              className="h-20 px-12 bg-[#3B82F6] text-white rounded-2xl font-black text-lg uppercase tracking-widest hover:scale-105 transition-all shadow-[0_0_30px_rgba(59,130,246,0.4)] border-2 border-white/20 flex items-center gap-4"
+              className="w-full md:w-auto h-20 px-6 md:px-12 bg-[#3B82F6] text-white rounded-2xl font-black text-sm md:text-lg uppercase tracking-widest hover:scale-105 transition-all shadow-[0_0_30px_rgba(59,130,246,0.4)] border-2 border-white/20 flex items-center justify-center gap-4"
             >
               <Plus size={28} /> AGREGAR PARÁMETRO
             </button>
@@ -826,16 +826,16 @@ const CropMasterView = ({
                   </div>
                 )}
 
-                <div className="flex gap-6 pt-10 border-t border-white/5">
+                <div className="flex flex-col md:flex-row flex-wrap gap-6 pt-10 border-t border-white/5">
                   <button 
                     onClick={() => setIsAddingParam(false)}
-                    className="flex-1 h-16 bg-white/5 text-white/40 rounded-2xl font-black uppercase tracking-widest text-xs border border-white/10"
+                    className="w-full md:w-auto flex-1 h-16 bg-white/5 text-white/40 rounded-2xl font-black uppercase tracking-widest text-xs border border-white/10"
                   >
                     Cancelar
                   </button>
                   <button 
                     onClick={addParameter}
-                    className="flex-1 h-16 bg-[#3B82F6] text-white rounded-2xl font-black shadow-2xl shadow-blue-500/20 uppercase tracking-widest text-xs"
+                    className="w-full md:w-auto flex-1 h-16 bg-[#3B82F6] text-white rounded-2xl font-black shadow-2xl shadow-blue-500/20 uppercase tracking-widest text-xs"
                   >
                     Guardar Parámetro
                   </button>
@@ -1268,16 +1268,16 @@ const MaterialReceptionView = ({
                           {getStatusFromScore(calculateHealthScore(newReception.qualityValues || {}))}
                         </div>
                       </div>
-                      <div className="flex gap-4">
+                      <div className="flex flex-col md:flex-row flex-wrap gap-4">
                         <button 
                           onClick={() => setIsAdding(false)}
-                          className="flex-1 h-20 bg-black text-white rounded-[1.5rem] font-black uppercase tracking-widest text-xs border-2 border-white/20 hover:bg-white/5 transition-all"
+                          className="w-full md:w-auto flex-1 h-20 bg-black text-white rounded-[1.5rem] font-black uppercase tracking-widest text-xs border-2 border-white/20 hover:bg-white/5 transition-all"
                         >
                           Cancelar
                         </button>
                         <button 
                           onClick={handleAdd}
-                          className="flex-[2] h-20 bg-white text-black rounded-[1.5rem] font-black uppercase tracking-widest text-xs hover:scale-[1.02] active:scale-[0.98] transition-all shadow-[0_0_30px_rgba(255,255,255,0.2)]"
+                          className="w-full md:w-auto flex-[2] h-20 bg-white text-black rounded-[1.5rem] font-black uppercase tracking-widest text-xs hover:scale-[1.02] active:scale-[0.98] transition-all shadow-[0_0_30px_rgba(255,255,255,0.2)]"
                         >
                           Confirmar Recepción
                         </button>
@@ -1575,7 +1575,7 @@ const CureManagementView = ({
               </div>
             </div>
 
-            <div className="mt-16 pt-10 border-t-2 border-white/10">
+            <div className="mt-16 pt-10 border-t-2 border-white/10 flex flex-col md:flex-row flex-wrap gap-4">
               <button
                 onClick={() => {
                   if (!selectedLotId) {
@@ -1585,7 +1585,7 @@ const CureManagementView = ({
                   onAddCureRecord({ ...newCure, lotId: selectedLotId });
                   alert("Tratamiento registrado con éxito");
                 }}
-                className="w-full h-20 bg-[#3B82F6] text-white rounded-2xl font-black text-xl shadow-[0_0_20px_rgba(59,130,246,0.4)] hover:scale-[1.02] active:scale-[0.98] transition-all uppercase tracking-widest border-2 border-white/20"
+                className="w-full md:w-auto flex-1 h-20 bg-[#3B82F6] text-white rounded-2xl font-black text-xl shadow-[0_0_20px_rgba(59,130,246,0.4)] hover:scale-[1.02] active:scale-[0.98] transition-all uppercase tracking-widest border-2 border-white/20"
               >
                 Registrar Tratamiento (Cura)
               </button>
@@ -1951,8 +1951,8 @@ export default function App() {
   return (
     <div className="min-h-screen bg-[#000000] text-white font-sans flex flex-col">
       {/* Navigation Header */}
-      <div className="px-10 py-8 flex justify-between items-center sticky top-0 z-40 bg-black border-b-2 border-white/20">
-        <div className="flex items-center gap-12">
+      <div className="px-4 md:px-10 py-6 md:py-8 flex flex-col md:flex-row justify-between items-start md:items-center gap-6 md:gap-0 sticky top-0 z-40 bg-black border-b-2 border-white/20">
+        <div className="flex flex-col md:flex-row items-start md:items-center gap-6 md:gap-12 w-full md:w-auto">
           {currentModule === 'home' ? (
             <button 
               onClick={() => setCurrentModule('home')}
@@ -1962,60 +1962,65 @@ export default function App() {
               <span>TERRASYNC</span>
             </button>
           ) : (
-            <button 
-              onClick={() => {
-                setCurrentModule('home');
-                setActiveTab('');
-              }}
-              className="w-20 h-20 bg-black text-white rounded-2xl flex items-center justify-center hover:bg-white/10 transition-colors border-2 border-white"
-            >
-              <ArrowLeft size={40} />
-            </button>
+            <div className="flex items-center gap-4">
+              <button 
+                onClick={() => {
+                  setCurrentModule('home');
+                  setActiveTab('');
+                }}
+                className="w-16 h-16 md:w-20 md:h-20 bg-black text-white rounded-2xl flex items-center justify-center hover:bg-white/10 transition-colors border-2 border-white shrink-0"
+              >
+                <ArrowLeft size={32} className="md:w-10 md:h-10" />
+              </button>
+              <span className="text-2xl font-black uppercase tracking-widest text-white md:hidden">
+                {currentModule}
+              </span>
+            </div>
           )}
           
           {currentModule !== 'home' && (
-            <nav className="flex gap-4">
+            <nav className="flex gap-4 overflow-x-auto no-scrollbar pb-2 md:pb-0 w-full md:w-auto">
               {currentModule === 'maestros' && (
                 <>
-                  <button onClick={() => setActiveTab('crops')} className={`px-10 py-4 rounded-2xl font-black text-lg uppercase tracking-widest transition-all ${activeTab === 'crops' ? 'bg-[#3B82F6] text-white shadow-[0_0_30px_rgba(59,130,246,0.6)]' : 'text-white hover:bg-white/5'}`}>Rubros</button>
-                  <button onClick={() => setActiveTab('contacts')} className={`px-10 py-4 rounded-2xl font-black text-lg uppercase tracking-widest transition-all ${activeTab === 'contacts' ? 'bg-[#3B82F6] text-white shadow-[0_0_30px_rgba(59,130,246,0.6)]' : 'text-white hover:bg-white/5'}`}>Contactos</button>
+                  <button onClick={() => setActiveTab('crops')} className={`px-6 md:px-10 py-3 md:py-4 rounded-2xl font-black text-sm md:text-lg uppercase tracking-widest transition-all whitespace-nowrap ${activeTab === 'crops' ? 'bg-[#3B82F6] text-white shadow-[0_0_30px_rgba(59,130,246,0.6)]' : 'text-white hover:bg-white/5'}`}>Rubros</button>
+                  <button onClick={() => setActiveTab('contacts')} className={`px-6 md:px-10 py-3 md:py-4 rounded-2xl font-black text-sm md:text-lg uppercase tracking-widest transition-all whitespace-nowrap ${activeTab === 'contacts' ? 'bg-[#3B82F6] text-white shadow-[0_0_30px_rgba(59,130,246,0.6)]' : 'text-white hover:bg-white/5'}`}>Contactos</button>
                 </>
               )}
               {currentModule === 'campo' && (
                 <>
-                  <button onClick={() => setActiveTab('fincas')} className={`px-10 py-4 rounded-2xl font-black text-lg uppercase tracking-widest transition-all ${activeTab === 'fincas' ? 'bg-[#10B981] text-white shadow-[0_0_30px_rgba(16,185,129,0.6)]' : 'text-white hover:bg-white/5'}`}>Fincas</button>
-                  <button onClick={() => setActiveTab('lots')} className={`px-10 py-4 rounded-2xl font-black text-lg uppercase tracking-widest transition-all ${activeTab === 'lots' ? 'bg-[#10B981] text-white shadow-[0_0_30px_rgba(16,185,129,0.6)]' : 'text-white hover:bg-white/5'}`}>Lotes</button>
-                  <button onClick={() => setActiveTab('cura')} className={`px-10 py-4 rounded-2xl font-black text-lg uppercase tracking-widest transition-all ${activeTab === 'cura' ? 'bg-[#10B981] text-white shadow-[0_0_30px_rgba(16,185,129,0.6)]' : 'text-white hover:bg-white/5'}`}>Cura</button>
-                  <button onClick={() => setActiveTab('control-siembra')} className={`px-10 py-4 rounded-2xl font-black text-lg uppercase tracking-widest transition-all ${activeTab === 'control-siembra' ? 'bg-[#10B981] text-white shadow-[0_0_30px_rgba(16,185,129,0.6)]' : 'text-white hover:bg-white/5'}`}>Proyectos</button>
+                  <button onClick={() => setActiveTab('fincas')} className={`px-6 md:px-10 py-3 md:py-4 rounded-2xl font-black text-sm md:text-lg uppercase tracking-widest transition-all whitespace-nowrap ${activeTab === 'fincas' ? 'bg-[#10B981] text-white shadow-[0_0_30px_rgba(16,185,129,0.6)]' : 'text-white hover:bg-white/5'}`}>Fincas</button>
+                  <button onClick={() => setActiveTab('lots')} className={`px-6 md:px-10 py-3 md:py-4 rounded-2xl font-black text-sm md:text-lg uppercase tracking-widest transition-all whitespace-nowrap ${activeTab === 'lots' ? 'bg-[#10B981] text-white shadow-[0_0_30px_rgba(16,185,129,0.6)]' : 'text-white hover:bg-white/5'}`}>Lotes</button>
+                  <button onClick={() => setActiveTab('cura')} className={`px-6 md:px-10 py-3 md:py-4 rounded-2xl font-black text-sm md:text-lg uppercase tracking-widest transition-all whitespace-nowrap ${activeTab === 'cura' ? 'bg-[#10B981] text-white shadow-[0_0_30px_rgba(16,185,129,0.6)]' : 'text-white hover:bg-white/5'}`}>Cura</button>
+                  <button onClick={() => setActiveTab('control-siembra')} className={`px-6 md:px-10 py-3 md:py-4 rounded-2xl font-black text-sm md:text-lg uppercase tracking-widest transition-all whitespace-nowrap ${activeTab === 'control-siembra' ? 'bg-[#10B981] text-white shadow-[0_0_30px_rgba(16,185,129,0.6)]' : 'text-white hover:bg-white/5'}`}>Proyectos</button>
                 </>
               )}
               {currentModule === 'planta' && (
                 <>
-                  <button onClick={() => setActiveTab('recepcion')} className={`px-10 py-4 rounded-2xl font-black text-lg uppercase tracking-widest transition-all ${activeTab === 'recepcion' ? 'bg-[#3B82F6] text-white shadow-[0_0_30px_rgba(59,130,246,0.6)]' : 'text-white hover:bg-white/5'}`}>Recepción</button>
-                  <button onClick={() => setActiveTab('despacho')} className={`px-10 py-4 rounded-2xl font-black text-lg uppercase tracking-widest transition-all ${activeTab === 'despacho' ? 'bg-[#3B82F6] text-white shadow-[0_0_30px_rgba(59,130,246,0.6)]' : 'text-white hover:bg-white/5'}`}>Despacho</button>
-                  <button onClick={() => setActiveTab('silos')} className={`px-10 py-4 rounded-2xl font-black text-lg uppercase tracking-widest transition-all ${activeTab === 'silos' ? 'bg-[#3B82F6] text-white shadow-[0_0_30px_rgba(59,130,246,0.6)]' : 'text-white hover:bg-white/5'}`}>Silos</button>
+                  <button onClick={() => setActiveTab('recepcion')} className={`px-6 md:px-10 py-3 md:py-4 rounded-2xl font-black text-sm md:text-lg uppercase tracking-widest transition-all whitespace-nowrap ${activeTab === 'recepcion' ? 'bg-[#3B82F6] text-white shadow-[0_0_30px_rgba(59,130,246,0.6)]' : 'text-white hover:bg-white/5'}`}>Recepción</button>
+                  <button onClick={() => setActiveTab('despacho')} className={`px-6 md:px-10 py-3 md:py-4 rounded-2xl font-black text-sm md:text-lg uppercase tracking-widest transition-all whitespace-nowrap ${activeTab === 'despacho' ? 'bg-[#3B82F6] text-white shadow-[0_0_30px_rgba(59,130,246,0.6)]' : 'text-white hover:bg-white/5'}`}>Despacho</button>
+                  <button onClick={() => setActiveTab('silos')} className={`px-6 md:px-10 py-3 md:py-4 rounded-2xl font-black text-sm md:text-lg uppercase tracking-widest transition-all whitespace-nowrap ${activeTab === 'silos' ? 'bg-[#3B82F6] text-white shadow-[0_0_30px_rgba(59,130,246,0.6)]' : 'text-white hover:bg-white/5'}`}>Silos</button>
                 </>
               )}
               {currentModule === 'calidad' && (
                 <>
-                  <button onClick={() => setActiveTab('analisis')} className={`px-10 py-4 rounded-2xl font-black text-lg uppercase tracking-widest transition-all ${activeTab === 'analisis' ? 'bg-[#F59E0B] text-white shadow-[0_0_30px_rgba(245,158,11,0.6)]' : 'text-white hover:bg-white/5'}`}>Calidad</button>
-                  <button onClick={() => setActiveTab('cuarentena')} className={`px-10 py-4 rounded-2xl font-black text-lg uppercase tracking-widest transition-all ${activeTab === 'cuarentena' ? 'bg-[#F59E0B] text-white shadow-[0_0_30px_rgba(245,158,11,0.6)]' : 'text-white hover:bg-white/5'}`}>Cuarentena</button>
+                  <button onClick={() => setActiveTab('analisis')} className={`px-6 md:px-10 py-3 md:py-4 rounded-2xl font-black text-sm md:text-lg uppercase tracking-widest transition-all whitespace-nowrap ${activeTab === 'analisis' ? 'bg-[#F59E0B] text-white shadow-[0_0_30px_rgba(245,158,11,0.6)]' : 'text-white hover:bg-white/5'}`}>Calidad</button>
+                  <button onClick={() => setActiveTab('cuarentena')} className={`px-6 md:px-10 py-3 md:py-4 rounded-2xl font-black text-sm md:text-lg uppercase tracking-widest transition-all whitespace-nowrap ${activeTab === 'cuarentena' ? 'bg-[#F59E0B] text-white shadow-[0_0_30px_rgba(245,158,11,0.6)]' : 'text-white hover:bg-white/5'}`}>Cuarentena</button>
                 </>
               )}
             </nav>
           )}
         </div>
 
-        <div className="flex items-center gap-6">
+        <div className="flex items-center gap-6 w-full md:w-auto justify-end">
           <div className="flex items-center gap-2 px-6 py-3 bg-black rounded-2xl border-2 border-[#10B981]">
             <div className="w-4 h-4 bg-[#10B981] rounded-full animate-pulse shadow-[0_0_15px_#10B981]" />
-            <span className="text-sm font-black tracking-widest uppercase text-white">Sistema Online</span>
+            <span className="text-xs md:text-sm font-black tracking-widest uppercase text-white">Sistema Online</span>
           </div>
         </div>
       </div>
 
-      <div className="p-6 md:p-10 flex-1 bg-[#000000]">
-        <main className="max-w-7xl mx-auto w-full">
+      <div className="flex-1 bg-[#000000] py-6 md:py-10">
+        <main className="w-full px-4 md:px-10 mx-auto">
           <AnimatePresence mode="wait">
             {currentModule === 'home' && (
               <HomeDashboardView 

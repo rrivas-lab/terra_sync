@@ -261,9 +261,9 @@ export const QualityManagementView = ({
                   </div>
                 </div>
               </div>
-              <div className="flex flex-col items-end gap-6 w-full lg:w-auto">
+              <div className="flex flex-col lg:items-end gap-6 w-full lg:w-auto mt-6 lg:mt-0">
                 {selectedBarrel && <Countdown date={selectedBarrel.date} />}
-                <div className="flex flex-wrap justify-end gap-3">
+                <div className="flex flex-col sm:flex-row flex-wrap lg:justify-end gap-3 w-full">
                   {(['EN ESPERA', 'EN ANÁLISIS', 'LIBERADO', 'RECHAZADO'] as BarrelStatus[]).map(s => {
                     const isActive = selectedBarrel?.status === s;
                     const isRelease = s === 'LIBERADO';
@@ -281,7 +281,7 @@ export const QualityManagementView = ({
                         key={s}
                         onClick={() => handleStatusChange(s)}
                         disabled={releaseDisabled}
-                        className={`px-8 py-4 rounded-2xl text-[10px] font-black transition-all border-2 uppercase tracking-widest ${
+                        className={`w-full sm:w-auto px-8 py-4 rounded-2xl text-[10px] font-black transition-all border-2 uppercase tracking-widest ${
                           isActive 
                             ? 'bg-white text-black border-white shadow-[0_0_30px_rgba(255,255,255,0.3)] scale-105' 
                             : releaseDisabled

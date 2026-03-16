@@ -83,29 +83,29 @@ export const SiloManagementView = ({
               </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
               {paginatedSilos.map(silo => {
                 const fillPercentage = (silo.currentLevel / silo.capacity) * 100;
                 return (
                   <button
                     key={silo.id}
                     onClick={() => setSelectedSiloId(silo.id)}
-                    className={`p-10 rounded-[3rem] border-2 transition-all text-left flex flex-col gap-8 bg-[#3B82F6] text-white border-transparent hover:scale-[1.02] active:scale-[0.98] shadow-[0_0_40px_rgba(59,130,246,0.2)] group relative overflow-hidden h-[360px]`}
+                    className={`p-10 rounded-[3rem] border-2 transition-all text-left flex flex-col gap-8 bg-[#3B82F6] text-black border-transparent hover:scale-[1.02] active:scale-[0.98] shadow-[0_0_40px_rgba(59,130,246,0.2)] group relative overflow-hidden`}
                   >
                     <div className="absolute top-0 right-0 p-10 opacity-10 group-hover:scale-110 transition-transform text-black">
                       <Database size={160} />
                     </div>
-                    <div className="flex justify-between items-start w-full z-10">
+                    <div className="flex justify-between items-start w-full z-10 flex-col sm:flex-row gap-4">
                       <div className="p-5 rounded-2xl bg-black/20 text-white backdrop-blur-md border-2 border-white/10">
                         <Database size={32} />
                       </div>
-                      <span className={`px-4 py-1.5 rounded-xl text-[10px] font-black tracking-widest bg-black/20 text-white border-2 border-white/10 backdrop-blur-md`}>
+                      <span className={`px-4 py-1.5 rounded-xl text-sm font-black tracking-widest bg-black/20 text-white border-2 border-white/10 backdrop-blur-md`}>
                         {fillPercentage.toFixed(1)}% LLENO
                       </span>
                     </div>
                     <div className="z-10 mt-auto">
-                      <h4 className="font-black text-4xl mb-2 tracking-tighter uppercase leading-none">{silo.name}</h4>
-                      <p className="text-[10px] font-black text-white/60 uppercase tracking-widest">
+                      <h4 className="font-black text-4xl mb-2 tracking-tighter uppercase leading-none text-white">{silo.name}</h4>
+                      <p className="text-lg font-black text-white/80 uppercase tracking-widest">
                         {crops.find(c => c.id === silo.cropId)?.name || 'SIN RUBRO'}
                       </p>
                     </div>
@@ -135,7 +135,7 @@ export const SiloManagementView = ({
             exit={{ opacity: 0, x: 20 }}
             className="flex flex-col gap-8 h-full"
           >
-            <div className="flex justify-between items-center bg-black p-10 rounded-[3rem] border-2 border-white/10 shadow-[0_0_30px_rgba(255,255,255,0.02)]">
+            <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6 bg-black p-10 rounded-[3rem] border-2 border-white/10 shadow-[0_0_30px_rgba(255,255,255,0.02)]">
               <div className="flex items-center gap-6">
                 <button 
                   onClick={() => setSelectedSiloId(null)}
@@ -145,7 +145,7 @@ export const SiloManagementView = ({
                 </button>
                 <div>
                   <h2 className="text-4xl font-black tracking-tighter uppercase leading-none text-white">{selectedSilo?.name}</h2>
-                  <p className="text-white/40 font-black uppercase text-[10px] tracking-widest mt-3">Detalles del Silo</p>
+                  <p className="text-white/40 font-black uppercase text-lg tracking-widest mt-3">Detalles del Silo</p>
                 </div>
               </div>
             </div>
@@ -162,7 +162,7 @@ export const SiloManagementView = ({
                     </div>
                   </div>
                   <h3 className="text-5xl font-black font-mono mb-3 text-white tracking-tighter">{selectedSilo?.currentLevel.toLocaleString()} <span className="text-2xl text-white/40">KG</span></h3>
-                  <p className="text-[10px] font-black text-white/40 uppercase tracking-widest">
+                  <p className="text-lg font-black text-white/40 uppercase tracking-widest">
                     DE {selectedSilo?.capacity.toLocaleString()} KG CAPACIDAD
                   </p>
                 </div>
@@ -172,22 +172,22 @@ export const SiloManagementView = ({
                 <div className="bg-black rounded-[3rem] border-2 border-white/10 shadow-[0_0_30px_rgba(255,255,255,0.02)] p-10">
                   <h3 className="text-2xl font-black mb-10 text-white uppercase tracking-tighter">Información del Material</h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                    <div className="p-8 bg-white/5 rounded-[2.5rem] flex items-center gap-6 border-2 border-white/10">
+                    <div className="p-8 bg-white/5 rounded-[2.5rem] flex items-center gap-6 border-2 border-white/10 flex-col sm:flex-row text-center sm:text-left">
                       <div className="p-5 bg-white/10 rounded-2xl text-[#3B82F6] border border-[#3B82F6]/30">
                         {selectedCrop?.icon || <Droplets size={32} />}
                       </div>
                       <div>
-                        <span className="text-[10px] font-black text-white/40 uppercase tracking-widest block mb-2">Rubro Almacenado</span>
+                        <span className="text-lg font-black text-white/40 uppercase tracking-widest block mb-2">Rubro Almacenado</span>
                         <span className="text-2xl font-black text-white uppercase tracking-tight">{selectedCrop?.name || 'N/A'}</span>
                       </div>
                     </div>
-                    <div className="p-8 bg-white/5 rounded-[2.5rem] flex items-center gap-6 border-2 border-white/10">
+                    <div className="p-8 bg-white/5 rounded-[2.5rem] flex items-center gap-6 border-2 border-white/10 flex-col sm:flex-row text-center sm:text-left">
                       <div className="p-5 bg-white/10 rounded-2xl text-amber-500 border border-amber-500/30">
                         <TrendingUp size={32} />
                       </div>
                       <div>
-                        <span className="text-[10px] font-black text-white/40 uppercase tracking-widest block mb-2">Brix Promedio</span>
-                        <span className="text-2xl font-black text-white uppercase tracking-tight">{selectedSilo?.averageBrix.toFixed(1)} °BX</span>
+                        <span className="text-lg font-black text-white/40 uppercase tracking-widest block mb-2">Brix Promedio</span>
+                        <span className="text-2xl font-black text-white uppercase tracking-tight font-mono">{selectedSilo?.averageBrix.toFixed(1)} °BX</span>
                       </div>
                     </div>
                   </div>

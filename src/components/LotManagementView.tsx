@@ -143,15 +143,15 @@ export const LotManagementView = ({
             </button>
             <div>
               <h2 className="text-4xl font-black tracking-tighter uppercase text-white">{isEditing ? `Lote ${selectedLot.lotCode}` : 'Nuevo Lote'}</h2>
-              <p className="text-white/40 font-black uppercase text-[10px] tracking-widest mt-2">Configuración de Terreno</p>
+              <p className="text-[#4ADE80] font-black uppercase text-lg tracking-widest mt-2">Configuración de Terreno</p>
             </div>
           </div>
 
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-4 flex-wrap">
             {isEditing && (
               <button 
                 onClick={() => handleStartAnalysis(selectedLot)}
-                className="flex items-center gap-3 px-8 py-4 bg-amber-500/10 text-amber-500 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-amber-500 hover:text-black transition-all border-2 border-amber-500/20 hover:border-amber-500"
+                className="flex items-center justify-center gap-3 px-8 py-4 bg-amber-500/10 text-amber-500 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-amber-500 hover:text-black transition-all border-2 border-amber-500/20 hover:border-amber-500 w-full sm:w-auto"
               >
                 <Beaker size={20} /> Nuevo Análisis
               </button>
@@ -168,7 +168,7 @@ export const LotManagementView = ({
                   }
                 }}
                 disabled={!isAreaValid}
-                className="flex items-center gap-3 px-10 py-5 bg-[#3B82F6] text-white rounded-2xl font-black text-xs uppercase tracking-widest hover:scale-105 transition-all shadow-[0_0_20px_rgba(59,130,246,0.4)] disabled:opacity-50"
+                className="flex items-center justify-center gap-3 px-10 py-5 bg-[#3B82F6] text-white rounded-2xl font-black text-xs uppercase tracking-widest hover:scale-105 transition-all shadow-[0_0_20px_rgba(59,130,246,0.4)] disabled:opacity-50 w-full sm:w-auto"
               >
                 <Save size={20} /> Guardar Lote
               </button>
@@ -180,7 +180,7 @@ export const LotManagementView = ({
           <div className="lg:col-span-2 bg-black rounded-[3rem] border-2 border-white/10 p-12 flex flex-col gap-12">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
               <div className="flex flex-col gap-4">
-                <label className="text-[10px] font-black text-white/40 uppercase tracking-widest">Código de Lote</label>
+                <label className="text-lg font-black text-white uppercase tracking-widest">Código de Lote</label>
                 <input 
                   type="text" 
                   value={lotData.lotCode || ''} 
@@ -189,7 +189,7 @@ export const LotManagementView = ({
                 />
               </div>
               <div className="flex flex-col gap-4">
-                <label className="text-[10px] font-black text-white/40 uppercase tracking-widest">Finca Asociada</label>
+                <label className="text-lg font-black text-white uppercase tracking-widest">Finca Asociada</label>
                 <select 
                   value={lotData.farmId || ''} 
                   onChange={e => setLotData({ ...lotData, farmId: e.target.value })} 
@@ -202,7 +202,7 @@ export const LotManagementView = ({
                 </select>
               </div>
               <div className="flex flex-col gap-4">
-                <label className="text-[10px] font-black text-white/40 uppercase tracking-widest">Tipo de Cultivo</label>
+                <label className="text-lg font-black text-white uppercase tracking-widest">Tipo de Cultivo</label>
                 <select 
                   value={lotData.cropId || ''} 
                   onChange={e => setLotData({ ...lotData, cropId: e.target.value })} 
@@ -214,7 +214,7 @@ export const LotManagementView = ({
                 </select>
               </div>
               <div className="flex flex-col gap-4">
-                <label className="text-[10px] font-black text-white/40 uppercase tracking-widest">Área de Cultivo (Ha)</label>
+                <label className="text-lg font-black text-white uppercase tracking-widest">Área de Cultivo (Ha)</label>
                 <div className="flex flex-col gap-2">
                   <input 
                     type="number" 
@@ -223,14 +223,14 @@ export const LotManagementView = ({
                     className={`industrial-input w-full h-20 px-8 bg-black rounded-2xl border-2 ${!isAreaValid ? 'border-red-500 focus:border-red-500 text-red-500' : 'border-white/20 focus:border-[#3B82F6] text-white'} font-black text-2xl outline-none transition-all uppercase`} 
                   />
                   {selectedFarm && (
-                    <span className={`text-[10px] font-black ${isAreaValid ? 'text-[#10B981]' : 'text-red-500'} uppercase tracking-widest`}>
+                    <span className={`text-lg font-black ${isAreaValid ? 'text-[#4ADE80]' : 'text-red-500'} uppercase tracking-widest`}>
                       Capacidad Disponible: {availableArea.toFixed(2)} Ha
                     </span>
                   )}
                 </div>
               </div>
               <div className="flex flex-col gap-4">
-                <label className="text-[10px] font-black text-white/40 uppercase tracking-widest">Tipo de Suelo</label>
+                <label className="text-lg font-black text-white uppercase tracking-widest">Tipo de Suelo</label>
                 <select 
                   value={lotData.soilType || ''} 
                   onChange={e => setLotData({ ...lotData, soilType: e.target.value as SoilType })} 
@@ -242,7 +242,7 @@ export const LotManagementView = ({
                 </select>
               </div>
               <div className="flex flex-col gap-4">
-                <label className="text-[10px] font-black text-white/40 uppercase tracking-widest">Estado Operativo</label>
+                <label className="text-lg font-black text-white uppercase tracking-widest">Estado Operativo</label>
                 <select 
                   value={lotData.status || ''} 
                   onChange={e => setLotData({ ...lotData, status: e.target.value as LotStatus })} 
@@ -323,12 +323,12 @@ export const LotManagementView = ({
           </div>
           <div>
             <h2 className="text-4xl font-black tracking-tighter uppercase leading-none text-white">Gestión de Lotes</h2>
-            <div className="flex items-center gap-3 mt-3">
-              <span className="px-3 py-1 bg-white/10 rounded-lg text-[10px] font-black uppercase tracking-widest text-white/60">
+            <div className="flex items-center gap-3 mt-3 flex-wrap">
+              <span className="px-3 py-1 bg-white/10 rounded-lg text-lg font-black uppercase tracking-widest text-white">
                 Página {currentPage} de {totalPages}
               </span>
-              <span className="w-1.5 h-1.5 bg-white/20 rounded-full" />
-              <span className="text-[10px] font-black uppercase tracking-widest text-[#10B981]">
+              <span className="w-1.5 h-1.5 bg-white/20 rounded-full hidden sm:block" />
+              <span className="text-lg font-black uppercase tracking-widest text-[#4ADE80]">
                 {filteredLots.length} Lotes Activos
               </span>
             </div>
@@ -371,10 +371,10 @@ export const LotManagementView = ({
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
         {paginatedLots.length === 0 ? (
           <div className="col-span-full text-center py-32 bg-black rounded-[3rem] border-2 border-white/10 border-dashed">
-            <p className="text-white/40 font-black uppercase tracking-[0.3em]">No se encontraron lotes</p>
+            <p className="text-white font-black uppercase tracking-[0.3em] text-lg">No se encontraron lotes</p>
           </div>
         ) : (
           paginatedLots.map(lot => {
@@ -384,7 +384,7 @@ export const LotManagementView = ({
               <button
                 key={lot.id}
                 onClick={() => setSelectedLotId(lot.id)}
-                className="p-10 rounded-[3rem] text-left transition-all flex flex-col gap-6 bg-[#10B981] text-black hover:-translate-y-2 active:scale-95 shadow-[0_0_30px_rgba(16,185,129,0.2)] group relative overflow-hidden h-[340px]"
+                className="p-10 rounded-[3rem] text-left transition-all flex flex-col gap-6 bg-[#4ADE80] text-black hover:-translate-y-2 active:scale-95 shadow-[0_0_30px_rgba(74,222,128,0.2)] group relative overflow-hidden min-h-[340px]"
               >
                 <div className="absolute top-0 right-0 p-10 opacity-10 group-hover:scale-110 transition-transform">
                   <LayoutGrid size={120} />
@@ -399,21 +399,21 @@ export const LotManagementView = ({
                   </div>
                 </div>
 
-                <div className="z-10 mt-auto">
+                <div className="z-10 mt-auto flex flex-col gap-4">
                   <div className="flex items-center gap-3 mb-2">
-                    <span className="px-3 py-1 bg-black/10 rounded-lg text-[10px] font-black uppercase tracking-widest">
+                    <span className="px-3 py-1 bg-black/10 rounded-lg text-lg font-black uppercase tracking-widest">
                       {lot.status}
                     </span>
                   </div>
-                  <h3 className="font-black text-4xl tracking-tighter leading-none mb-4">Lote {lot.lotCode}</h3>
-                  <div className="flex flex-wrap gap-3">
-                    <div className="px-3 py-1.5 bg-black/5 rounded-lg text-[10px] font-black uppercase tracking-widest flex items-center gap-2">
-                      <MapPin size={12} /> {farm?.name || 'SIN FINCA'}
+                  <h3 className="font-black text-4xl tracking-tighter leading-none">Lote {lot.lotCode}</h3>
+                  <div className="flex flex-col gap-3">
+                    <div className="px-3 py-2 bg-black/5 rounded-lg text-lg font-black uppercase tracking-widest flex items-center gap-2">
+                      <MapPin size={16} className="shrink-0" /> <span className="truncate">{farm?.name || 'SIN FINCA'}</span>
                     </div>
-                    <div className="px-3 py-1.5 bg-black/5 rounded-lg text-[10px] font-black uppercase tracking-widest flex items-center gap-2">
-                      <Beaker size={12} /> {crop?.name}
+                    <div className="px-3 py-2 bg-black/5 rounded-lg text-lg font-black uppercase tracking-widest flex items-center gap-2">
+                      <Beaker size={16} className="shrink-0" /> <span className="truncate">{crop?.name}</span>
                     </div>
-                    <div className="px-3 py-1.5 bg-black/5 rounded-lg text-[10px] font-black uppercase tracking-widest flex items-center gap-2">
+                    <div className="px-3 py-2 bg-black/5 rounded-lg text-lg font-black uppercase tracking-widest flex items-center gap-2">
                       {lot.area} Ha
                     </div>
                   </div>
